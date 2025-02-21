@@ -20,12 +20,21 @@ void Client::initializeSession() {
     pack.set_int(lt::settings_pack::alert_mask,
         lt::alert::status_notification
         | lt::alert::error_notification
-        | lt::alert::dht_notification);
+        | lt::alert::dht_notification
+        | lt::alert::port_mapping_notification);
     
     // Enable DHT
     pack.set_bool(lt::settings_pack::enable_dht, true);
-    pack.set_int(lt::settings_pack::dht_upload_rate_limit, 20000);
-    pack.set_str(lt::settings_pack::listen_interfaces, "0.0.0.0:" + std::to_string(port_));
+    
+    // Only listen on localhost
+    pack.set_str(lt::settings_pack::listen_interfaces, "127.0.0.1:" + std::to_string(port_));
+    
+    // Disable external connections
+    pack.set_bool(lt::settings_pack::enable_upnp, false);
+    pack.set_bool(lt::settings_pack::enable_natpmp, false);
+    pack.set_bool(lt::settings_pack::enable_lsd, false);
+    pack.set_bool(lt::settings_pack::enable_outgoing_utp, false);
+    pack.set_bool(lt::settings_pack::enable_incoming_utp, false);
     
     session_ = std::make_unique<lt::session>(pack);
 }
