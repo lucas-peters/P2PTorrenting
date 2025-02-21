@@ -63,11 +63,13 @@ CMAKE_BINARY_DIR = /Users/lucaspeters/Documents/GitHub/P2PTorrenting/build
 # Directory level rules for the build root directory
 
 # The main recursive "all" target.
-all: CMakeFiles/p2p_torrent.dir/all
+all: CMakeFiles/p2p_bootstrap.dir/all
+all: CMakeFiles/p2p_client.dir/all
 .PHONY : all
 
 # The main recursive "codegen" target.
-codegen: CMakeFiles/p2p_torrent.dir/codegen
+codegen: CMakeFiles/p2p_bootstrap.dir/codegen
+codegen: CMakeFiles/p2p_client.dir/codegen
 .PHONY : codegen
 
 # The main recursive "preinstall" target.
@@ -75,40 +77,73 @@ preinstall:
 .PHONY : preinstall
 
 # The main recursive "clean" target.
-clean: CMakeFiles/p2p_torrent.dir/clean
+clean: CMakeFiles/p2p_bootstrap.dir/clean
+clean: CMakeFiles/p2p_client.dir/clean
 .PHONY : clean
 
 #=============================================================================
-# Target rules for target CMakeFiles/p2p_torrent.dir
+# Target rules for target CMakeFiles/p2p_bootstrap.dir
 
 # All Build rule for target.
-CMakeFiles/p2p_torrent.dir/all:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/p2p_torrent.dir/build.make CMakeFiles/p2p_torrent.dir/depend
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/p2p_torrent.dir/build.make CMakeFiles/p2p_torrent.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/lucaspeters/Documents/GitHub/P2PTorrenting/build/CMakeFiles --progress-num=1,2,3,4 "Built target p2p_torrent"
-.PHONY : CMakeFiles/p2p_torrent.dir/all
+CMakeFiles/p2p_bootstrap.dir/all:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/p2p_bootstrap.dir/build.make CMakeFiles/p2p_bootstrap.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/p2p_bootstrap.dir/build.make CMakeFiles/p2p_bootstrap.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/lucaspeters/Documents/GitHub/P2PTorrenting/build/CMakeFiles --progress-num=1,2,3 "Built target p2p_bootstrap"
+.PHONY : CMakeFiles/p2p_bootstrap.dir/all
 
 # Build rule for subdir invocation for target.
-CMakeFiles/p2p_torrent.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/lucaspeters/Documents/GitHub/P2PTorrenting/build/CMakeFiles 4
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/p2p_torrent.dir/all
+CMakeFiles/p2p_bootstrap.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/lucaspeters/Documents/GitHub/P2PTorrenting/build/CMakeFiles 3
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/p2p_bootstrap.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /Users/lucaspeters/Documents/GitHub/P2PTorrenting/build/CMakeFiles 0
-.PHONY : CMakeFiles/p2p_torrent.dir/rule
+.PHONY : CMakeFiles/p2p_bootstrap.dir/rule
 
 # Convenience name for target.
-p2p_torrent: CMakeFiles/p2p_torrent.dir/rule
-.PHONY : p2p_torrent
+p2p_bootstrap: CMakeFiles/p2p_bootstrap.dir/rule
+.PHONY : p2p_bootstrap
 
 # codegen rule for target.
-CMakeFiles/p2p_torrent.dir/codegen:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/p2p_torrent.dir/build.make CMakeFiles/p2p_torrent.dir/codegen
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/lucaspeters/Documents/GitHub/P2PTorrenting/build/CMakeFiles --progress-num=1,2,3,4 "Finished codegen for target p2p_torrent"
-.PHONY : CMakeFiles/p2p_torrent.dir/codegen
+CMakeFiles/p2p_bootstrap.dir/codegen:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/p2p_bootstrap.dir/build.make CMakeFiles/p2p_bootstrap.dir/codegen
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/lucaspeters/Documents/GitHub/P2PTorrenting/build/CMakeFiles --progress-num=1,2,3 "Finished codegen for target p2p_bootstrap"
+.PHONY : CMakeFiles/p2p_bootstrap.dir/codegen
 
 # clean rule for target.
-CMakeFiles/p2p_torrent.dir/clean:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/p2p_torrent.dir/build.make CMakeFiles/p2p_torrent.dir/clean
-.PHONY : CMakeFiles/p2p_torrent.dir/clean
+CMakeFiles/p2p_bootstrap.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/p2p_bootstrap.dir/build.make CMakeFiles/p2p_bootstrap.dir/clean
+.PHONY : CMakeFiles/p2p_bootstrap.dir/clean
+
+#=============================================================================
+# Target rules for target CMakeFiles/p2p_client.dir
+
+# All Build rule for target.
+CMakeFiles/p2p_client.dir/all:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/p2p_client.dir/build.make CMakeFiles/p2p_client.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/p2p_client.dir/build.make CMakeFiles/p2p_client.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/lucaspeters/Documents/GitHub/P2PTorrenting/build/CMakeFiles --progress-num=4,5,6 "Built target p2p_client"
+.PHONY : CMakeFiles/p2p_client.dir/all
+
+# Build rule for subdir invocation for target.
+CMakeFiles/p2p_client.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/lucaspeters/Documents/GitHub/P2PTorrenting/build/CMakeFiles 3
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/p2p_client.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/lucaspeters/Documents/GitHub/P2PTorrenting/build/CMakeFiles 0
+.PHONY : CMakeFiles/p2p_client.dir/rule
+
+# Convenience name for target.
+p2p_client: CMakeFiles/p2p_client.dir/rule
+.PHONY : p2p_client
+
+# codegen rule for target.
+CMakeFiles/p2p_client.dir/codegen:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/p2p_client.dir/build.make CMakeFiles/p2p_client.dir/codegen
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/lucaspeters/Documents/GitHub/P2PTorrenting/build/CMakeFiles --progress-num=4,5,6 "Finished codegen for target p2p_client"
+.PHONY : CMakeFiles/p2p_client.dir/codegen
+
+# clean rule for target.
+CMakeFiles/p2p_client.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/p2p_client.dir/build.make CMakeFiles/p2p_client.dir/clean
+.PHONY : CMakeFiles/p2p_client.dir/clean
 
 #=============================================================================
 # Special targets to cleanup operation of make.

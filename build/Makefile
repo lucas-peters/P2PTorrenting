@@ -117,89 +117,126 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named p2p_torrent
+# Target rules for targets named p2p_bootstrap
 
 # Build rule for target.
-p2p_torrent: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 p2p_torrent
-.PHONY : p2p_torrent
+p2p_bootstrap: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 p2p_bootstrap
+.PHONY : p2p_bootstrap
 
 # fast build rule for target.
-p2p_torrent/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/p2p_torrent.dir/build.make CMakeFiles/p2p_torrent.dir/build
-.PHONY : p2p_torrent/fast
+p2p_bootstrap/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/p2p_bootstrap.dir/build.make CMakeFiles/p2p_bootstrap.dir/build
+.PHONY : p2p_bootstrap/fast
 
-src/bootstrap_node.o: src/bootstrap_node.cpp.o
-.PHONY : src/bootstrap_node.o
+#=============================================================================
+# Target rules for targets named p2p_client
 
-# target to build an object file
-src/bootstrap_node.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/p2p_torrent.dir/build.make CMakeFiles/p2p_torrent.dir/src/bootstrap_node.cpp.o
-.PHONY : src/bootstrap_node.cpp.o
+# Build rule for target.
+p2p_client: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 p2p_client
+.PHONY : p2p_client
 
-src/bootstrap_node.i: src/bootstrap_node.cpp.i
-.PHONY : src/bootstrap_node.i
+# fast build rule for target.
+p2p_client/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/p2p_client.dir/build.make CMakeFiles/p2p_client.dir/build
+.PHONY : p2p_client/fast
 
-# target to preprocess a source file
-src/bootstrap_node.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/p2p_torrent.dir/build.make CMakeFiles/p2p_torrent.dir/src/bootstrap_node.cpp.i
-.PHONY : src/bootstrap_node.cpp.i
-
-src/bootstrap_node.s: src/bootstrap_node.cpp.s
-.PHONY : src/bootstrap_node.s
-
-# target to generate assembly for a file
-src/bootstrap_node.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/p2p_torrent.dir/build.make CMakeFiles/p2p_torrent.dir/src/bootstrap_node.cpp.s
-.PHONY : src/bootstrap_node.cpp.s
-
-src/client.o: src/client.cpp.o
-.PHONY : src/client.o
+src/bootstrap/bootstrap_node.o: src/bootstrap/bootstrap_node.cpp.o
+.PHONY : src/bootstrap/bootstrap_node.o
 
 # target to build an object file
-src/client.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/p2p_torrent.dir/build.make CMakeFiles/p2p_torrent.dir/src/client.cpp.o
-.PHONY : src/client.cpp.o
+src/bootstrap/bootstrap_node.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/p2p_bootstrap.dir/build.make CMakeFiles/p2p_bootstrap.dir/src/bootstrap/bootstrap_node.cpp.o
+.PHONY : src/bootstrap/bootstrap_node.cpp.o
 
-src/client.i: src/client.cpp.i
-.PHONY : src/client.i
+src/bootstrap/bootstrap_node.i: src/bootstrap/bootstrap_node.cpp.i
+.PHONY : src/bootstrap/bootstrap_node.i
 
 # target to preprocess a source file
-src/client.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/p2p_torrent.dir/build.make CMakeFiles/p2p_torrent.dir/src/client.cpp.i
-.PHONY : src/client.cpp.i
+src/bootstrap/bootstrap_node.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/p2p_bootstrap.dir/build.make CMakeFiles/p2p_bootstrap.dir/src/bootstrap/bootstrap_node.cpp.i
+.PHONY : src/bootstrap/bootstrap_node.cpp.i
 
-src/client.s: src/client.cpp.s
-.PHONY : src/client.s
+src/bootstrap/bootstrap_node.s: src/bootstrap/bootstrap_node.cpp.s
+.PHONY : src/bootstrap/bootstrap_node.s
 
 # target to generate assembly for a file
-src/client.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/p2p_torrent.dir/build.make CMakeFiles/p2p_torrent.dir/src/client.cpp.s
-.PHONY : src/client.cpp.s
+src/bootstrap/bootstrap_node.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/p2p_bootstrap.dir/build.make CMakeFiles/p2p_bootstrap.dir/src/bootstrap/bootstrap_node.cpp.s
+.PHONY : src/bootstrap/bootstrap_node.cpp.s
 
-src/main.o: src/main.cpp.o
-.PHONY : src/main.o
+src/bootstrap/main.o: src/bootstrap/main.cpp.o
+.PHONY : src/bootstrap/main.o
 
 # target to build an object file
-src/main.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/p2p_torrent.dir/build.make CMakeFiles/p2p_torrent.dir/src/main.cpp.o
-.PHONY : src/main.cpp.o
+src/bootstrap/main.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/p2p_bootstrap.dir/build.make CMakeFiles/p2p_bootstrap.dir/src/bootstrap/main.cpp.o
+.PHONY : src/bootstrap/main.cpp.o
 
-src/main.i: src/main.cpp.i
-.PHONY : src/main.i
+src/bootstrap/main.i: src/bootstrap/main.cpp.i
+.PHONY : src/bootstrap/main.i
 
 # target to preprocess a source file
-src/main.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/p2p_torrent.dir/build.make CMakeFiles/p2p_torrent.dir/src/main.cpp.i
-.PHONY : src/main.cpp.i
+src/bootstrap/main.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/p2p_bootstrap.dir/build.make CMakeFiles/p2p_bootstrap.dir/src/bootstrap/main.cpp.i
+.PHONY : src/bootstrap/main.cpp.i
 
-src/main.s: src/main.cpp.s
-.PHONY : src/main.s
+src/bootstrap/main.s: src/bootstrap/main.cpp.s
+.PHONY : src/bootstrap/main.s
 
 # target to generate assembly for a file
-src/main.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/p2p_torrent.dir/build.make CMakeFiles/p2p_torrent.dir/src/main.cpp.s
-.PHONY : src/main.cpp.s
+src/bootstrap/main.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/p2p_bootstrap.dir/build.make CMakeFiles/p2p_bootstrap.dir/src/bootstrap/main.cpp.s
+.PHONY : src/bootstrap/main.cpp.s
+
+src/client/client.o: src/client/client.cpp.o
+.PHONY : src/client/client.o
+
+# target to build an object file
+src/client/client.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/p2p_client.dir/build.make CMakeFiles/p2p_client.dir/src/client/client.cpp.o
+.PHONY : src/client/client.cpp.o
+
+src/client/client.i: src/client/client.cpp.i
+.PHONY : src/client/client.i
+
+# target to preprocess a source file
+src/client/client.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/p2p_client.dir/build.make CMakeFiles/p2p_client.dir/src/client/client.cpp.i
+.PHONY : src/client/client.cpp.i
+
+src/client/client.s: src/client/client.cpp.s
+.PHONY : src/client/client.s
+
+# target to generate assembly for a file
+src/client/client.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/p2p_client.dir/build.make CMakeFiles/p2p_client.dir/src/client/client.cpp.s
+.PHONY : src/client/client.cpp.s
+
+src/client/main.o: src/client/main.cpp.o
+.PHONY : src/client/main.o
+
+# target to build an object file
+src/client/main.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/p2p_client.dir/build.make CMakeFiles/p2p_client.dir/src/client/main.cpp.o
+.PHONY : src/client/main.cpp.o
+
+src/client/main.i: src/client/main.cpp.i
+.PHONY : src/client/main.i
+
+# target to preprocess a source file
+src/client/main.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/p2p_client.dir/build.make CMakeFiles/p2p_client.dir/src/client/main.cpp.i
+.PHONY : src/client/main.cpp.i
+
+src/client/main.s: src/client/main.cpp.s
+.PHONY : src/client/main.s
+
+# target to generate assembly for a file
+src/client/main.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/p2p_client.dir/build.make CMakeFiles/p2p_client.dir/src/client/main.cpp.s
+.PHONY : src/client/main.cpp.s
 
 # Help Target
 help:
@@ -209,16 +246,20 @@ help:
 	@echo "... depend"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
-	@echo "... p2p_torrent"
-	@echo "... src/bootstrap_node.o"
-	@echo "... src/bootstrap_node.i"
-	@echo "... src/bootstrap_node.s"
-	@echo "... src/client.o"
-	@echo "... src/client.i"
-	@echo "... src/client.s"
-	@echo "... src/main.o"
-	@echo "... src/main.i"
-	@echo "... src/main.s"
+	@echo "... p2p_bootstrap"
+	@echo "... p2p_client"
+	@echo "... src/bootstrap/bootstrap_node.o"
+	@echo "... src/bootstrap/bootstrap_node.i"
+	@echo "... src/bootstrap/bootstrap_node.s"
+	@echo "... src/bootstrap/main.o"
+	@echo "... src/bootstrap/main.i"
+	@echo "... src/bootstrap/main.s"
+	@echo "... src/client/client.o"
+	@echo "... src/client/client.i"
+	@echo "... src/client/client.s"
+	@echo "... src/client/main.o"
+	@echo "... src/client/main.i"
+	@echo "... src/client/main.s"
 .PHONY : help
 
 

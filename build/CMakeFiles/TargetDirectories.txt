@@ -1,3 +1,4 @@
-/Users/lucaspeters/Documents/GitHub/P2PTorrenting/build/CMakeFiles/p2p_torrent.dir
+/Users/lucaspeters/Documents/GitHub/P2PTorrenting/build/CMakeFiles/p2p_bootstrap.dir
+/Users/lucaspeters/Documents/GitHub/P2PTorrenting/build/CMakeFiles/p2p_client.dir
 /Users/lucaspeters/Documents/GitHub/P2PTorrenting/build/CMakeFiles/edit_cache.dir
 /Users/lucaspeters/Documents/GitHub/P2PTorrenting/build/CMakeFiles/rebuild_cache.dir

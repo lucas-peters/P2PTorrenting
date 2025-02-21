@@ -76,5 +76,6 @@ set(CMAKE_MAKEFILE_PRODUCTS
 
 # Dependency information for all targets:
 set(CMAKE_DEPEND_INFO_FILES
-  "CMakeFiles/p2p_torrent.dir/DependInfo.cmake"
+  "CMakeFiles/p2p_bootstrap.dir/DependInfo.cmake"
+  "CMakeFiles/p2p_client.dir/DependInfo.cmake"
   )

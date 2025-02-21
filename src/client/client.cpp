@@ -134,4 +134,25 @@ std::string Client::getDHTStats() const {
     return "DHT stats requested";
 }
 
+void Client::printStatus() const {
+    if (!session_) {
+        return;
+    }
+    
+    if (torrents_.empty()) {
+        std::cout << "No active torrents" << std::endl;
+        return;
+    }
+
+    std::cout << "Active torrents:" << std::endl;
+    for (const auto& [path, handle] : torrents_) {
+        std::cout << "Torent: " << path << std::endl;
+        std::cout << "\tProgress: " << (handle.status().progress * 100) << "%" << std::endl;
+        std::cout << "\tDownload Rate: " << handle.status().download_rate << std::endl;
+        std::cout << "\tUpload Rate: " << handle.status().upload_rate << std::endl;
+        std::cout << "\tState: " << handle.status().state << std::endl;
+    }
+    std::cout << std::endl;
+}
+
 } // namespace torrent_p2p

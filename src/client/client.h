@@ -35,6 +35,9 @@ public:
     // Get DHT statistics
     std::string getDHTStats() const;
 
+    // Print the status of all torrents
+    void printStatus() const;
+
 private:
     std::unique_ptr<lt::session> session_;
     std::map<std::string, lt::torrent_handle> torrents_;
