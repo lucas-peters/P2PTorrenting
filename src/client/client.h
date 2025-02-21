@@ -38,6 +38,9 @@ public:
     // Print the status of all torrents
     void printStatus() const;
 
+    // Seach DHT network for peers with a specific info hash
+    void searchDHT(const std::string& infoHash);
+
 private:
     std::unique_ptr<lt::session> session_;
     std::map<std::string, lt::torrent_handle> torrents_;

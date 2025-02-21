@@ -112,13 +112,14 @@ void Client::handleAlerts() {
     for (lt::alert* a : alerts) {
         if (auto* dht_stats = lt::alert_cast<lt::dht_stats_alert>(a)) {
             std::cout << "DHT running" << std::endl;
-        }
-        else if (auto* state = lt::alert_cast<lt::state_update_alert>(a)) {
+        } else if (auto* state = lt::alert_cast<lt::state_update_alert>(a)) {
             for (const lt::torrent_status& st : state->status) {
                 std::cout << "Progress: " << (st.progress * 100) << "%" << std::endl;
             }
-        }
-        else {
+        } else if (auto* peers_alert = lt::alert_cast<lt::dht_get_peers_reply_alert>(a)) {
+            std::cout << "\nFound peers for info hash: " << peers_alert->info_hash << std::endl;
+            std::cout << "Number of peers: " << peers_alert->num_peers() << std::endl;
+        } else {
             // Log all alert messages for debugging
             std::cout << a->message() << std::endl;
         }
@@ -153,6 +154,26 @@ void Client::printStatus() const {
         std::cout << "\tState: " << handle.status().state << std::endl;
     }
     std::cout << std::endl;
+}
+
+void Client::searchDHT(const std::string& infoHash) {
+    if (!session_) {
+        std::cout << "Session not initialized" << std::endl;
+        return;
+    }
+    lt::sha1_hash targetHash;
+    if(infoHash.size() == 40) {
+        // Hash in hex format
+        from_hex(infoHash.c_str(), targetHash.data());
+    } else if (infoHash.size() == 20) {
+        // Hash in binary format
+        std::copy(infoHash.begin(), infoHash.end(), targetHash.begin());    
+    } else {
+        std::cout << "Invalid info hash" << std::endl;
+        return;
+    }
+
+    session_->dht_get_peers(targetHash);
 }
 
 } // namespace torrent_p2p
