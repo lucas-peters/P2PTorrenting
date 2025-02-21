@@ -1,0 +1,40 @@
+# Important to do immediately
+1. Turn regular files into .torrent files
+2. Generate magnet links from .torrent files
+3. Implement seeding
+4. Implement downloading
+5. Test having a client seed and a client download from the seeder
+6. Fault tolerance
+7. We need to implement at least 3 of the algorithms in the project description
+
+# Testing
+- Python bindings for our code 
+- Docker image to build each client/bootstrap node in
+- Docker compose file to start all nodes and client in one go
+- Write Python scripts to simulate interactions between nodes
+- Test different amounts of seeders/leechers
+- Test how our system reacts to a node dying during different situations. (downloading, seeding, leeching)
+- Test how our system reacts to a bootstrap node dying
+
+# Deployment
+- create EC2 instances for each node
+- deploy dockerized nodes in the cloud
+- AWS lambda functions:
+    - deploy all the nodes simultaneously
+    - delete all the nodes 
+    - build the docker images and run code in each node
+    - run test scripts in each node
+- have each node run test scripts
+
+# Report
+- write the 10-15 page report on our project
+- discuss previous work that we reference in project proposal
+- talk about design choices we made 
+    - did we change our implementation from what we outlined in proposal?
+    - node communication (DHT, gosipping, heatbeating)
+    - fault tolerance
+
+# Nice to have
+- GUI
+- Testing advanced scenarios (ie. Sybil Attack)
+- decentralized search for torrents available on the network
