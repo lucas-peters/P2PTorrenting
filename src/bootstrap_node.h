@@ -1,27 +1,41 @@
 #ifndef BOOTSTRAP_NODES_H
 #define BOOTSTRAP_NODES_H
 
-#include <vector>
+#include <libtorrent/session.hpp>
+#include <libtorrent/settings_pack.hpp>
+#include <libtorrent/alert_types.hpp>
 #include <string>
+#include <memory>
+#include <vector>
 
 namespace torrent_p2p {
 
-struct BootstrapNode {
-    std::string ip;
-    int port;
-};
-
-class BootstrapNodeManager {
+class BootstrapNode {
 public:
-    BootstrapNodeManager();
-    ~BootstrapNodeManager();
+    BootstrapNode(int port = 6881);
+    ~BootstrapNode();
 
-    std::vector<BootstrapNode> getBootstrapNodes();
-    void addBootstrapNode(const std::string& ip, int port);
-    void removeBootstrapNode(const std::string& ip, int port);
+    // Start the bootstrap node
+    void start();
+    
+    // Stop the bootstrap node
+    void stop();
+    
+    // Get the node's DHT state
+    std::string getDHTStats() const;
+    
+    // Get the node's endpoint information
+    std::pair<std::string, int> getEndpoint() const;
 
 private:
-    std::vector<BootstrapNode> bootstrapNodes_;
+    std::unique_ptr<lt::session> session_;
+    int port_;
+    
+    // Initialize the session with DHT settings
+    void initializeSession();
+    
+    // Handle DHT alerts
+    void handleAlerts();
 };
 
 } // namespace torrent_p2p
