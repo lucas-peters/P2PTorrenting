@@ -33,13 +33,6 @@ void Client::initializeSession() {
     // Only listen on localhost
     pack.set_str(lt::settings_pack::listen_interfaces, "127.0.0.1:" + std::to_string(port_));
     
-    // Disable external connections
-    pack.set_bool(lt::settings_pack::enable_upnp, false);
-    pack.set_bool(lt::settings_pack::enable_natpmp, false);
-    pack.set_bool(lt::settings_pack::enable_lsd, false);
-    pack.set_bool(lt::settings_pack::enable_outgoing_utp, false);
-    pack.set_bool(lt::settings_pack::enable_incoming_utp, false);
-    
     session_ = std::make_unique<lt::session>(pack);
 }
 
