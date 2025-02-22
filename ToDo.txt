@@ -33,6 +33,9 @@
     - did we change our implementation from what we outlined in proposal?
     - node communication (DHT, gosipping, heatbeating)
     - fault tolerance
+- limitations/set backs
+- findings
+- were we successful in implementing all the features we had in mind?
 
 # Nice to have
 - GUI

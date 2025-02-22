@@ -7,6 +7,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # Find libtorrent package
 find_package(LibtorrentRasterbar REQUIRED)
 
+# Include libtorrent directories
+include_directories(${LibtorrentRasterbar_INCLUDE_DIRS})
+
 # Bootstrap node executable
 set(BOOTSTRAP_SOURCES
     src/bootstrap/main.cpp

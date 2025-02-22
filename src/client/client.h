@@ -21,7 +21,10 @@ public:
     void connectToDHT(const std::vector<std::pair<std::string, int>>& bootstrap_nodes);
     
     // Add a torrent to download
-    void addTorrent(const std::string& torrentFilePath, const std::string& savePath);
+    void addTorrent(const std::string& torrentFile, const std::string& savePath);
+
+    // Check if a torrent is already added
+    bool hasTorrent(const lt::sha1_hash& hash) const;
     
     // Start the client
     void start();
@@ -30,7 +33,7 @@ public:
     void stop();
     
     // Get progress of a specific torrent
-    double getProgress(const std::string& torrentFilePath);
+   //double getProgress(const std::string& torrentFilePath);
     
     // Get DHT statistics
     std::string getDHTStats() const;
@@ -41,9 +44,24 @@ public:
     // Seach DHT network for peers with a specific info hash
     void searchDHT(const std::string& infoHash);
 
+    // Generate a magnet URI for a specific torrent
+    std::string createMagnetURI(const std::string& torrentFilePath) const;
+
+    // Add a magnet link to the client
+    void addMagnet(const std::string& infoHash, const std::string& savePath);
+
+    // Begins seeding a torrent file for other clients to download from
+    void startSeeding(const std::string& torrentFilePath);
+
+    // Stops seeding a torrent file for other clients to download from
+    void stopSeeding(const std::string& torrentFilePath);
+
+    // Converts a string representation of an info hash to a sha1_hash
+    lt::sha1_hash stringToHash(const std::string& infoHashString) const;
+
 private:
     std::unique_ptr<lt::session> session_;
-    std::map<std::string, lt::torrent_handle> torrents_;
+    std::map<lt::sha1_hash, lt::torrent_handle> torrents_;
     int port_;
     
     // Initialize the session with DHT settings

@@ -1,9 +1,13 @@
 #include "client.h"
 #include <libtorrent/magnet_uri.hpp>
 #include <libtorrent/bencode.hpp>
+#include <libtorrent/hex.hpp>
 #include <iostream>
 #include <thread>
 #include <chrono>
+
+#define BYTES_STRING_LENGTH 20
+#define HEX_STRING_LENGTH 40
 
 namespace torrent_p2p {
 
@@ -73,36 +77,84 @@ void Client::stop() {
     }
 }
 
-void Client::addTorrent(const std::string& torrentFilePath, const std::string& savePath) {
-    lt::add_torrent_params params;
-    params.save_path = savePath;
-    
+bool Client::hasTorrent(const lt::sha1_hash& hash) const {
+    return torrents_.find(hash) != torrents_.end();
+}
+
+void Client::addTorrent(const std::string& torrentFile, const std::string& savePath) {
     try {
-        params.ti = std::make_shared<lt::torrent_info>(torrentFilePath);
+        lt::add_torrent_params params;
+        params.ti = std::make_shared<lt::torrent_info>(torrentFile);
+        params.save_path = savePath;
+        
+        // Check if we already have this torrent
+        lt::sha1_hash hash = params.ti->info_hash();
+        if (hasTorrent(hash)) {
+            std::cout << "Torrent already exists" << std::endl;
+            return;
+        }
+        
+        lt::torrent_handle handle = session_->add_torrent(params);
+        torrents_[hash] = handle;
+        
+        std::cout << "Added torrent: " << params.ti->name() << std::endl;
+        
     } catch (const std::exception& e) {
-        std::cerr << "Error loading torrent file: " << e.what() << std::endl;
+        std::cout << "Error adding torrent: " << e.what() << std::endl;
+    }
+}
+
+void Client::addMagnet(const std::string& infoHashString, const std::string& savePath) {
+    if (!session_) {
+        std::cout << "Session not initialized" << std::endl;
+        return;
+    }
+
+    try {
+        lt::sha1_hash hash = stringToHash(infoHashString);
+        
+        // Check if we already have this torrent
+        if (hasTorrent(hash)) {
+            std::cout << "Torrent already exists" << std::endl;
+            return;
+        }
+        
+        // Create magnet URI from info hash
+        std::string magnetUri = "magnet:?xt=urn:btih:" + hash.to_string();
+        
+        lt::add_torrent_params params = lt::parse_magnet_uri(magnetUri);
+        params.save_path = savePath;
+        
+        lt::torrent_handle handle = session_->add_torrent(params);
+        torrents_[hash] = handle;
+        
+        std::cout << "Added magnet link with info hash: " << hash.to_string() << std::endl;
+        
+    } catch (const std::exception& e) {
+        std::cout << "Error: " << e.what() << std::endl;
+    }
+}
+
+void Client::printStatus() const {
+    if (!session_) {
         return;
     }
     
-    lt::torrent_handle h = session_->add_torrent(params);
-    torrents_[torrentFilePath] = h;
-    
-    std::cout << "Added torrent: " << params.ti->name() << std::endl;
-}
+    if (torrents_.empty()) {
+        std::cout << "No active torrents" << std::endl;
+        return;
+    }
 
-double Client::getProgress(const std::string& torrentFilePath) {
-    auto it = torrents_.find(torrentFilePath);
-    if (it == torrents_.end()) {
-        return 0.0;
+    std::cout << "Active torrents:" << std::endl;
+    for (const auto& [hash, handle] : torrents_) {
+        auto status = handle.status();
+        std::cout << "Torrent: " << hash.to_string() << std::endl;
+        std::cout << "\tProgress: " << (status.progress * 100) << "%" << std::endl;
+        std::cout << "\tDownload Rate: " << status.download_rate << std::endl;
+        std::cout << "\tUpload Rate: " << status.upload_rate << std::endl;
+        std::cout << "\tState: " << status.state << std::endl;
     }
-    
-    lt::torrent_handle& h = it->second;
-    if (!h.is_valid()) {
-        return 0.0;
-    }
-    
-    lt::torrent_status status = h.status();
-    return status.progress * 100.0;
+    std::cout << std::endl;
 }
 
 void Client::handleAlerts() {
@@ -135,45 +187,45 @@ std::string Client::getDHTStats() const {
     return "DHT stats requested";
 }
 
-void Client::printStatus() const {
-    if (!session_) {
-        return;
-    }
-    
-    if (torrents_.empty()) {
-        std::cout << "No active torrents" << std::endl;
-        return;
-    }
-
-    std::cout << "Active torrents:" << std::endl;
-    for (const auto& [path, handle] : torrents_) {
-        std::cout << "Torent: " << path << std::endl;
-        std::cout << "\tProgress: " << (handle.status().progress * 100) << "%" << std::endl;
-        std::cout << "\tDownload Rate: " << handle.status().download_rate << std::endl;
-        std::cout << "\tUpload Rate: " << handle.status().upload_rate << std::endl;
-        std::cout << "\tState: " << handle.status().state << std::endl;
-    }
-    std::cout << std::endl;
-}
-
-void Client::searchDHT(const std::string& infoHash) {
+// dht will communicate back through alerts
+void Client::searchDHT(const std::string& infoHashString) {
     if (!session_) {
         std::cout << "Session not initialized" << std::endl;
         return;
     }
+
     lt::sha1_hash targetHash;
-    if(infoHash.size() == 40) {
-        // Hash in hex format
-        from_hex(infoHash.c_str(), targetHash.data());
-    } else if (infoHash.size() == 20) {
-        // Hash in binary format
-        std::copy(infoHash.begin(), infoHash.end(), targetHash.begin());    
+    targetHash = stringToHash(infoHashString);
+    session_->dht_get_peers(targetHash);
+}
+
+std::string Client::createMagnetURI(const std::string& torrentFilePath) const {
+    if (!session_) {
+        std::cout << "Session not initialized" << std::endl;
+        return NULL;
+    }
+    lt::torrent_info ti(torrentFilePath);
+    std::string magnetURI = lt::make_magnet_uri(ti);
+    std::cout << "Magnet URI: " << magnetURI << std::endl;
+    return magnetURI;
+}
+
+lt::sha1_hash Client::stringToHash(const std::string& infoHashString) const {
+    lt::sha1_hash hash;
+
+    if (infoHashString.size() == HEX_STRING_LENGTH) {
+        // Hexadecimal string
+        lt::aux::from_hex(infoHashString, hash.data());
+    } else if (infoHashString.size() == BYTES_STRING_LENGTH) {
+        // Binary string
+        std::array<char, BYTES_STRING_LENGTH> hashArray;
+        std::copy(infoHashString.begin(), infoHashString.end(), hashArray.begin());
+        hash = lt::sha1_hash(hashArray);
     } else {
-        std::cout << "Invalid info hash" << std::endl;
-        return;
+        std::cout << "Invalid info hash string size" << std::endl;
     }
 
-    session_->dht_get_peers(targetHash);
+    return hash;
 }
 
 } // namespace torrent_p2p
