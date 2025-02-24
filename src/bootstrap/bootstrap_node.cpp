@@ -23,6 +23,10 @@ void BootstrapNode::start() {
             lt::alert::status_notification +
             lt::alert::error_notification +
             lt::alert::dht_log_notification);
+        
+        // Force Highest Level Encryption, ChaCha20 instead of RC4
+        pack.set_int(lt::settings_pack::in_enc_policy, lt::settings_pack::pe_forced);
+        pack.set_int(lt::settings_pack::out_enc_policy, lt::settings_pack::pe_forced);
             
         // Enable DHT with local-only settings
         pack.set_bool(lt::settings_pack::enable_dht, true);
@@ -33,7 +37,7 @@ void BootstrapNode::start() {
         pack.set_bool(lt::settings_pack::enable_outgoing_tcp, true);
         pack.set_bool(lt::settings_pack::enable_incoming_tcp, true);
         
-        // Disable IP restrictions for local testing
+        // Disable IP restrictions for local testing, by default it blocks having 2 nodes in the routing table from the same ip
         pack.set_bool(lt::settings_pack::dht_restrict_routing_ips, false);
         pack.set_bool(lt::settings_pack::dht_restrict_search_ips, false);
         pack.set_int(lt::settings_pack::dht_max_peers_reply, 100);
@@ -138,6 +142,23 @@ void BootstrapNode::handleAlerts() {
                           << ": " << listen_failed->error.message() << std::endl;
             } else if (auto* listen_succeeded = lt::alert_cast<lt::listen_succeeded_alert>(a)) {
                 std::cout << "[Bootstrap] Successfully listening on port " << listen_succeeded->port << std::endl;
+            // } else if (auto* pa = lt::alert_cast<lt::peer_connect_alert>(a)) {
+            // // We are ensuring that all peers are using ChaCha20 encryption
+            //     std::vector<lt::peer_info> peers;
+            //     pa->handle.get_peer_info(peers);
+            //     for (const auto& p : peers) {
+            //         if (p.ip == pa->ip) { // Find the peer that just connected
+            //             if (p.flags & lt::peer_info::rc4) {
+            //                 std::cout << "Peer " << p.ip << " is using RC4 encryption." << std::endl; // Should NEVER happen
+            //             } else {
+            //                 std::cout << "Peer " << p.ip << " is using ChaCha20 encryption." << std::endl; // Expected output
+            //             }
+            //         }
+            //     }
+            // 
+            } else {
+                // Log all alert messages for debugging
+                std::cout << a->message() << std::endl;
             }
         } catch (const std::exception& e) {
             std::cerr << "[Bootstrap] Error processing alert: " << e.what() << std::endl;

@@ -60,7 +60,11 @@ int main(int argc, char* argv[]) {
             }
         } else if (command == "status") {
             client.printStatus();
-        } else if (!command.empty()) {
+        } else if (command == "generate") {
+            std::string save_path("/Users/lucaspeters/Downloads/pedestrian.pdf");
+            client.generateTorrentFile(save_path);
+        } 
+        else if (!command.empty()) {
             std::cout << "Unknown command. Available commands:" << std::endl;
             std::cout << "  add <torrent_file> <save_path>" << std::endl;
             std::cout << "  status" << std::endl;

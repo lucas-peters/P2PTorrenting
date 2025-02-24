@@ -25,6 +25,9 @@ public:
 
     // Check if a torrent is already added
     bool hasTorrent(const lt::sha1_hash& hash) const;
+
+    // turns a normal file into a torrent file
+    void generateTorrentFile(const std::string& savePath);
     
     // Start the client
     void start();

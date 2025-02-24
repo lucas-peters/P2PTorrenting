@@ -3,18 +3,25 @@
 #include <libtorrent/bencode.hpp>
 #include <libtorrent/hex.hpp>
 #include <libtorrent/address.hpp>
+#include <libtorrent/create_torrent.hpp>  // For create_torrent
+#include <libtorrent/file_storage.hpp>    // For file_storage
+#include <libtorrent/entry.hpp>           // For bencoding
+#include <filesystem>
+#include <fstream>
 #include <iostream>
 #include <thread>
 #include <chrono>
 #include <random>
+#include <stdexcept>
 
 #define BYTES_STRING_LENGTH 20
 #define HEX_STRING_LENGTH 40
+#define PIECE_LENGTH 16 * 1024
 
 namespace torrent_p2p {
 
 Client::Client(int port) : port_(port) {
-    initializeSession();
+    start();
 }
 
 Client::~Client() {
@@ -29,6 +36,10 @@ void Client::initializeSession() {
         | lt::alert::dht_notification
         | lt::alert::port_mapping_notification
         | lt::alert::dht_log_notification);
+
+    // Force Highest Level Encryption, ChaCha20 instead of RC4
+    pack.set_int(lt::settings_pack::in_enc_policy, lt::settings_pack::pe_forced);
+    pack.set_int(lt::settings_pack::out_enc_policy, lt::settings_pack::pe_forced);
     
     // Enable DHT with local-only settings
     pack.set_bool(lt::settings_pack::enable_dht, true);
@@ -232,6 +243,20 @@ void Client::handleAlerts() {
         } else if (auto* peers_alert = lt::alert_cast<lt::dht_get_peers_reply_alert>(a)) {
             std::cout << "\nFound peers for info hash: " << peers_alert->info_hash << std::endl;
             std::cout << "Number of peers: " << peers_alert->num_peers() << std::endl;
+        // } else if (auto* pa = lt::alert_cast<lt::peer_connect_alert>(a)) {
+        //     // We are ensuring that all peers are using ChaCha20 encryption
+        //     std::vector<lt::peer_info> peers;
+        //     pa->handle.get_peer_info(peers);
+        //     for (const auto& p : peers) {
+        //         if (p.ip == pa->ip) { // Find the peer that just connected
+        //             if (p.flags & lt::peer_info::rc4) {
+        //                 std::cout << "Peer " << p.ip << " is using RC4 encryption." << std::endl; // Should NEVER happen
+        //             } else {
+        //                 std::cout << "Peer " << p.ip << " is using ChaCha20 encryption." << std::endl; // Expected output
+        //             }
+        //         }
+        //     }
+        // 
         } else {
             // Log all alert messages for debugging
             std::cout << a->message() << std::endl;
@@ -289,4 +314,50 @@ lt::sha1_hash Client::stringToHash(const std::string& infoHashString) const {
     return hash;
 }
 
-} // namespace torrent_p2p
+void Client::generateTorrentFile(const std::string& savePath) {
+    // output location, might change this
+    try {
+        // find last . to change extension to .torrent
+        int pos = savePath.find_last_of(".");
+        std::string torrentFilePath = savePath.substr(0, pos) + ".torrent";
+        // need to get file size for libtorrents file system
+        std::filesystem::path filePath(savePath);
+        int fileSize = std::filesystem::file_size(filePath);
+
+        // adding file to libtorrent file_storage, and using that object to create a torrent
+        lt::file_storage fs;
+        fs.add_file(savePath, fileSize);
+        std::cout << "added file to fs" << std::endl;
+        lt::create_torrent torrent(fs, PIECE_LENGTH);
+        std::cout << "created torrent" << std::endl;
+        std::cout << "Generating hashes..." << std::endl;
+
+        // Open the file *here*, just before generating hashes.  This guarantees
+        // it's open in the correct mode and won't be interfered with.
+        std::ifstream inputFile(savePath, std::ios::binary);
+        if (!inputFile) {
+            throw std::runtime_error("Could not open input file for hashing: " + savePath);
+        }
+
+        // Set the file to be read when generating hashes
+        lt::set_piece_hashes(torrent, ".");
+
+        inputFile.close(); // Close the file *after* set_piece_hashes.
+        std::cout << "Hashes generated." << std::endl;
+        lt::entry ent = torrent.generate();
+        std::cout << "generated torrent" << std::endl;
+
+        std::ofstream out(torrentFilePath, std::ios::binary);
+        if (!out) {
+          throw std::runtime_error("Could not open torrent output file:" + torrentFilePath);
+        }
+        lt::bencode(std::ostream_iterator<char>(out), ent);
+        out.close();
+
+    } catch (const std::exception& e) {
+        std::cout << "Error: " << e.what() << std::endl;
+    }
+
+}
+
+} // namepspace bracket
