@@ -6,6 +6,13 @@
 #include <libtorrent/create_torrent.hpp>  // For create_torrent
 #include <libtorrent/file_storage.hpp>    // For file_storage
 #include <libtorrent/entry.hpp>           // For bencoding
+#include <libtorrent/session.hpp>
+#include <libtorrent/torrent_info.hpp>
+#include <libtorrent/add_torrent_params.hpp>
+#include <libtorrent/alert_types.hpp>
+#include <libtorrent/torrent_handle.hpp>
+#include <libtorrent/load_torrent.hpp>
+#include <string>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
@@ -133,12 +140,55 @@ bool Client::hasTorrent(const lt::sha1_hash& hash) const {
     return torrents_.find(hash) != torrents_.end();
 }
 
-void Client::addTorrent(const std::string& torrentFile, const std::string& savePath) {
+// libtorrent add_torrent adds the torrent to the session
+// if the torrent is file is missing or incomplete it tries to download from peers
+// if the torrent is complete it starts seeding
+// We can bypass this if we want to roll our own torrent protocol but it will be a pain in the ass
+void Client::addTorrent(const std::string& torrentFilePath, const std::string& savePath) {
     try {
-        lt::add_torrent_params params;
-        params.ti = std::make_shared<lt::torrent_info>(torrentFile);
+        // load the torrent parameters from file
+        lt::add_torrent_params params = lt::load_torrent_file(torrentFilePath);
         params.save_path = savePath;
+        std::cout << "params.save_path: " << params.save_path << std::endl;
+
+        // this loop strips the absolute file path added by load_torrent_file, so thats in the correct format
+        for (lt::file_index_t i(0); i < params.ti->files().end_file(); ++i) {
+            std::string file_path = params.ti->files().file_path(i);
+            
+            // Get just the filename without any path
+            std::string filename = file_path;
+            size_t last_slash = file_path.find_last_of("/\\");
+            if (last_slash != std::string::npos) {
+                filename = file_path.substr(last_slash + 1);
+                // Rename the file to just its basename
+                params.ti->rename_file(i, filename);
+            }
+        }
+
+        // Print torrent file information
+        std::cout << "Torrent info:" << std::endl;
+        std::cout << "Total size: " << params.ti->total_size() << " bytes" << std::endl;
+        std::cout << "Piece length: " << params.ti->piece_length() << " bytes" << std::endl;
+        std::cout << "Number of pieces: " << params.ti->num_pieces() << std::endl;
+        std::cout << "Number of files: " << params.ti->num_files() << std::endl;
         
+        std::cout << "\nFiles in torrent:" << std::endl;
+        for (int i = 0; i < params.ti->num_files(); ++i) {
+            std::cout << "File " << i << ": " << params.ti->files().file_path(i) 
+                     << " (Size: " << params.ti->files().file_size(i) << " bytes)" << std::endl;
+            
+            // Check if file exists at the expected location
+            std::string full_path = savePath + "/" + params.ti->files().file_path(i);
+            std::error_code ec;
+            if (std::filesystem::exists(full_path, ec)) {
+                auto file_size = std::filesystem::file_size(full_path, ec);
+                std::cout << "Found file at: " << full_path << std::endl;
+                std::cout << "Actual file size: " << file_size << " bytes" << std::endl;
+            } else {
+                std::cout << "File not found at: " << full_path << std::endl;
+            }
+        }
+
         // Check if we already have this torrent
         lt::sha1_hash hash = params.ti->info_hash();
         if (hasTorrent(hash)) {
@@ -150,6 +200,23 @@ void Client::addTorrent(const std::string& torrentFile, const std::string& saveP
         torrents_[hash] = handle;
         
         std::cout << "Added torrent: " << params.ti->name() << std::endl;
+        
+        // Print detailed initial torrent status
+        lt::torrent_status status = handle.status();
+        std::cout << "\nInitial torrent status:" << std::endl;
+        std::cout << "State: " << 
+            (status.is_seeding ? "seeding" : 
+             status.is_finished ? "finished" : 
+             "downloading") << std::endl;
+        std::cout << "Progress: " << (status.progress * 100) << "%" << std::endl;
+        std::cout << "Total done: " << status.total_done << " bytes" << std::endl;
+        std::cout << "Total wanted: " << status.total_wanted << " bytes" << std::endl;
+        std::cout << "State: " << status.state << std::endl;
+        
+        // Check piece verification state
+        std::cout << "\nPiece verification:" << std::endl;
+        std::cout << "Checking files: " << (status.state == lt::torrent_status::checking_files) << std::endl;
+        std::cout << "Checking resume data: " << (status.state == lt::torrent_status::checking_resume_data) << std::endl;
         
     } catch (const std::exception& e) {
         std::cout << "Error adding torrent: " << e.what() << std::endl;
@@ -360,4 +427,13 @@ void Client::generateTorrentFile(const std::string& savePath) {
 
 }
 
-} // namepspace bracket
+// checks the torrent handle is valid
+// libtorrent sets seeding to true automatically
+// sets the seed flag to false, doesn't let other clients download from it
+// void Client::stopSeeding(lt::torrent_handle& handle) {
+// }
+
+// void Client::startSeeding(lt::torrent_handle& handle) {
+// }
+
+} // namespace bracket

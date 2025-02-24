@@ -21,7 +21,7 @@ public:
     void connectToDHT(const std::vector<std::pair<std::string, int>>& bootstrap_nodes);
     
     // Add a torrent to download
-    void addTorrent(const std::string& torrentFile, const std::string& savePath);
+    void addTorrent(const std::string& torrentFilePath, const std::string& savePath);
 
     // Check if a torrent is already added
     bool hasTorrent(const lt::sha1_hash& hash) const;
