@@ -2,9 +2,11 @@
 #include <libtorrent/magnet_uri.hpp>
 #include <libtorrent/bencode.hpp>
 #include <libtorrent/hex.hpp>
+#include <libtorrent/address.hpp>
 #include <iostream>
 #include <thread>
 #include <chrono>
+#include <random>
 
 #define BYTES_STRING_LENGTH 20
 #define HEX_STRING_LENGTH 40
@@ -25,10 +27,24 @@ void Client::initializeSession() {
         lt::alert::status_notification
         | lt::alert::error_notification
         | lt::alert::dht_notification
-        | lt::alert::port_mapping_notification);
+        | lt::alert::port_mapping_notification
+        | lt::alert::dht_log_notification);
     
-    // Enable DHT
+    // Enable DHT with local-only settings
     pack.set_bool(lt::settings_pack::enable_dht, true);
+    pack.set_str(lt::settings_pack::dht_bootstrap_nodes, "");  // Disable external bootstrap nodes
+    pack.set_int(lt::settings_pack::dht_announce_interval, 5);
+    pack.set_bool(lt::settings_pack::enable_outgoing_utp, true);
+    pack.set_bool(lt::settings_pack::enable_incoming_utp, true);
+    pack.set_bool(lt::settings_pack::enable_outgoing_tcp, true);
+    pack.set_bool(lt::settings_pack::enable_incoming_tcp, true);
+    
+    // Disable IP restrictions for local testing
+    pack.set_bool(lt::settings_pack::dht_restrict_routing_ips, false);
+    pack.set_bool(lt::settings_pack::dht_restrict_search_ips, false);
+    pack.set_int(lt::settings_pack::dht_max_peers_reply, 100);
+    pack.set_bool(lt::settings_pack::dht_ignore_dark_internet, false);
+    pack.set_int(lt::settings_pack::dht_max_fail_count, 100);  // More forgiving of failures
     
     // Only listen on localhost
     pack.set_str(lt::settings_pack::listen_interfaces, "127.0.0.1:" + std::to_string(port_));
@@ -38,13 +54,44 @@ void Client::initializeSession() {
 
 void Client::connectToDHT(const std::vector<std::pair<std::string, int>>& bootstrap_nodes) {
     if (!session_) {
-        initializeSession();
+        std::cout << "Session not initialized" << std::endl;
+        return;
+    }
+
+    // Add bootstrap nodes to routing table
+    for (const auto& node : bootstrap_nodes) {
+        std::cout << "[Client:" << port_ << "] Adding bootstrap node: " << node.first << ":" << node.second << std::endl;
+        session_->add_dht_node(std::make_pair(node.first, node.second));
+        
+        try {
+            // Force immediate DHT lookup to this node
+            lt::udp::endpoint ep(lt::make_address_v4(node.first), node.second);
+            session_->dht_direct_request(ep, lt::entry{}, lt::client_data_t{});
+            
+            // Also announce ourselves with a generated hash
+            lt::sha1_hash hash;
+            std::random_device rd;
+            std::mt19937 gen(rd());
+            std::uniform_int_distribution<uint32_t> dis;
+            for (int i = 0; i < 5; i++) {
+                reinterpret_cast<uint32_t*>(hash.data())[i] = dis(gen);
+            }
+            session_->dht_announce(hash, port_);
+        } catch (const std::exception& e) {
+            std::cerr << "[Client:" << port_ << "] Error connecting to node: " << e.what() << std::endl;
+        }
     }
     
-    // Add bootstrap nodes to the DHT
-    for (const auto& node : bootstrap_nodes) {
-        session_->add_dht_node({node.first, node.second});
-    }
+    // Start periodic DHT lookups
+    std::thread([this]() {
+        while (running_) {
+            if (session_) {
+                session_->dht_get_peers(lt::sha1_hash());
+                session_->post_dht_stats();
+            }
+            std::this_thread::sleep_for(std::chrono::seconds(5));
+        }
+    }).detach();
 }
 
 void Client::start() {
@@ -66,6 +113,7 @@ void Client::start() {
 void Client::stop() {
     if (session_) {
         // DHT will be automatically stopped when session is destroyed
+        running_ = false;
         session_.reset();
     }
 }
@@ -151,15 +199,35 @@ void Client::printStatus() const {
 }
 
 void Client::handleAlerts() {
+    if (!session_) return;
+
     std::vector<lt::alert*> alerts;
     session_->pop_alerts(&alerts);
 
     for (lt::alert* a : alerts) {
         if (auto* dht_stats = lt::alert_cast<lt::dht_stats_alert>(a)) {
-            std::cout << "DHT running" << std::endl;
+            int total_nodes = 0;
+            for (auto const& t : dht_stats->routing_table) {
+                total_nodes += t.num_nodes;
+            }
+            std::cout << "\n[Client:" << port_ << "] DHT nodes in routing table: " << total_nodes << std::endl;
+            
+            // Print detailed routing table info
+            if (total_nodes > 0) {
+                std::cout << "[Client:" << port_ << "] Routing table details:" << std::endl;
+                for (size_t i = 0; i < dht_stats->routing_table.size(); ++i) {
+                    const auto& bucket = dht_stats->routing_table[i];
+                    if (bucket.num_nodes > 0) {
+                        std::cout << "  Bucket " << i << ": " << bucket.num_nodes << " nodes" << std::endl;
+                    }
+                }
+            }
+        } else if (auto* dht_log = lt::alert_cast<lt::dht_log_alert>(a)) {
+            // Log all DHT activity for debugging
+            std::cout << "[Client:" << port_ << "] DHT: " << dht_log->message() << std::endl;
         } else if (auto* state = lt::alert_cast<lt::state_update_alert>(a)) {
             for (const lt::torrent_status& st : state->status) {
-                std::cout << "Progress: " << (st.progress * 100) << "%" << std::endl;
+                std::cout << "[Client:" << port_ << "] Progress: " << (st.progress * 100) << "%" << std::endl;
             }
         } else if (auto* peers_alert = lt::alert_cast<lt::dht_get_peers_reply_alert>(a)) {
             std::cout << "\nFound peers for info hash: " << peers_alert->info_hash << std::endl;

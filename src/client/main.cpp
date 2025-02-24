@@ -10,12 +10,14 @@ using namespace torrent_p2p;
 
 int main(int argc, char* argv[]) {
     int port = (argc > 1) ? std::stoi(argv[1]) : 6882;
+    std::cout << "port: " << port << std::endl;
+
     // Run as client
     Client client(port);
     
     // Connect to bootstrap nodes
     std::vector<std::pair<std::string, int>> bootstrap_nodes = {
-        {"127.0.0.1", 6881}  // Connect to local bootstrap node
+        {"127.0.0.1", 6881}  // local bootstrap node
     };
     
     client.connectToDHT(bootstrap_nodes);

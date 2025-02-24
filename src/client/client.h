@@ -63,6 +63,7 @@ private:
     std::unique_ptr<lt::session> session_;
     std::map<lt::sha1_hash, lt::torrent_handle> torrents_;
     int port_;
+    bool running_;
     
     // Initialize the session with DHT settings
     void initializeSession();
