@@ -29,7 +29,9 @@ public:
 
 private:
     std::unique_ptr<lt::session> session_;
+    std::unique_ptr<std::thread> announceTimer_;
     int port_;
+    bool running_;
     
     // Initialize the session with DHT settings
     void initializeSession();
