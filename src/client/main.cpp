@@ -50,15 +50,16 @@ int main(int argc, char* argv[]) {
         if (command == "quit") {
             running = false;
             break;
-        // } else if (command == "add") {
-        //     std::string torrent_file, save_path;
-        //     if (iss >> torrent_file >> save_path) {
-        //         client.addTorrent(torrent_file, save_path);
-        //     } else {
-        //         std::cout << "Usage: add <torrent_file> <save_path>" << std::endl;
+        } else if (command == "add") {
+            std::string torrent_file, save_path;
+            if (iss >> torrent_file >> save_path) {
+                std::cout << "save_path in main: " << save_path << std::endl;
+                client.addTorrent(torrent_file, save_path);
+            } else {
+                std::cout << "Usage: add <torrent_file> <save_path>" << std::endl;
     
-        //     }
-        // 
+            }
+        
         } else if (command == "status") {
             client.printStatus();
         } else if (command == "generate") {
@@ -67,10 +68,6 @@ int main(int argc, char* argv[]) {
         } else if (command == "create") {
             std::string save_path("/Users/lucaspeters/Downloads/pedestrian.torrent");
             client.createMagnetURI(save_path);
-        } else if (command == "add") {
-            std::string torrentFilePath("/Users/lucaspeters/Downloads/pedestrian.torrent");
-            std::string savePath("/Users/lucaspeters/Downloads/");
-            client.addTorrent(torrentFilePath, savePath);
         }
         else if (!command.empty()) {
             std::cout << "Unknown command. Available commands:" << std::endl;

@@ -42,7 +42,9 @@ void Client::initializeSession() {
         | lt::alert::error_notification
         | lt::alert::dht_notification
         | lt::alert::port_mapping_notification
-        | lt::alert::dht_log_notification);
+        | lt::alert::dht_log_notification
+        | lt::alert::piece_progress_notification
+        | lt::alert::storage_notification);
 
     // Force Highest Level Encryption, ChaCha20 instead of RC4
     pack.set_int(lt::settings_pack::in_enc_policy, lt::settings_pack::pe_forced);
@@ -160,6 +162,7 @@ void Client::addTorrent(const std::string& torrentFilePath, const std::string& s
             size_t last_slash = file_path.find_last_of("/\\");
             if (last_slash != std::string::npos) {
                 filename = file_path.substr(last_slash + 1);
+                std::cout << "filename: " << filename << std::endl;
                 // Rename the file to just its basename
                 params.ti->rename_file(i, filename);
             }
@@ -282,8 +285,49 @@ void Client::handleAlerts() {
     std::vector<lt::alert*> alerts;
     session_->pop_alerts(&alerts);
 
-    for (lt::alert* a : alerts) {
-        if (auto* dht_stats = lt::alert_cast<lt::dht_stats_alert>(a)) {
+    for (lt::alert const* a : alerts) {
+        if (auto* st = lt::alert_cast<lt::state_changed_alert>(a)) {
+            if (st->state == lt::torrent_status::checking_files) {
+                if (st->handle.torrent_file())
+                    std::cout << "Started verifying pieces for torrent: " << st->handle.torrent_file()->name() << std::endl;
+                else
+                    std::cout << "Started verifying pieces for torrent" << std::endl;
+            }
+        }
+        else if (auto* pf = lt::alert_cast<lt::piece_finished_alert>(a)) {
+            // Calculate verification progress
+            lt::torrent_status status = pf->handle.status();
+            float progress = status.progress * 100;
+            std::cout << "\rVerifying pieces: " << static_cast<int>(progress) << "% complete" << std::flush;
+        }
+        else if (auto* sc = lt::alert_cast<lt::storage_moved_alert>(a)) {
+            std::cout << "\nTorrent data moved to: " << sc->storage_path() << std::endl;
+        }
+        else if (auto* fa = lt::alert_cast<lt::file_completed_alert>(a)) {
+            if (fa->handle.torrent_file())
+                std::cout << "\nFile completed in torrent: " << fa->handle.torrent_file()->name() << std::endl;
+            else
+                std::cout << "\nFile completed in torrent" << std::endl;
+        }
+        else if (auto* fea = lt::alert_cast<lt::fastresume_rejected_alert>(a)) {
+            std::cout << "Fast resume data rejected: " << fea->message() << std::endl;
+        }
+        // Handle verification completion
+        else if (auto* tc = lt::alert_cast<lt::torrent_checked_alert>(a)) {
+            if (tc->handle.torrent_file())
+                std::cout << "\nPiece verification completed for torrent: " << tc->handle.torrent_file()->name() << std::endl;
+            else
+                std::cout << "\nPiece verification completed for torrent" << std::endl;
+            
+            lt::torrent_status status = tc->handle.status();
+            if (status.is_seeding) {
+                std::cout << "All pieces verified successfully - torrent is complete" << std::endl;
+            } else {
+                std::cout << "Some pieces failed verification - torrent is incomplete" << std::endl;
+                std::cout << "Progress: " << (status.progress * 100) << "%" << std::endl;
+            }
+        }
+        else if (auto* dht_stats = lt::alert_cast<lt::dht_stats_alert>(a)) {
             int total_nodes = 0;
             for (auto const& t : dht_stats->routing_table) {
                 total_nodes += t.num_nodes;
@@ -300,16 +344,17 @@ void Client::handleAlerts() {
                     }
                 }
             }
-        } else if (auto* dht_log = lt::alert_cast<lt::dht_log_alert>(a)) {
-            // Log all DHT activity for debugging
-            std::cout << "[Client:" << port_ << "] DHT: " << dht_log->message() << std::endl;
-        } else if (auto* state = lt::alert_cast<lt::state_update_alert>(a)) {
-            for (const lt::torrent_status& st : state->status) {
-                std::cout << "[Client:" << port_ << "] Progress: " << (st.progress * 100) << "%" << std::endl;
-            }
-        } else if (auto* peers_alert = lt::alert_cast<lt::dht_get_peers_reply_alert>(a)) {
-            std::cout << "\nFound peers for info hash: " << peers_alert->info_hash << std::endl;
-            std::cout << "Number of peers: " << peers_alert->num_peers() << std::endl;
+        }
+        // } else if (auto* dht_log = lt::alert_cast<lt::dht_log_alert>(a)) {
+        //     // Log all DHT activity for debugging
+        //     std::cout << "[Client:" << port_ << "] DHT: " << dht_log->message() << std::endl;
+        // } else if (auto* state = lt::alert_cast<lt::state_update_alert>(a)) {
+        //     for (const lt::torrent_status& st : state->status) {
+        //         std::cout << "[Client:" << port_ << "] Progress: " << (st.progress * 100) << "%" << std::endl;
+        //     }
+        // } else if (auto* peers_alert = lt::alert_cast<lt::dht_get_peers_reply_alert>(a)) {
+        //     std::cout << "\nFound peers for info hash: " << peers_alert->info_hash << std::endl;
+        //     std::cout << "Number of peers: " << peers_alert->num_peers() << std::endl;
         // } else if (auto* pa = lt::alert_cast<lt::peer_connect_alert>(a)) {
         //     // We are ensuring that all peers are using ChaCha20 encryption
         //     std::vector<lt::peer_info> peers;
@@ -324,10 +369,10 @@ void Client::handleAlerts() {
         //         }
         //     }
         // 
-        } else {
-            // Log all alert messages for debugging
-            std::cout << a->message() << std::endl;
-        }
+        // } else {
+        //     // Log all alert messages for debugging
+        //     std::cout << a->message() << std::endl;
+        // }
     }
 }
 
