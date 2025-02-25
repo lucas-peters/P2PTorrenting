@@ -67,12 +67,19 @@ private:
     std::map<lt::sha1_hash, lt::torrent_handle> torrents_;
     int port_;
     bool running_;
-    
+    PieceStrategy current_strategy_;
+    BandwidthSettings bandwidth_settings_;
+
     // Initialize the session with DHT settings
     void initializeSession();
     
     // Handle alerts from libtorrent
     void handleAlerts();
+    
+    // New private members for performance optimization
+    void updatePieceStrategy(const lt::torrent_handle& handle);
+    void applyEndGameMode(const lt::torrent_handle& handle);
+    bool isEndGameMode(const lt::torrent_handle& handle) const;
 };
 
 } // namespace torrent_p2p

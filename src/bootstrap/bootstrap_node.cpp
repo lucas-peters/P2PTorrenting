@@ -1,4 +1,4 @@
-#include "bootstrap_node.h"
+#include "bootstrap_node.hpp"
 #include <libtorrent/entry.hpp>
 #include <libtorrent/bencode.hpp>
 #include <libtorrent/socket.hpp>

@@ -1,4 +1,4 @@
-#include "client.h"
+#include "client.hpp"
 #include <libtorrent/magnet_uri.hpp>
 #include <libtorrent/bencode.hpp>
 #include <libtorrent/hex.hpp>
@@ -279,6 +279,7 @@ void Client::printStatus() const {
     std::cout << std::endl;
 }
 
+// libtorrent dht communicates through sending asynchronous alerts
 void Client::handleAlerts() {
     if (!session_) return;
 
@@ -376,12 +377,15 @@ void Client::handleAlerts() {
     }
 }
 
+// called by main in a daemon thread
 std::string Client::getDHTStats() const {
     if (!session_) {
         return "Session not initialized";
     }
     
     session_->post_dht_stats();
+    session_->dht_live_nodes();
+
     return "DHT stats requested";
 }
 
