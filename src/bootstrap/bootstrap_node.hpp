@@ -6,6 +6,13 @@
 #include <libtorrent/session.hpp>
 #include <libtorrent/settings_pack.hpp>
 #include <libtorrent/alert_types.hpp>
+#include <libtorrent/entry.hpp>
+#include <libtorrent/bencode.hpp>
+#include <libtorrent/socket.hpp>
+#include <iostream>
+#include <thread>
+#include <chrono>
+#include <random>
 #include <string>
 #include <memory>
 #include <vector>

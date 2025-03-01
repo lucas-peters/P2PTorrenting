@@ -1,25 +1,4 @@
 #include "client.hpp"
-#include <libtorrent/magnet_uri.hpp>
-#include <libtorrent/bencode.hpp>
-#include <libtorrent/hex.hpp>
-#include <libtorrent/address.hpp>
-#include <libtorrent/create_torrent.hpp>  // For create_torrent
-#include <libtorrent/file_storage.hpp>    // For file_storage
-#include <libtorrent/entry.hpp>           // For bencoding
-#include <libtorrent/session.hpp>
-#include <libtorrent/torrent_info.hpp>
-#include <libtorrent/add_torrent_params.hpp>
-#include <libtorrent/alert_types.hpp>
-#include <libtorrent/torrent_handle.hpp>
-#include <libtorrent/load_torrent.hpp>
-#include <string>
-#include <filesystem>
-#include <fstream>
-#include <iostream>
-#include <thread>
-#include <chrono>
-#include <random>
-#include <stdexcept>
 
 #define BYTES_STRING_LENGTH 20
 #define HEX_STRING_LENGTH 40

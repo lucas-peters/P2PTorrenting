@@ -7,10 +7,30 @@
 #include <libtorrent/add_torrent_params.hpp>
 #include <libtorrent/torrent_info.hpp>
 #include <libtorrent/alert_types.hpp>
+#include <libtorrent/magnet_uri.hpp>
+#include <libtorrent/bencode.hpp>
+#include <libtorrent/hex.hpp>
+#include <libtorrent/address.hpp>
+#include <libtorrent/create_torrent.hpp>  // For create_torrent
+#include <libtorrent/file_storage.hpp>    // For file_storage
+#include <libtorrent/entry.hpp>           // For bencoding
+#include <libtorrent/session.hpp>
+#include <libtorrent/torrent_info.hpp>
+#include <libtorrent/add_torrent_params.hpp>
+#include <libtorrent/alert_types.hpp>
+#include <libtorrent/torrent_handle.hpp>
+#include <libtorrent/load_torrent.hpp>
+#include <filesystem>
+#include <fstream>
+#include <iostream>
+#include <thread>
 #include <string>
 #include <memory>
 #include <map>
 #include <vector>
+#include <chrono>
+#include <random>
+#include <stdexcept>
 
 namespace torrent_p2p {
 
