@@ -18,13 +18,17 @@ message GossipMessage {
 
 class GossipExtension : public lt::plugin {
 public:
+    explicit GossipExtension(lt::session &session);
+    ~GossipExtension() override;
+    
     void on_alert(lt::alert* alert) override;
-    GossipExtension();
-    ~GossipExtension();
+    void on_tick() override;
+    void on_piece_
 private:
+    
     lt::session &session_;
-    // keeps a list of nodes we've connected to, if a new node shows up, prompt the dht to try adding it and send a gossip message to other nodes announcing the node
-    std::unordered_map<lt::sha1_hash, int32_t> nodes_;
+    // sets unchoke priority
+    std::unordered_map<tcp::endpoint, uint64_t> peer_reputation_;
 };
 
 class GossipPeerPlugin: public lt::peer_plugin {

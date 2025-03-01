@@ -27,8 +27,13 @@
 
 namespace torrent_p2p {
 
-Client::Client(int port) : port_(port) {
+Client::Client(int port) : Node(port) {
     start();
+}
+
+Client::Client(int port, const std::string& state_file) : Node(port, state_file) {
+    start();
+    // The base class constructor already loads the DHT state, so we don't need to call loadDHTState again
 }
 
 Client::~Client() {
@@ -375,18 +380,6 @@ void Client::handleAlerts() {
         //     std::cout << a->message() << std::endl;
         // }
     }
-}
-
-// called by main in a daemon thread
-std::string Client::getDHTStats() const {
-    if (!session_) {
-        return "Session not initialized";
-    }
-    
-    session_->post_dht_stats();
-    session_->dht_live_nodes();
-
-    return "DHT stats requested";
 }
 
 // dht will communicate back through alerts

@@ -1,3 +1,8 @@
 add /Users/lucaspeters/Documents/GitHub/P2PTorrenting/6882/pedestrian.torrent /Users/lucaspeters/Documents/GitHub/P2PTorrenting/6882
 
 add /Users/lucaspeters/Documents/GitHub/P2PTorrenting/6883/pedestrian.torrent /Users/lucaspeters/Documents/GitHub/P2PTorrenting/6883
+
+add /Users/lucaspeters/Documents/GitHub/P2PTorrenting/6883/DOOM1.torrent /Users/lucaspeters/Documents/GitHub/P2PTorrenting/6883
+
+add /Users/lucaspeters/Documents/GitHub/P2PTorrenting/6882/DOOM1.torrent /Users/lucaspeters/Documents/GitHub/P2PTorrenting/6882
+

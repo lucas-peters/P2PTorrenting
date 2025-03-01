@@ -1,4 +1,4 @@
-#include "bootstrap_node.h"
+#include "bootstrap_node.hpp"
 #include <iostream>
 #include <thread>
 #include <chrono>
@@ -9,7 +9,6 @@ using namespace torrent_p2p;
 int main(int argc, char* argv[]) {
     int port = (argc > 1) ? std::stoi(argv[1]) : 6881;
     BootstrapNode node(port);
-    node.start();
     
     // Keep the program running
     while (true) {

@@ -1,6 +1,8 @@
 #ifndef BOOTSTRAP_NODES_H
 #define BOOTSTRAP_NODES_H
 
+#include "node/node.hpp"
+
 #include <libtorrent/session.hpp>
 #include <libtorrent/settings_pack.hpp>
 #include <libtorrent/alert_types.hpp>
@@ -10,34 +12,18 @@
 
 namespace torrent_p2p {
 
-class BootstrapNode {
+class BootstrapNode : public Node {
 public:
     BootstrapNode(int port = 6881);
+    BootstrapNode(int port, const std::string& state_file);
     ~BootstrapNode();
 
-    // Start the bootstrap node
-    void start();
-    
-    // Stop the bootstrap node
-    void stop();
-    
-    // Get the node's DHT state
-    std::string getDHTStats() const;
-    
-    // Get the node's endpoint information
-    std::pair<std::string, int> getEndpoint() const;
-
 private:
-    std::unique_ptr<lt::session> session_;
     std::unique_ptr<std::thread> announceTimer_;
-    int port_;
-    bool running_;
-    
-    // Initialize the session with DHT settings
-    void initializeSession();
-    
+    void start() override;
+    void stop() override;
     // Handle DHT alerts
-    void handleAlerts();
+    void handleAlerts() override;
 };
 
 } // namespace torrent_p2p

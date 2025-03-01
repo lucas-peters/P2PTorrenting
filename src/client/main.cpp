@@ -1,4 +1,4 @@
-#include "client.h"
+#include "client.hpp"
 #include <iostream>
 #include <thread>
 #include <chrono>
@@ -21,7 +21,6 @@ int main(int argc, char* argv[]) {
     };
     
     client.connectToDHT(bootstrap_nodes);
-    client.start();
     
     std::cout << "Client running. Commands available:" << std::endl;
     std::cout << "  add <torrent_file> <save_path>" << std::endl;
@@ -63,10 +62,10 @@ int main(int argc, char* argv[]) {
         } else if (command == "status") {
             client.printStatus();
         } else if (command == "generate") {
-            std::string save_path("/Users/lucaspeters/Downloads/pedestrian.pdf");
+            std::string save_path("/Users/lucaspeters/Documents/GitHub/P2PTorrenting/6882/DOOM1.wad");
             client.generateTorrentFile(save_path);
         } else if (command == "create") {
-            std::string save_path("/Users/lucaspeters/Downloads/pedestrian.torrent");
+            std::string save_path("/Users/lucaspeters/Documents/GitHub/P2PTorrenting/6882/DOOM1.torrent");
             client.createMagnetURI(save_path);
         }
         else if (!command.empty()) {

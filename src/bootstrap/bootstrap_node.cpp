@@ -9,7 +9,14 @@
 
 namespace torrent_p2p {
 
-BootstrapNode::BootstrapNode(int port) : port_(port), running_(false) {}
+BootstrapNode::BootstrapNode(int port) : Node(port) {
+    start();
+}
+
+BootstrapNode::BootstrapNode(int port, const std::string& state_file) : Node(port, state_file) {
+    start();
+    // The base class constructor already loads the DHT state, so we don't need to call loadDHTState again
+}
 
 BootstrapNode::~BootstrapNode() {
     stop();
@@ -100,9 +107,8 @@ void BootstrapNode::stop() {
     if (announceTimer_ && announceTimer_->joinable()) {
         announceTimer_->join();
     }
+    saveDHTState();
     if (session_) {
-        session_->post_dht_stats();
-        // DHT will be automatically stopped when session is destroyed
         session_.reset();
     }
 }
@@ -166,21 +172,6 @@ void BootstrapNode::handleAlerts() {
     }
 }
 
-std::string BootstrapNode::getDHTStats() const {
-    if (!session_) {
-        return "Session not initialized";
-    }
-    
-    session_->post_dht_stats();
-    return "DHT stats requested";
-}
 
-std::pair<std::string, int> BootstrapNode::getEndpoint() const {
-    if (!session_) {
-        return {"not started", 0};
-    }
-    
-    return {"127.0.0.1", port_};
-}
 
 } // namespace torrent_p2p

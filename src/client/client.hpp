@@ -1,6 +1,8 @@
 #ifndef CLIENT_H
 #define CLIENT_H
 
+#include "node/node.hpp"
+
 #include <libtorrent/session.hpp>
 #include <libtorrent/add_torrent_params.hpp>
 #include <libtorrent/torrent_info.hpp>
@@ -12,9 +14,10 @@
 
 namespace torrent_p2p {
 
-class Client {
+class Client : public Node {
 public:
     Client(int port = 6882);
+    Client(int port, const std::string& state_file);
     ~Client();
 
     // Connect to the DHT network using bootstrap nodes
@@ -29,17 +32,8 @@ public:
     // turns a normal file into a torrent file
     void generateTorrentFile(const std::string& savePath);
     
-    // Start the client
-    void start();
-    
-    // Stop the client
-    void stop();
-    
     // Get progress of a specific torrent
    //double getProgress(const std::string& torrentFilePath);
-    
-    // Get DHT statistics
-    std::string getDHTStats() const;
 
     // Print the status of all torrents
     void printStatus() const;
@@ -62,24 +56,21 @@ public:
     // Converts a string representation of an info hash to a sha1_hash
     lt::sha1_hash stringToHash(const std::string& infoHashString) const;
 
-private:
-    std::unique_ptr<lt::session> session_;
-    std::map<lt::sha1_hash, lt::torrent_handle> torrents_;
-    int port_;
-    bool running_;
-    PieceStrategy current_strategy_;
-    BandwidthSettings bandwidth_settings_;
+    // save/load the client's DHT state to/from a file
+    bool saveDHTState(const std::string& state_file) const;
+    bool loadDHTState(const std::string& state_file);
 
+private:
+    std::map<lt::sha1_hash, lt::torrent_handle> torrents_;
+    // Start the client
+    void start() override;
+    
+    // Stop the client
+    void stop() override;
     // Initialize the session with DHT settings
     void initializeSession();
-    
     // Handle alerts from libtorrent
-    void handleAlerts();
-    
-    // New private members for performance optimization
-    void updatePieceStrategy(const lt::torrent_handle& handle);
-    void applyEndGameMode(const lt::torrent_handle& handle);
-    bool isEndGameMode(const lt::torrent_handle& handle) const;
+    void handleAlerts() override;
 };
 
 } // namespace torrent_p2p

@@ -1,20 +1,36 @@
-# Do By Tuesday: Basic Implementation
+# Done
 1. Turn regular files into .torrent files -Done
 2. Generate magnet links from .torrent files -Done
-3. Implement seeding
-4. Implement downloading
-5. Test having a client seed and a client download from the seeder
+3. Implement seeding -Done
+4. Implement downloading -Done
+5. Test having a client seed and a client download from the seeder -Done
 
-# Finish next weekend: Testing
-6. Fault tolerance
-7. We need to implement at least 3 of the algorithms in the project description
-- Python bindings for our code 
-- Docker image to build each client/bootstrap node in
-- Docker compose file to start all nodes and client in one go
+# Finish this week
+- Fault tolerance
+    - bootstrap nodes communicate to each other on their network, i.e. ring topology or separate dht
+        - their will be a leader dht node that manages the creation of new bootstrap nodes
+        - if a node fails, the leader will automatically try to deploy another bootstrap node at the same location
+        - if the leader fails a simple election will occur and the new leader will try to redeploy the previous leader and other failed nodes
+        - create a new ec2 instance and deploy the docker image for a bootstrap node, and run it
+    - client saves state to disk so it can resume where it left off and tries connecting to all the peers it knew of
+    - index nodes will have replicas and will share index information with each other in case of failure
+- Gossip reputation system: in progress
+    - peers will increase or decrease reputation of other nodes based on experience
+    - they will gossip with each other across the network to maintain a reputation
+    - A node will get lower priority though set_unchoke_priority if they have a bad reputation
+    - potentially block/ban nodes that get a low enough reputation
+    - need to be wary of sybil Attack
+- Resouce discovery through shared index of available torrents
+    - when a node begins seeding a torrent, they will send a message to known index node containing key info about the torrent
+    - this will allow other clients to search for files on the network through the index nodes
+    - it does increase centralization, but we will add robust fault tolerance and the network still functions without these indexes
+- Python bindings for our code for testing/GUI
+- Docker image to build each client/bootstrap/index node in
+- Docker compose file to start all nodes in one go
 - Write Python scripts to simulate interactions between nodes
 - Test different amounts of seeders/leechers
 - Test how our system reacts to a node dying during different situations. (downloading, seeding, leeching)
-- Test how our system reacts to a bootstrap node dying
+- Test how our system reacts to a bootstrap node dying, client dying during download, etc.
 
 # Finish Week 9: Deployment
 - create EC2 instances for each node
@@ -31,7 +47,7 @@
 - discuss previous work that we reference in project proposal
 - talk about design choices we made 
     - did we change our implementation from what we outlined in proposal?
-    - node communication (DHT, gosipping, heatbeating)
+    - node communication (DHT, gosipping, heatbeating)33
     - fault tolerance
 - limitations/set backs
 - findings
@@ -40,4 +56,3 @@
 # Nice to have
 - GUI
 - Testing advanced scenarios (ie. Sybil Attack)
-- decentralized search for torrents available on the network
