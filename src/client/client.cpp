@@ -65,7 +65,8 @@ void Client::connectToDHT(const std::vector<std::pair<std::string, int>>& bootst
     // Add bootstrap nodes to routing table
     for (const auto& node : bootstrap_nodes) {
         std::cout << "[Client:" << port_ << "] Adding bootstrap node: " << node.first << ":" << node.second << std::endl;
-        session_->add_dht_node(std::make_pair(node.first, node.second));
+        session_->add_dht_node(std::make_pair(node.first, node.second)); //adding the boostrap_node to the DHT
+        // pings to bootrap_node (in the list), if successfull adds to DHT
         
         try {
             // Force immediate DHT lookup to this node
@@ -86,7 +87,7 @@ void Client::connectToDHT(const std::vector<std::pair<std::string, int>>& bootst
         }
     }
     
-    // Start periodic DHT lookups
+    // Start periodic DHT lookups //like a heartbeat
     std::thread([this]() {
         while (running_) {
             if (session_) {
