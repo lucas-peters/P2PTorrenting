@@ -62,12 +62,15 @@ void Client::initializeSession() {
     pack.set_bool(lt::settings_pack::dht_restrict_search_ips, false);
     pack.set_int(lt::settings_pack::dht_max_peers_reply, 100);
     pack.set_bool(lt::settings_pack::dht_ignore_dark_internet, false);
-    pack.set_int(lt::settings_pack::dht_max_fail_count, 100);  // More forgiving of failures
+    pack.set_int(lt::settings_pack::dht_max_fail_count, 5);  // More forgiving of failures
     
     // Only listen on localhost
     pack.set_str(lt::settings_pack::listen_interfaces, "127.0.0.1:" + std::to_string(port_));
     
     session_ = std::make_unique<lt::session>(pack);
+    
+    // Register the gossip extension for reputation management
+    register_gossip_extension(*session_);
 }
 
 void Client::connectToDHT(const std::vector<std::pair<std::string, int>>& bootstrap_nodes) {
