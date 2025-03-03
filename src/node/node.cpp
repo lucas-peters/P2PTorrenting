@@ -103,4 +103,31 @@ std::string Node::getDHTStats() const {
     return "DHT stats requested";
 }
 
+// lt::sha1_hash Node::getMyNodeId() const {
+//     lt::sha1_hash node_id;
+    
+//     // Try method 1: Get from session state
+//     try {
+//         lt::entry session_state = session_->save_state();
+//         if (session_state.find_key("dht state")) {
+//             lt::entry dht_state = session_state["dht state"];
+//             if (dht_state.find_key("node-id")) {
+//                 std::string node_id_str = dht_state["node-id"].string();
+//                 if (node_id_str.size() == 20) {
+//                     std::memcpy(node_id.data(), node_id_str.data(), 20);
+//                     return node_id;
+//                 }
+//             }
+//         }
+//     } catch (const std::exception& e) {
+//         std::cerr << "Error getting node ID from session state: " << e.what() << std::endl;
+//     }
+    
+//     // If we couldn't get it from session state, try other methods
+//     // (Add additional methods here based on your specific implementation)
+    
+//     // If all else fails, return an empty hash
+//     return node_id;
+// }
+
 } // namespace torrent_p2p

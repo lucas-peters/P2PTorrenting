@@ -31,6 +31,7 @@ public:
     // Save/load the DHT state to/from a file
     bool saveDHTState() const;
     bool loadDHTState(const std::string& state_file);
+    //lt::sha1_hash getMyNodeId() const;
 
 private:
     // Start the node, needs to be implemented slightly different for each type of node

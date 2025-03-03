@@ -81,6 +81,21 @@ public:
     bool loadDHTState(const std::string& state_file);
 
 private:
+    struct PeerInfo {
+        std::string ip;
+        int port;
+        std::string id;  // Optional, if available
+        std::time_t last_seen;
+        int reputation;
+    };
+    
+    std::mutex peers_mutex_;
+    std::unordered_map<std::string, PeerInfo> peer_cache_;
+    
+    void addPeerToCache(const std::string& ip, int port, const std::string& id = "");
+    void updatePeerReputation(const std::string& peer_key, int delta);
+    std::vector<PeerInfo> getRandomPeers(size_t count);
+    
     std::map<lt::sha1_hash, lt::torrent_handle> torrents_;
     // Start the client
     void start() override;

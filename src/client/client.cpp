@@ -92,6 +92,11 @@ void Client::connectToDHT(const std::vector<std::pair<std::string, int>>& bootst
             if (session_) {
                 session_->dht_get_peers(lt::sha1_hash());
                 session_->post_dht_stats();
+                // lt::entry session_state = session_->save_state();
+                // lt::entry dht_state = session_state["dht_state"];
+                // lt::sha1_hash node_id = dht_state["node-id"].string();
+                session_->dht_live_nodes(lt::sha1_hash("0000000000000000000000000000000000000000"));
+
             }
             std::this_thread::sleep_for(std::chrono::seconds(5));
         }
@@ -329,6 +334,24 @@ void Client::handleAlerts() {
                     }
                 }
             }
+        } else if (auto* nodes_alert = lt::alert_cast<lt::dht_live_nodes_alert>(a)) {
+            std::cout << "\n[Client:" << port_ << "] DHT live nodes for node ID: " << lt::aux::to_hex(nodes_alert->node_id) << std::endl;
+            std::cout << "Number of nodes: " << nodes_alert->num_nodes() << std::endl;
+            
+            // Add these nodes to our peer cache
+            for (int i = 0; i < nodes_alert->num_nodes(); ++i) {
+                lt::dht_routing_node node = nodes_alert->nodes()[i];
+            std::string ip = node.endpoint.address().to_string();
+            int port = node.endpoint.port();
+            
+            // Add to peer cache
+            addPeerToCache(ip, port);
+            
+            // Optionally, print some info about the node
+            std::cout << "  Node " << i << ": " << ip << ":" << port 
+                    << ", id: " << lt::aux::to_hex(node.id).substr(0, 8) << "..."
+                    << ", rtt: " << node.rtt << "ms" << std::endl;
+            }
         }
         // } else if (auto* dht_log = lt::alert_cast<lt::dht_log_alert>(a)) {
         //     // Log all DHT activity for debugging
@@ -448,6 +471,43 @@ void Client::generateTorrentFile(const std::string& savePath) {
 
 }
 
+// Peer cache needs a way to remove old or stale peers that haven't been seen in a while, not implemented yet
+void Client::addPeerToCache(const std::string& ip, int port, const std::string& id) {
+    std::lock_guard<std::mutex> lock(peers_mutex_);
+    std::string peer_key = ip + ":" + std::to_string(port);
+
+    auto now = std::time(nullptr);
+
+    // if peer is in cache update its last seen time
+    if (peer_cache_.find(peer_key) != peer_cache_.end()) {
+        std::cout << "Peer " << peer_key << " already in cache" << std::endl;
+        peer_cache_[peer_key].last_seen = now;
+        if (!id.empty()) {
+            peer_cache_[peer_key].id = id;
+        }
+        return;
+    }
+
+    PeerInfo peer;
+    peer.ip = ip;
+    peer.port = port;
+    peer.id = id;
+    peer.reputation = 0;
+    peer.last_seen = now;
+    peer_cache_[peer_key] = peer;
+    std::cout << "Added peer " << peer_key << " to cache" << std::endl;
+    // mutex automatically unlocks when it goes out of scope, lock_guard destructors does this automatically
+}
+
+void Client::updatePeerReputation(const std::string& peer_key, int delta) {
+    std::lock_guard<std::mutex> lock(peers_mutex_);
+
+    if (peer_cache_.find(peer_key) == peer_cache_.end()) {
+        return;
+    }
+
+    peer_cache_[peer_key].reputation += delta;
+}
 // checks the torrent handle is valid
 // libtorrent sets seeding to true automatically
 // sets the seed flag to false, doesn't let other clients download from it
