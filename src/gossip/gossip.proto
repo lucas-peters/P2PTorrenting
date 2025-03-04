@@ -9,6 +9,7 @@ message GossipMessage {
   uint64 timestamp = 2;
   string source_ip = 3;
   uint32 source_port = 4;
+  uint64 lamport_timestamp = 5;
 
   // Different message types
   oneof message_type {

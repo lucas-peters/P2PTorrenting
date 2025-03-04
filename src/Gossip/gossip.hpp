@@ -12,10 +12,13 @@
 #include <functional>
 #include <list>
 #include <random>
+#include <algorithm>
+#include <queue>
 
 #include <libtorrent/session.hpp>
 
 #include "gossip.pb.h"
+#include "lamport.hpp"
 
 namespace torrent_p2p {
     
@@ -84,8 +87,13 @@ private:
         lt::tcp::endpoint sender;
         GossipMessage message;
         std::time_t receive_time;
+
+        // overloading < for priority queue
+        bool operator<(const IncomingMessage& other) const {
+            return message.lamport_timestamp() > other.message.lamport_timestamp();
+        }
     };
-    std::queue<IncomingMessage> incoming_messages_;
+    std::priority_queue<IncomingMessage> incoming_messages_;
     std::mutex incoming_queue_mutex_;
     
     // Thread for processing incoming messages
@@ -127,7 +135,7 @@ private:
     std::mutex peers_mutex_;
     std::string generateMessageId(const GossipMessage& message) const;
 
-    // Helper methods
+    LamportClock lamport_clock_;
     
     //lt::tcp::endpoint endpointFromMessage(const ReputationMessage& message) const;
     void updateKnownPeers();

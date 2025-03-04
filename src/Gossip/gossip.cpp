@@ -284,7 +284,6 @@ void Gossip::processOutgoingMessages() {
 
     {
         std::lock_guard<std::mutex> lock(outgoing_queue_mutex_);
-
         const size_t max_batch_size = 10;
         size_t count = 0;
 
@@ -295,6 +294,9 @@ void Gossip::processOutgoingMessages() {
         }
 
         for (auto& msg : messages_to_process) {
+            // attaching lamport clock timestamp to outgoing message
+            msg.second.set_lamport_timestamp(lamport_clock_.getClock());
+            lamport_clock_.incrementClock();
             sendMessageAsync(msg.first, msg.second);
         }
 
@@ -317,7 +319,7 @@ void Gossip::processIncomingMessages() {
         size_t count = 0;
         
         while (!incoming_messages_.empty() && count < max_batch_size) {
-            messages_to_process.push_back(incoming_messages_.front());
+            messages_to_process.push_back(incoming_messages_.top()); // gets message with lowest lamport timestamp
             incoming_messages_.pop();
             count++;
         }
@@ -329,6 +331,10 @@ void Gossip::processIncomingMessages() {
         const lt::tcp::endpoint& sender = incoming.sender;
         
         try {
+            // updating lamport clock
+            if (message.lamport_timestamp() > 0) {
+                lamport_clock_.updateClock(message.lamport_timestamp());
+            }
             // Check which message type is set in the oneof field
             if (message.has_reputation()) {
                 // Handle reputation message

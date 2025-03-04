@@ -30,12 +30,18 @@ include_directories(
 set(PROTO_FILES src/gossip/gossip.proto)
 protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS ${PROTO_FILES})
 
+# Add lamport clock library
+add_library(lamport STATIC
+    src/gossip/lamport.cpp
+)
+
 add_library(gossip STATIC
     src/gossip/gossip.cpp
     ${PROTO_SRCS}
 )
 
 target_link_libraries(gossip PRIVATE
+    lamport
     LibtorrentRasterbar::torrent-rasterbar
     Boost::thread
     Boost::chrono
@@ -67,6 +73,7 @@ target_link_libraries(node PRIVATE
     Boost::thread
     Boost::chrono
     gossip
+    lamport
 )
 
 target_include_directories(node PUBLIC 

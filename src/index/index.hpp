@@ -6,6 +6,8 @@ public:
     Index(int port = 6882);
     Index(int port, const std::string& state_file);
     ~Index();
+
+    addTorrent();
 private:
     void start() override;
     void stop() override;
