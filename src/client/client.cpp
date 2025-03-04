@@ -98,7 +98,7 @@ void Client::connectToDHT(const std::vector<std::pair<std::string, int>>& bootst
         }
     }
     
-    // Start periodic DHT lookups
+    // Start periodic DHT lookups //like a heartbeat
     std::thread([this]() {
         while (running_) {
             std::cout << "[Client:" << port_ << "] Running periodic DHT maintenance..." << std::endl;
