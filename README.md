@@ -22,6 +22,11 @@ brew install libtorrent-rasterbar
 
 ## Building
 
+This project uses git submodules for dependencies. After cloning, run:
+
+```bash
+git submodule update --init --recursive
+
 ```bash
 mkdir build
 cd build

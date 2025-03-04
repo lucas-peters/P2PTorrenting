@@ -4,18 +4,21 @@ project(P2PTorrenting)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Set the path to the locally built Abseil
-set(ABSEIL_DIR ${CMAKE_CURRENT_SOURCE_DIR}/abseil-cpp/build)
-list(APPEND CMAKE_PREFIX_PATH ${ABSEIL_DIR})
+# Use Abseil from submodule
+message(STATUS "Using Abseil from submodule")
+# Prevent Abseil from overriding our compiler flags
+set(ABSL_PROPAGATE_CXX_STD ON)
+# Disable Abseil tests to speed up the build
+set(BUILD_TESTING OFF CACHE BOOL "Disable Abseil tests")
+# Add Abseil from the submodule
+add_subdirectory(third_party/abseil-cpp)
 
 # Find required packages
 find_package(LibtorrentRasterbar REQUIRED)
 find_package(Boost REQUIRED COMPONENTS system thread chrono)
 find_package(Protobuf REQUIRED)
-find_package(absl REQUIRED CONFIG) # Use CONFIG mode to find the local build
 
 # Print debug info
-message(STATUS "Found Abseil at: ${ABSEIL_DIR}")
 message(STATUS "LibtorrentRasterbar include dirs: ${LibtorrentRasterbar_INCLUDE_DIRS}")
 
 include_directories(
@@ -40,12 +43,11 @@ target_link_libraries(gossip PRIVATE
     absl::base
     absl::strings
     absl::raw_logging_internal
-    # Add missing Abseil logging libraries, cmake could not find these I had to declare this directy
+    # Add missing Abseil logging libraries
     absl::log_internal_check_op
     absl::log_internal_message
     absl::log_internal_conditions
     absl::log_internal_format
-    absl::log_internal_globals
     absl::log_internal_log_sink_set
     absl::log_globals
     absl::log_initialize
