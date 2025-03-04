@@ -15,17 +15,18 @@ int main(int argc, char* argv[]) {
     // Run as client
     Client client(port);
     
-    // Connect to bootstrap nodes
-    std::vector<std::pair<std::string, int>> bootstrap_nodes = {
-        {"127.0.0.1", 6881}  // local bootstrap node
-    };
+    // Connect to bootstrap nodes, need to store this in a config file
+    // std::vector<std::pair<std::string, int>> bootstrap_nodes = {
+    //     {"172.31.17.201", 6881}  // local bootstrap node
+    // };
     
-    client.connectToDHT(bootstrap_nodes);
+    //client.connectToDHT(bootstrap_nodes);
     
     std::cout << "Client running. Commands available:" << std::endl;
     std::cout << "  add <torrent_file> <save_path>" << std::endl;
     std::cout << "  status" << std::endl;
     std::cout << "  quit" << std::endl;
+    std::cout << "  gossip" << std::endl;
 
     // Starting a background thread that prints DHT stats
     std::atomic<bool> running{true};
@@ -67,6 +68,13 @@ int main(int argc, char* argv[]) {
         } else if (command == "create") {
             std::string save_path("/Users/lucaspeters/Documents/GitHub/P2PTorrenting/6882/DOOM1.torrent");
             client.createMagnetURI(save_path);
+        } else if (command == "gossip") {
+            std::cout << "gossiping in main" << std::endl;
+            GossipMessage message;
+            message.set_source_ip("127.0.0.1");
+            message.set_source_port(port);
+            lt::udp::endpoint exclude(lt::make_address_v4("127.0.0.1"), port);
+            client.gossip_->spreadMessage(message, exclude);
         }
         else if (!command.empty()) {
             std::cout << "Unknown command. Available commands:" << std::endl;

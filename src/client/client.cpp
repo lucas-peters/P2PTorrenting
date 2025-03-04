@@ -51,7 +51,7 @@ void Client::initializeSession() {
     pack.set_int(lt::settings_pack::dht_max_fail_count, 100);  // More forgiving of failures
     
     // Only listen on localhost
-    pack.set_str(lt::settings_pack::listen_interfaces, "127.0.0.1:" + std::to_string(port_));
+    pack.set_str(lt::settings_pack::listen_interfaces, "0.0.0.0:" + std::to_string(port_));
     
     session_ = std::make_unique<lt::session>(pack);
 }
@@ -65,11 +65,17 @@ void Client::connectToDHT(const std::vector<std::pair<std::string, int>>& bootst
     // Add bootstrap nodes to routing table
     for (const auto& node : bootstrap_nodes) {
         std::cout << "[Client:" << port_ << "] Adding bootstrap node: " << node.first << ":" << node.second << std::endl;
-        session_->add_dht_node(std::make_pair(node.first, node.second));
         
         try {
-            // Force immediate DHT lookup to this node
+            // First, check if the bootstrap node is reachable
+            std::cout << "[Client:" << port_ << "] Checking if bootstrap node is reachable..." << std::endl;
             lt::udp::endpoint ep(lt::make_address_v4(node.first), node.second);
+            
+            // Add the node to the DHT routing table
+            session_->add_dht_node(std::make_pair(node.first, node.second));
+            
+            // Force immediate DHT lookup to this node
+            std::cout << "[Client:" << port_ << "] Sending direct DHT request to " << node.first << ":" << node.second << std::endl;
             session_->dht_direct_request(ep, lt::entry{}, lt::client_data_t{});
             
             // Also announce ourselves with a generated hash
@@ -80,23 +86,49 @@ void Client::connectToDHT(const std::vector<std::pair<std::string, int>>& bootst
             for (int i = 0; i < 5; i++) {
                 reinterpret_cast<uint32_t*>(hash.data())[i] = dis(gen);
             }
+            std::cout << "[Client:" << port_ << "] Announcing to DHT with hash: " << hash << std::endl;
             session_->dht_announce(hash, port_);
+            
+            // Also try to get peers for this hash to force DHT activity
+            std::cout << "[Client:" << port_ << "] Getting peers for hash: " << hash << std::endl;
+            session_->dht_get_peers(hash);
         } catch (const std::exception& e) {
-            std::cerr << "[Client:" << port_ << "] Error connecting to node: " << e.what() << std::endl;
+            std::cerr << "[Client:" << port_ << "] Error connecting to node " << node.first << ":" << node.second 
+                      << " - " << e.what() << std::endl;
         }
     }
     
     // Start periodic DHT lookups
     std::thread([this]() {
         while (running_) {
+            std::cout << "[Client:" << port_ << "] Running periodic DHT maintenance..." << std::endl;
             if (session_) {
-                session_->dht_get_peers(lt::sha1_hash());
-                session_->post_dht_stats();
-                // lt::entry session_state = session_->save_state();
-                // lt::entry dht_state = session_state["dht_state"];
-                // lt::sha1_hash node_id = dht_state["node-id"].string();
-                session_->dht_live_nodes(lt::sha1_hash("0000000000000000000000000000000000000000"));
-
+                try {
+                    // Request DHT stats to see what's happening
+                    session_->post_dht_stats();
+                    
+                    // Try to get peers for an empty hash to force DHT activity
+                    session_->dht_get_peers(lt::sha1_hash());
+                    
+                    // Get nodes from our DHT routing table
+                    lt::session_params params = session_->session_state();
+                    if (params.dht_state.nodes.empty()) {
+                        std::cout << "[Client:" << port_ << "] WARNING: No DHT nodes in routing table!" << std::endl;
+                        
+                        // Try to reconnect to bootstrap nodes
+                        for (const auto& node : bootstrap_nodes_) {
+                            std::cout << "[Client:" << port_ << "] Re-adding bootstrap node: " << node.first << ":" << node.second << std::endl;
+                            session_->add_dht_node(std::make_pair(node.first, node.second));
+                        }
+                    } else {
+                        std::cout << "[Client:" << port_ << "] DHT routing table has " << params.dht_state.nodes.size() << " nodes:" << std::endl;
+                        for (auto & node : params.dht_state.nodes) {
+                            std::cout << "[Client:" << port_ << "] DHT node: " << node.address() << ":" << node.port() << std::endl;
+                        }
+                    }
+                } catch (const std::exception& e) {
+                    std::cerr << "[Client:" << port_ << "] Error in DHT maintenance: " << e.what() << std::endl;
+                }
             }
             std::this_thread::sleep_for(std::chrono::seconds(5));
         }
@@ -107,6 +139,10 @@ void Client::start() {
     if (!session_) {
         initializeSession();
     }
+    std::cout << "Starting client..." << std::endl;
+
+    std::cout << "Connecting to DHT bootstrap nodes..." << std::endl;
+    connectToDHT(bootstrap_nodes_);
     
     // Start handling alerts in a separate thread
     std::thread([this]() {
@@ -116,6 +152,24 @@ void Client::start() {
         }
     }).detach();
     
+    try {
+        // Make sure the session is fully initialized before creating Gossip
+        std::cout << "Waiting for DHT to initialize..." << std::endl;
+        std::this_thread::sleep_for(std::chrono::seconds(2)); // Give DHT time to initialize
+        
+        std::cout << "Creating Gossip object..." << std::endl;
+        gossip_ = std::make_unique<Gossip>(*session_, port_ + 1000);
+        
+        std::cout << "Gossip object created successfully" << std::endl;
+        // Don't call start() here as the Gossip constructor already calls it
+        // gossip_->start();
+    } catch (const std::exception& e) {
+        std::cerr << "Exception during Gossip initialization: " << e.what() << std::endl;
+    } catch (...) {
+        std::cerr << "Unknown exception during Gossip initialization" << std::endl;
+    }
+
+    running_ = true;
     std::cout << "Client started on port " << port_ << std::endl;
 }
 
@@ -123,6 +177,7 @@ void Client::stop() {
     if (session_) {
         // DHT will be automatically stopped when session is destroyed
         running_ = false;
+        gossip_->stop();
         session_.reset();
     }
 }
@@ -335,22 +390,19 @@ void Client::handleAlerts() {
                 }
             }
         } else if (auto* nodes_alert = lt::alert_cast<lt::dht_live_nodes_alert>(a)) {
-            std::cout << "\n[Client:" << port_ << "] DHT live nodes for node ID: " << lt::aux::to_hex(nodes_alert->node_id) << std::endl;
+            std::cout << "\n[Client:" << port_ << "] DHT live nodes" << std::endl;
             std::cout << "Number of nodes: " << nodes_alert->num_nodes() << std::endl;
             
             // Add these nodes to our peer cache
-            for (int i = 0; i < nodes_alert->num_nodes(); ++i) {
-                lt::dht_routing_node node = nodes_alert->nodes()[i];
-            std::string ip = node.endpoint.address().to_string();
-            int port = node.endpoint.port();
-            
+            std::vector<std::pair<lt::sha1_hash, lt::udp::endpoint>> nodes = nodes_alert->nodes();
+            for (auto & node: nodes) {
+                
             // Add to peer cache
-            addPeerToCache(ip, port);
+            addPeerToCache(node.second.address().to_string(), node.second.port());
             
             // Optionally, print some info about the node
-            std::cout << "  Node " << i << ": " << ip << ":" << port 
-                    << ", id: " << lt::aux::to_hex(node.id).substr(0, 8) << "..."
-                    << ", rtt: " << node.rtt << "ms" << std::endl;
+            std::cout  << "ip: " << node.second.address().to_string() << "port: " << node.second.port() 
+                    << ", id: " << nodes_alert->node_id.to_string() << "..." << std::endl;
             }
         }
         // } else if (auto* dht_log = lt::alert_cast<lt::dht_log_alert>(a)) {
@@ -407,6 +459,7 @@ std::string Client::createMagnetURI(const std::string& torrentFilePath) const {
     return magnetURI;
 }
 
+// create a sha-1 hash from magnet string
 lt::sha1_hash Client::stringToHash(const std::string& infoHashString) const {
     lt::sha1_hash hash;
 
@@ -508,6 +561,7 @@ void Client::updatePeerReputation(const std::string& peer_key, int delta) {
 
     peer_cache_[peer_key].reputation += delta;
 }
+
 // checks the torrent handle is valid
 // libtorrent sets seeding to true automatically
 // sets the seed flag to false, doesn't let other clients download from it

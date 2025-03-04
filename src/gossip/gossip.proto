@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package torrent_p2p;
+
+// Common message wrapper for all gossip types
+message GossipMessage {
+  // Metadata for all messages
+  string message_id = 1;
+  uint64 timestamp = 2;
+  string source_ip = 3;
+  uint32 source_port = 4;
+
+  // Different message types
+  oneof message_type {
+    ReputationMessage reputation = 10;
+    // Add more message types here as needed
+  }
+}
+
+// Reputation message
+message ReputationMessage {
+  string subject_ip = 1;
+  uint32 subject_port = 2;
+  int32 reputation = 3;
+  string reason = 4;  // Optional reason for reputation change
+}

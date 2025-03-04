@@ -11,6 +11,8 @@
 #include <iostream>
 #include <fstream>
 
+#include "gossip/gossip.hpp"
+
 namespace torrent_p2p {
 
 // Node is an abstract class that defines the interface for other nodes to inherit from
@@ -32,6 +34,8 @@ public:
     bool saveDHTState() const;
     bool loadDHTState(const std::string& state_file);
     //lt::sha1_hash getMyNodeId() const;
+    // putting this in public to test with main, we should hide this object behind an API
+    std::unique_ptr<Gossip> gossip_;
 
 private:
     // Start the node, needs to be implemented slightly different for each type of node
@@ -45,9 +49,11 @@ private:
 
 protected:
     std::unique_ptr<lt::session> session_;
+    std::unique_ptr<torrent_p2p::Gossip> gossip_manager_;
     int port_;
     bool running_;
     std::string state_file_;
+    
 
 }; // namespace torrent_p2p
 

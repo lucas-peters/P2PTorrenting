@@ -45,11 +45,22 @@ void BootstrapNode::start() {
         pack.set_bool(lt::settings_pack::dht_ignore_dark_internet, false);
         pack.set_int(lt::settings_pack::dht_max_fail_count, 100);  // More forgiving of failures
         
-        // Only listen on localhost
-        pack.set_str(lt::settings_pack::listen_interfaces, "127.0.0.1:" + std::to_string(port_));
+        // Listen on all interfaces to accept connections from any IP
+        pack.set_str(lt::settings_pack::listen_interfaces, "0.0.0.0:" + std::to_string(port_));        
+        std::cout << "[Bootstrap] Starting on port " << port_ << " listening on all interfaces" << std::endl;
         
-        std::cout << "[Bootstrap] Starting on port " << port_ << std::endl;
+        // Set up the session
         session_ = std::make_unique<lt::session>(pack);
+        
+        // Verify that we're actually listening
+        // auto endpoints = session_->get_listen_status();
+        // if (endpoints.empty()) {
+        //     std::cerr << "[Bootstrap] WARNING: Not listening on any interfaces!" << std::endl;
+        // } else {
+        //     for (const auto& ep : endpoints) {
+        //         std::cout << "[Bootstrap] Listening on: " << ep.address() << ":" << ep.port() << std::endl;
+        //     }
+        // }
         
         // Start periodic DHT announcements
         announceTimer_ = std::make_unique<std::thread>([this]() {
@@ -58,6 +69,7 @@ void BootstrapNode::start() {
                     if (session_) {
                         std::cout << "[Bootstrap] Requesting DHT stats..." << std::endl;
                         session_->post_dht_stats();
+                        
                         // Force DHT bootstrap
                         session_->dht_get_peers(lt::sha1_hash());
                         
@@ -69,7 +81,15 @@ void BootstrapNode::start() {
                         for (int i = 0; i < 5; i++) {
                             reinterpret_cast<uint32_t*>(hash.data())[i] = dis(gen);
                         }
+                        std::cout << "[Bootstrap] Announcing hash: " << hash << " on port " << port_ << std::endl;
                         session_->dht_announce(hash, port_);
+                        
+                        // Print current DHT routing table
+                        lt::session_params params = session_->session_state();
+                        std::cout << "[Bootstrap] DHT routing table has " << params.dht_state.nodes.size() << " nodes" << std::endl;
+                        for (auto & node : params.dht_state.nodes) {
+                            std::cout << "[Bootstrap] DHT node: " << node.address() << ":" << node.port() << std::endl;
+                        }
                     }
                 } catch (const std::exception& e) {
                     std::cerr << "[Bootstrap] Error in announce timer: " << e.what() << std::endl;
@@ -80,6 +100,16 @@ void BootstrapNode::start() {
     }
     
     running_ = true;
+    
+    try {
+        std::cout << "[Bootstrap] Creating Gossip object..." << std::endl;
+        gossip_ = std::make_unique<torrent_p2p::Gossip>(*session_, port_ + 1000);
+        std::cout << "[Bootstrap] Gossip object created successfully" << std::endl;
+    } catch (const std::exception& e) {
+        std::cerr << "[Bootstrap] Exception during Gossip initialization: " << e.what() << std::endl;
+    } catch (...) {
+        std::cerr << "[Bootstrap] Unknown exception during Gossip initialization" << std::endl;
+    }
     
     // Start handling alerts in a separate thread
     std::thread([this]() {
@@ -100,6 +130,9 @@ void BootstrapNode::stop() {
     running_ = false;
     if (announceTimer_ && announceTimer_->joinable()) {
         announceTimer_->join();
+    }
+    if (gossip_) {
+        gossip_->stop();
     }
     saveDHTState();
     if (session_) {
