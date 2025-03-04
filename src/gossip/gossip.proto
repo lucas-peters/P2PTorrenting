@@ -22,5 +22,4 @@ message ReputationMessage {
   string subject_ip = 1;
   uint32 subject_port = 2;
   int32 reputation = 3;
-  string reason = 4;  // Optional reason for reputation change
 }

@@ -27,11 +27,11 @@ include_directories(
     ${CMAKE_CURRENT_BINARY_DIR}
 )
 
-set(PROTO_FILES src/Gossip/gossip.proto)
+set(PROTO_FILES src/gossip/gossip.proto)
 protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS ${PROTO_FILES})
 
 add_library(gossip STATIC
-    src/Gossip/Gossip.cpp
+    src/gossip/gossip.cpp
     ${PROTO_SRCS}
 )
 
@@ -68,28 +68,37 @@ target_link_libraries(node PRIVATE
     Boost::chrono
     gossip
 )
-target_include_directories(node PUBLIC src)
+
+target_include_directories(node PUBLIC 
+    src
+    ${PROTOBUF_INCLUDE_DIRS}
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
+)
 
 add_executable(p2p_bootstrap
     src/bootstrap/main.cpp
     src/bootstrap/bootstrap_node.cpp
 )
+
 target_link_libraries(p2p_bootstrap PRIVATE
     node
     LibtorrentRasterbar::torrent-rasterbar
     Boost::thread
     Boost::chrono
 )
+
 target_include_directories(p2p_bootstrap PRIVATE src/bootstrap PUBLIC src)
 
 add_executable(p2p_client
     src/client/main.cpp
     src/client/client.cpp
 )
+
 target_link_libraries(p2p_client PRIVATE
     node
     LibtorrentRasterbar::torrent-rasterbar
     Boost::thread
     Boost::chrono
 )
+
 target_include_directories(p2p_client PRIVATE src/client PUBLIC src)

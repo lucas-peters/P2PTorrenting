@@ -28,13 +28,14 @@ void Client::initializeSession() {
         | lt::alert::port_mapping_notification
         | lt::alert::dht_log_notification
         | lt::alert::piece_progress_notification
-        | lt::alert::storage_notification);
+        | lt::alert::storage_notification
+        | lt::alert_category::block_progress);
 
     // Force Highest Level Encryption, ChaCha20 instead of RC4
     pack.set_int(lt::settings_pack::in_enc_policy, lt::settings_pack::pe_forced);
     pack.set_int(lt::settings_pack::out_enc_policy, lt::settings_pack::pe_forced);
     
-    // Enable DHT with local-only settings
+    // Enable DHT but don't give it access to bitTorrent bootstrap nodes, we are implementing a closed system
     pack.set_bool(lt::settings_pack::enable_dht, true);
     pack.set_str(lt::settings_pack::dht_bootstrap_nodes, "");  // Disable external bootstrap nodes
     pack.set_int(lt::settings_pack::dht_announce_interval, 5);
@@ -43,14 +44,14 @@ void Client::initializeSession() {
     pack.set_bool(lt::settings_pack::enable_outgoing_tcp, true);
     pack.set_bool(lt::settings_pack::enable_incoming_tcp, true);
     
-    // Disable IP restrictions for local testing
+    // Disable IP restrictions for local testing, by default it doesn't allow duplicate ips. i.e: localhost
     pack.set_bool(lt::settings_pack::dht_restrict_routing_ips, false);
     pack.set_bool(lt::settings_pack::dht_restrict_search_ips, false);
     pack.set_int(lt::settings_pack::dht_max_peers_reply, 100);
     pack.set_bool(lt::settings_pack::dht_ignore_dark_internet, false);
     pack.set_int(lt::settings_pack::dht_max_fail_count, 100);  // More forgiving of failures
     
-    // Only listen on localhost
+    // listen on all
     pack.set_str(lt::settings_pack::listen_interfaces, "0.0.0.0:" + std::to_string(port_));
     
     session_ = std::make_unique<lt::session>(pack);
@@ -145,12 +146,20 @@ void Client::start() {
     connectToDHT(bootstrap_nodes_);
     
     // Start handling alerts in a separate thread
-    std::thread([this]() {
+    alert_thread_ = std::make_unique<std::thread>([this]() {
         while (session_) {
             handleAlerts();
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
-    }).detach();
+    });
+
+    // peer cache thread
+    peer_cache_thread_ = std::make_unique<std::thread>([this]() {
+        while (session_) {
+            updatePeerCache();
+            std::this_thread::sleep_for(std::chrono::seconds(60)); // for real use case this would be longer
+        }
+    });
     
     try {
         // Make sure the session is fully initialized before creating Gossip
@@ -163,6 +172,13 @@ void Client::start() {
         std::cout << "Gossip object created successfully" << std::endl;
         // Don't call start() here as the Gossip constructor already calls it
         // gossip_->start();
+        
+        // Register the reputation message handler
+        gossip_->setReputationHandler(
+            [this](const ReputationMessage& message, const lt::tcp::endpoint& sender) {
+                this->handleReputationMessage(message, sender);
+            }
+        );
     } catch (const std::exception& e) {
         std::cerr << "Exception during Gossip initialization: " << e.what() << std::endl;
     } catch (...) {
@@ -178,6 +194,12 @@ void Client::stop() {
         // DHT will be automatically stopped when session is destroyed
         running_ = false;
         gossip_->stop();
+        if (alert_thread_ && alert_thread_->joinable()) {
+            alert_thread_->join();
+        }
+        if (peer_cache_thread_ && peer_cache_thread_->joinable()) {
+            peer_cache_thread_->join();
+        }
         session_.reset();
     }
 }
@@ -339,12 +361,6 @@ void Client::handleAlerts() {
                     std::cout << "Started verifying pieces for torrent" << std::endl;
             }
         }
-        else if (auto* pf = lt::alert_cast<lt::piece_finished_alert>(a)) {
-            // Calculate verification progress
-            lt::torrent_status status = pf->handle.status();
-            float progress = status.progress * 100;
-            std::cout << "\rVerifying pieces: " << static_cast<int>(progress) << "% complete" << std::flush;
-        }
         else if (auto* sc = lt::alert_cast<lt::storage_moved_alert>(a)) {
             std::cout << "\nTorrent data moved to: " << sc->storage_path() << std::endl;
         }
@@ -389,22 +405,78 @@ void Client::handleAlerts() {
                     }
                 }
             }
-        } else if (auto* nodes_alert = lt::alert_cast<lt::dht_live_nodes_alert>(a)) {
+        } 
+        else if (auto* nodes_alert = lt::alert_cast<lt::dht_live_nodes_alert>(a)) {
             std::cout << "\n[Client:" << port_ << "] DHT live nodes" << std::endl;
             std::cout << "Number of nodes: " << nodes_alert->num_nodes() << std::endl;
             
             // Add these nodes to our peer cache
-            std::vector<std::pair<lt::sha1_hash, lt::udp::endpoint>> nodes = nodes_alert->nodes();
-            for (auto & node: nodes) {
+            // std::vector<std::pair<lt::sha1_hash, lt::tcp::endpoint>> nodes = nodes_alert->nodes();
+            for (auto & node: nodes_alert->nodes()) {
                 
             // Add to peer cache
-            addPeerToCache(node.second.address().to_string(), node.second.port());
+            // addPeerToCache(lt::tcp::endpoint(node);
             
             // Optionally, print some info about the node
             std::cout  << "ip: " << node.second.address().to_string() << "port: " << node.second.port() 
                     << ", id: " << nodes_alert->node_id.to_string() << "..." << std::endl;
             }
         }
+        /* PIECE TRACKING */
+        else if (auto* bfa = lt::alert_cast<lt::block_finished_alert>(a)) {
+            std::cout << "finished downloading block from peer: " << bfa->endpoint << std::endl;
+            lt::sha1_hash info_hash = bfa->handle.info_hash();
+            
+            // mutex unlocks when this variabale goes out of scope at the end of the else if block
+            std::lock_guard<std::mutex> lock(torrent_tracker_mutex_);
+            // if a tracker doesn't exist for the torrent instantiate one
+            if(torrent_trackers_.find(info_hash) == torrent_trackers_.end()) {
+                torrent_trackers_[info_hash] = std::make_unique<PieceTracker>();
+            }
+            torrent_trackers_[info_hash]->add_block(bfa->piece_index, bfa->block_index, bfa->endpoint);
+            
+        }
+        else if (auto* hfa = lt::alert_cast<lt::hash_failed_alert>(a)) {
+            std::cout << "Hash check failed! getting bad peers" << std::endl;
+            lt::sha1_hash info_hash = hfa->handle.info_hash();
+
+            if(torrent_trackers_.find(info_hash) != torrent_trackers_.end()) {
+                torrent_trackers_[info_hash]->record_bad_piece(hfa->piece_index);
+
+                // printing bad piece information for debugging
+                auto bad_peers = torrent_trackers_[info_hash]->get_piece_contributors(hfa->piece_index);
+                for (auto& peer: bad_peers) {
+                    std::cout << "Bad piece contribution from peer: " << peer 
+                            << " for torrent: " << info_hash << std::endl;
+                }
+            }
+        }
+        else if (auto* pfa = lt::alert_cast<lt::piece_finished_alert>(a)) {
+            std::cout << "piece finished downloading" << std::endl;
+            lt::sha1_hash info_hash = pfa->handle.info_hash();
+            if(torrent_trackers_.find(info_hash) != torrent_trackers_.end()) {
+                torrent_trackers_[info_hash]->record_good_piece(pfa->piece_index);
+            }
+        }
+        else if (auto * tfa = lt::alert_cast<lt::torrent_finished_alert>(a)) {
+            // Get the info hash directly - works with both older and newer libtorrent versions
+            lt::sha1_hash info_hash = tfa->handle.info_hash();
+
+            if (torrent_trackers_.find(info_hash) != torrent_trackers_.end()) {
+                auto updates = torrent_trackers_[info_hash]->get_reputation_updates();
+                
+                std::cout << "Torrent " << info_hash << " complete. Sending reputation updates for " 
+                        << updates.size() << " peers" << std::endl;
+                
+                sendGossip(updates);
+                
+                // Remove tracker for this torrent
+                torrent_trackers_.erase(info_hash);
+            }
+        }
+    }
+
+        
         // } else if (auto* dht_log = lt::alert_cast<lt::dht_log_alert>(a)) {
         //     // Log all DHT activity for debugging
         //     std::cout << "[Client:" << port_ << "] DHT: " << dht_log->message() << std::endl;
@@ -433,7 +505,6 @@ void Client::handleAlerts() {
         //     // Log all alert messages for debugging
         //     std::cout << a->message() << std::endl;
         // }
-    }
 }
 
 // dht will communicate back through alerts
@@ -525,41 +596,126 @@ void Client::generateTorrentFile(const std::string& savePath) {
 }
 
 // Peer cache needs a way to remove old or stale peers that haven't been seen in a while, not implemented yet
-void Client::addPeerToCache(const std::string& ip, int port, const std::string& id) {
-    std::lock_guard<std::mutex> lock(peers_mutex_);
-    std::string peer_key = ip + ":" + std::to_string(port);
+// void Client::addPeerToCache(const std::string& ip, int port, const std::string& id) {
+//     std::lock_guard<std::mutex> lock(peers_mutex_);
+//     std::string peer_key = ip + ":" + std::to_string(port);
 
-    auto now = std::time(nullptr);
+//     auto now = std::time(nullptr);
 
-    // if peer is in cache update its last seen time
-    if (peer_cache_.find(peer_key) != peer_cache_.end()) {
-        std::cout << "Peer " << peer_key << " already in cache" << std::endl;
-        peer_cache_[peer_key].last_seen = now;
-        if (!id.empty()) {
-            peer_cache_[peer_key].id = id;
-        }
-        return;
+//     // if peer is in cache update its last seen time
+//     if (peer_cache_.find(peer_key) != peer_cache_.end()) {
+//         std::cout << "Peer " << peer_key << " already in cache" << std::endl;
+//         peer_cache_[peer_key].last_seen = now;
+//         if (!id.empty()) {
+//             peer_cache_[peer_key].id = id;
+//         }
+//         return;
+//     }
+
+//     PeerInfo peer;
+//     peer.ip = ip;
+//     peer.port = port;
+//     peer.id = id;
+//     peer.reputation = 0;
+//     peer.last_seen = now;
+//     peer_cache_[peer_key] = peer;
+//     std::cout << "Added peer " << peer_key << " to cache" << std::endl;
+//     // mutex automatically unlocks when it goes out of scope, lock_guard destructors does this automatically
+// }
+
+// void Client::updatePeerReputation(const std::string& peer_key, int delta) {
+//     std::lock_guard<std::mutex> lock(peers_mutex_);
+
+//     if (peer_cache_.find(peer_key) == peer_cache_.end()) {
+//         return;
+//     }
+
+//     peer_cache_[peer_key] += delta;
+// }
+
+void Client::sendGossip(std::vector<std::pair<lt::tcp::endpoint, int>> peer_reputation) const{
+    for (auto& peer : peer_reputation) {
+        lt::tcp::endpoint empty_endpoint(lt::address_v4::any(), 0);
+        std::cout << "In client, sending message to gossip..." << std::endl;
+        gossip_->spreadMessage(gossip_->createGossipMessage(peer.first, peer.second), empty_endpoint);
     }
-
-    PeerInfo peer;
-    peer.ip = ip;
-    peer.port = port;
-    peer.id = id;
-    peer.reputation = 0;
-    peer.last_seen = now;
-    peer_cache_[peer_key] = peer;
-    std::cout << "Added peer " << peer_key << " to cache" << std::endl;
-    // mutex automatically unlocks when it goes out of scope, lock_guard destructors does this automatically
 }
 
-void Client::updatePeerReputation(const std::string& peer_key, int delta) {
+// Handler for incoming reputation messages
+void Client::handleReputationMessage(const ReputationMessage& message, const lt::tcp::endpoint& sender) {
+    // Extract information from the message
+    std::string subject_ip = message.subject_ip();
+    int subject_port = message.subject_port();
+    int reputation_delta = message.reputation();
+    
+    std::cout << "Received reputation update from " << sender.address().to_string() 
+              << ":" << sender.port() << " about peer " << subject_ip << ":" 
+              << subject_port << " with delta " << reputation_delta << std::endl;
+    
+    // Update our local peer cache with this reputation information
+    lt::tcp::endpoint peer_key(lt::make_address_v4(subject_ip), subject_port);
+    
+    std::lock_guard<std::mutex> lock(peers_mutex_);
+    if (peer_cache_.find(peer_key) != peer_cache_.end()) {
+        // Update existing peer
+        peer_cache_[peer_key] += reputation_delta;
+        std::cout << "Updated peer " << peer_key << " reputation to " 
+                  << peer_cache_[peer_key] << std::endl;
+        if (peer_cache_[peer_key] < 0) {
+            banNode(peer_key);
+        }
+    }
+}
+
+void Client::updatePeerCache() {
+    auto peers = session_->session_state().dht_state.nodes;
     std::lock_guard<std::mutex> lock(peers_mutex_);
 
-    if (peer_cache_.find(peer_key) == peer_cache_.end()) {
+    for (const auto& peer : peers) {
+        // converting udp object to tcp
+        lt::tcp::endpoint temp_peer(peer.address(), peer.port());
+        
+        // checking cache
+        if (peer_cache_.find(temp_peer) != peer_cache_.end()) {
+            peer_cache_[temp_peer] = 100;
+        }
+    }
+}
+
+// Ban a node from the DHT network
+// This is the only way to ban nodes, wont work for localhost tests since it will just ban all nodes
+void Client::banNode(const lt::tcp::endpoint& endpoint) {
+    if (!session_) {
+        std::cerr << "Cannot ban node: session not initialized" << std::endl;
         return;
     }
-
-    peer_cache_[peer_key].reputation += delta;
+    
+    try {
+        std::cout << "Banning node " << endpoint.address().to_string() 
+                  << ":" << endpoint.port() << std::endl;
+        
+        // Create an IP filter
+        lt::ip_filter filter = session_->get_ip_filter();
+        
+        // Add the node's IP to the filter
+        // This blocks all connections from this IP address
+        filter.add_rule(endpoint.address(), endpoint.address(), lt::ip_filter::blocked);
+        
+        // Apply the updated filter to the session
+        session_->set_ip_filter(filter);
+        
+        std::cout << "Added node " << endpoint.address().to_string() 
+                  << " to IP filter" << std::endl;
+        
+        // Also remove the node from our peer cache to avoid future interactions
+        std::lock_guard<std::mutex> lock(peers_mutex_);
+        if (peer_cache_.find(endpoint) != peer_cache_.end()) {
+            peer_cache_.erase(endpoint);
+            std::cout << "Removed node from peer cache" << std::endl;
+        }
+    } catch (const std::exception& e) {
+        std::cerr << "Error banning node: " << e.what() << std::endl;
+    }
 }
 
 // checks the torrent handle is valid

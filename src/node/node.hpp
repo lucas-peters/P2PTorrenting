@@ -12,6 +12,7 @@
 #include <fstream>
 
 #include "gossip/gossip.hpp"
+#include "gossip.pb.h"
 
 namespace torrent_p2p {
 

@@ -161,9 +161,10 @@ void Gossip::startAccept() {
     }
 }
 
+// asynchronously reads messages from the socket and passes them to handleReceivedMessage()
 void Gossip::handleAccept(std::shared_ptr<boost::asio::ip::tcp::socket> socket) {
     // Get the endpoint of the sender
-    lt::udp::endpoint sender(
+    lt::tcp::endpoint sender(
         socket->remote_endpoint().address(),
         socket->remote_endpoint().port()
     );
@@ -198,7 +199,8 @@ void Gossip::handleAccept(std::shared_ptr<boost::asio::ip::tcp::socket> socket) 
     
 }
 
-void Gossip::handleReceivedMessage(const lt::udp::endpoint& sender, const std::vector<char>& buffer) {
+// checks whether we've seen the message before, if we haven't spread the messege and add it it our incoming queue
+void Gossip::handleReceivedMessage(const lt::tcp::endpoint& sender, const std::vector<char>& buffer) {
     try {
         GossipMessage message;
         if (!message.ParseFromArray(buffer.data(), buffer.size())) {
@@ -229,7 +231,7 @@ void Gossip::handleReceivedMessage(const lt::udp::endpoint& sender, const std::v
     }
 }
 
-void Gossip::sendMessageAsync(const lt::udp::endpoint& target, const GossipMessage& msg) {
+void Gossip::sendMessageAsync(const lt::tcp::endpoint& target, const GossipMessage& msg) {
     try {
         // create socket
         auto socket = std::make_shared<bip::tcp::socket>(io_context_);
@@ -249,7 +251,7 @@ void Gossip::sendMessageAsync(const lt::udp::endpoint& target, const GossipMessa
         std::memcpy(buffer->data(), &message_size, sizeof(message_size));
         std::memcpy(buffer->data() + sizeof(message_size), serialized_msg.data(), message_size);
         
-        // converting lt's UDP endpoint to asio's TCP endpoint
+        // converting lt's tcp endpoint to asio's TCP endpoint
         bip::tcp::endpoint tcp_endpoint(target.address(),target.port());
 
         socket->async_connect(tcp_endpoint,
@@ -276,8 +278,9 @@ void Gossip::sendMessageAsync(const lt::udp::endpoint& target, const GossipMessa
     std::cout << "Message sent asynchronously to: " << target << std::endl;
 }
 
+// processes messages that are in the outgoing message queue
 void Gossip::processOutgoingMessages() {
-    std::vector<std::pair<lt::udp::endpoint, GossipMessage>> messages_to_process;
+    std::vector<std::pair<lt::tcp::endpoint, GossipMessage>> messages_to_process;
 
     {
         std::lock_guard<std::mutex> lock(outgoing_queue_mutex_);
@@ -297,6 +300,9 @@ void Gossip::processOutgoingMessages() {
 
     }
 }
+
+// processes messages that have been accepted and added to incoming queue
+// triggers callback functions in node classes
 void Gossip::processIncomingMessages() {
     // Get a batch of messages from the queue
     std::vector<IncomingMessage> messages_to_process;
@@ -320,7 +326,7 @@ void Gossip::processIncomingMessages() {
     // Process each message
     for (const auto& incoming : messages_to_process) {
         const GossipMessage& message = incoming.message;
-        const lt::udp::endpoint& sender = incoming.sender;
+        const lt::tcp::endpoint& sender = incoming.sender;
         
         try {
             // Check which message type is set in the oneof field
@@ -383,12 +389,12 @@ std::string Gossip::generateMessageId(const GossipMessage& message) const {
 }
 
 void Gossip::updateKnownPeers() {
-    std::vector<lt::udp::endpoint> peers = session_.session_state().dht_state.nodes;
+    auto peers = session_.session_state().dht_state.nodes;
     std::lock_guard<std::mutex> lock(peers_mutex_);
     // Add new peers to the list, avoiding duplicates
     for (const auto& peer : peers) {
         // Create a new endpoint with port + 1000 for gossip
-        lt::udp::endpoint gossip_peer(peer.address(), peer.port() + 1000);
+        lt::tcp::endpoint gossip_peer(peer.address(), peer.port() + 1000);
         
         bool exists = false;
         for (const auto& known : known_peers_) {
@@ -404,15 +410,15 @@ void Gossip::updateKnownPeers() {
     }
 }
 
-std::vector<lt::udp::endpoint> Gossip::selectRandomPeers(size_t count, const lt::udp::endpoint& exclude) {
+std::vector<lt::tcp::endpoint> Gossip::selectRandomPeers(size_t count, const lt::tcp::endpoint& exclude) {
     std::lock_guard<std::mutex> lock(peers_mutex_);
     
-    std::vector<lt::udp::endpoint> result;
+    std::vector<lt::tcp::endpoint> result;
     if(known_peers_.empty())
         return result;
     
     // Create a copy of peers excluding the sender
-    std::vector<lt::udp::endpoint> available_peers;
+    std::vector<lt::tcp::endpoint> available_peers;
     for (const auto& peer : known_peers_) {
         if (peer.address() != exclude.address() || peer.port() != exclude.port()) {
             available_peers.push_back(peer);
@@ -434,10 +440,11 @@ std::vector<lt::udp::endpoint> Gossip::selectRandomPeers(size_t count, const lt:
     return result;
 }
 
-void Gossip::spreadMessage(const GossipMessage& message, const lt::udp::endpoint& exclude) {
+void Gossip::spreadMessage(const GossipMessage& message, const lt::tcp::endpoint& exclude) {
     std::cout << "spreading message" << std::endl;
     auto peers = selectRandomPeers(3, exclude);
     std::cout << "selected random peers" << std::endl;
+
     std::lock_guard<std::mutex> lock(outgoing_queue_mutex_);
     for (const auto & peer: peers) {
         std::cout << "peer: " << peer << std::endl;
@@ -445,17 +452,15 @@ void Gossip::spreadMessage(const GossipMessage& message, const lt::udp::endpoint
     }
 }
 
-void Gossip::sendReputationMessage(const lt::udp::endpoint& target, 
-                                  const lt::udp::endpoint& subject, 
+void Gossip::sendReputationMessage(const lt::tcp::endpoint& target, 
+                                  const lt::tcp::endpoint& subject, 
                                   int reputation,
                                   const std::string& reason) {
-    GossipMessage message = createGossipMessage(subject, reputation, reason);
+    GossipMessage message = createGossipMessage(subject, reputation);
     outgoing_messages_.push({target, message});
 }
 
-GossipMessage Gossip::createGossipMessage(const lt::udp::endpoint& subject, 
-                                        int reputation, 
-                                        const std::string& reason) const {
+GossipMessage Gossip::createGossipMessage(const lt::tcp::endpoint& subject, int reputation) const {
     GossipMessage message;
     message.set_timestamp(std::time(nullptr));
     
@@ -463,9 +468,6 @@ GossipMessage Gossip::createGossipMessage(const lt::udp::endpoint& subject,
     rep_msg->set_subject_ip(subject.address().to_string());
     rep_msg->set_subject_port(subject.port());
     rep_msg->set_reputation(reputation);
-    if (!reason.empty()) {
-        rep_msg->set_reason(reason);
-    }
     
     std::string id = generateMessageId(message);
     message.set_message_id(id);

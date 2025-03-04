@@ -73,7 +73,7 @@ int main(int argc, char* argv[]) {
             GossipMessage message;
             message.set_source_ip("127.0.0.1");
             message.set_source_port(port);
-            lt::udp::endpoint exclude(lt::make_address_v4("127.0.0.1"), port);
+            lt::tcp::endpoint exclude(lt::make_address_v4("127.0.0.1"), port);
             client.gossip_->spreadMessage(message, exclude);
         }
         else if (!command.empty()) {

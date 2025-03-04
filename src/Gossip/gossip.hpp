@@ -32,26 +32,28 @@ public:
     void stop();
     
     // Send a gossip message to a specific peer
-    void sendGossipMessage(const lt::udp::endpoint& target, const GossipMessage& message);
+    void sendGossipMessage(const lt::tcp::endpoint& target, const GossipMessage& message);
     
     // Send a reputation message (convenience method)
-    void sendReputationMessage(const lt::udp::endpoint& target, 
-                              const lt::udp::endpoint& subject, 
+    void sendReputationMessage(const lt::tcp::endpoint& target, 
+                              const lt::tcp::endpoint& subject, 
                               int reputation,
                               const std::string& reason = "");
 
     // message spreading
-    void spreadMessage(const GossipMessage& message, const lt::udp::endpoint& exclude);
-    std::vector<lt::udp::endpoint> selectRandomPeers(size_t count, const lt::udp::endpoint& exclude);
+    void spreadMessage(const GossipMessage& message, const lt::tcp::endpoint& exclude);
+    std::vector<lt::tcp::endpoint> selectRandomPeers(size_t count, const lt::tcp::endpoint& exclude);
     
     // Get peers from DHT
-    std::vector<lt::udp::endpoint> getPeersFromDHT();
+    std::vector<lt::tcp::endpoint> getPeersFromDHT();
     
     // Type aliases for handler functions
-    using ReputationHandler = std::function<void(const ReputationMessage&, const lt::udp::endpoint&)>;
+    using ReputationHandler = std::function<void(const ReputationMessage&, const lt::tcp::endpoint&)>;
     
     // Set handlers for different message types
     void setReputationHandler(ReputationHandler handler) { reputation_handler_ = handler; }
+
+    GossipMessage createGossipMessage(const lt::tcp::endpoint& subject, int reputation) const;
     
     // Process DHT alerts to find peers
     //void processDHTAlerts();
@@ -74,12 +76,12 @@ private:
     // Message handlers - can add more to support multiple types of messages
     ReputationHandler reputation_handler_;
     
-    std::queue<std::pair<lt::udp::endpoint, GossipMessage>> outgoing_messages_;
+    std::queue<std::pair<lt::tcp::endpoint, GossipMessage>> outgoing_messages_;
     std::mutex outgoing_queue_mutex_;
     
     // Incoming message queue
     struct IncomingMessage {
-        lt::udp::endpoint sender;
+        lt::tcp::endpoint sender;
         GossipMessage message;
         std::time_t receive_time;
     };
@@ -93,11 +95,11 @@ private:
     void processIncomingMessages();
     void startAccept();
     void handleAccept(std::shared_ptr<boost::asio::ip::tcp::socket> socket);
-    void handleReceivedMessage(const lt::udp::endpoint& sender, const std::vector<char>& buffer);
+    void handleReceivedMessage(const lt::tcp::endpoint& sender, const std::vector<char>& buffer);
     
     // Asynchronous message sending
     void processOutgoingMessages();
-    void sendMessageAsync(const lt::udp::endpoint& target, const GossipMessage& message);
+    void sendMessageAsync(const lt::tcp::endpoint& target, const GossipMessage& message);
     void handleConnect(const boost::system::error_code& error, 
                       boost::asio::ip::tcp::socket* socket, 
                       std::shared_ptr<std::string> serialized_message);
@@ -121,14 +123,13 @@ private:
     void addToCache(const std::string& message_id);
 
     // Known peers for message propagation
-    std::vector<lt::udp::endpoint> known_peers_;
+    std::vector<lt::tcp::endpoint> known_peers_;
     std::mutex peers_mutex_;
     std::string generateMessageId(const GossipMessage& message) const;
 
     // Helper methods
-    GossipMessage createGossipMessage(const lt::udp::endpoint& subject, int reputation, 
-                                        const std::string& reason = "") const;
-    //lt::udp::endpoint endpointFromMessage(const ReputationMessage& message) const;
+    
+    //lt::tcp::endpoint endpointFromMessage(const ReputationMessage& message) const;
     void updateKnownPeers();
 };
 
