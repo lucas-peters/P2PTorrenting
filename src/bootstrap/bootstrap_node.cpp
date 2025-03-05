@@ -12,6 +12,10 @@ BootstrapNode::BootstrapNode(int port, const std::string& state_file) : Node(por
     // The base class constructor already loads the DHT state, so we don't need to call loadDHTState again
 }
 
+BootstrapNode::BootstrapNode(int port, const std::vector<lt::tcp::endpoint>& bootstrap_nodes): Node(port), bootstrap_nodes_(bootstrap_nodes) {
+    start();
+}
+
 BootstrapNode::~BootstrapNode() {
     stop();
 }
@@ -105,6 +109,8 @@ void BootstrapNode::start() {
         std::cout << "[Bootstrap] Creating Gossip object..." << std::endl;
         gossip_ = std::make_unique<torrent_p2p::Gossip>(*session_, port_ + 1000);
         std::cout << "[Bootstrap] Gossip object created successfully" << std::endl;
+        // Initialize heartbeat after gossip is created
+        initializeHeartbeat();
     } catch (const std::exception& e) {
         std::cerr << "[Bootstrap] Exception during Gossip initialization: " << e.what() << std::endl;
     } catch (...) {
@@ -133,6 +139,9 @@ void BootstrapNode::stop() {
     }
     if (gossip_) {
         gossip_->stop();
+    }
+    if (heartbeat_manager_) {
+        heartbeat_manager_->stop();
     }
     saveDHTState();
     if (session_) {
@@ -199,6 +208,19 @@ void BootstrapNode::handleAlerts() {
     }
 }
 
-
+void BootstrapNode::initializeHeartbeat() {
+    std::cout << "[Bootstrap] Initiallizing Heartbeat" << std::endl;
+    if (gossip_ && !bootstrap_nodes_.empty()) {
+        gossip_->setHeartbeatHandler([this](const lt::tcp::endpoint& sender) {
+            // Optional: Add additional logic for handling heartbeat responses here
+            std::cout << "Received heartbeat response from: " 
+                      << sender.address() << ":" << sender.port() << std::endl;
+        });
+        
+        // Create heartbeat manager
+        heartbeat_manager_ = std::make_unique<BootstrapHeartbeat>(*gossip_, bootstrap_nodes_);
+        heartbeat_manager_->start();
+    }
+}
 
 } // namespace torrent_p2p
