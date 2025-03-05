@@ -286,6 +286,11 @@ void Client::addTorrent(const std::string& torrentFilePath, const std::string& s
         std::cout << "\nPiece verification:" << std::endl;
         std::cout << "Checking files: " << (status.state == lt::torrent_status::checking_files) << std::endl;
         std::cout << "Checking resume data: " << (status.state == lt::torrent_status::checking_resume_data) << std::endl;
+
+        // Publish the torrent title and magnet link to the DHT
+        std::string title = params.ti->name();
+        std::string magnetLink = lt::make_magnet_uri(*(params.ti));
+        publishTitleToDHT(title, magnetLink);
         
     } catch (const std::exception& e) {
         std::cout << "Error adding torrent: " << e.what() << std::endl;
@@ -473,6 +478,12 @@ void Client::handleAlerts() {
                 // Remove tracker for this torrent
                 torrent_trackers_.erase(info_hash);
             }
+        }
+        else if (auto* put_alert = lt::alert_cast<lt::dht_put_item_alert>(a)) {
+
+        }
+        else if (auto* get_alert = lt::alert_cast<lt::dht_get_item_alert>(a)) {
+
         }
     }
 
@@ -718,6 +729,17 @@ void Client::banNode(const lt::tcp::endpoint& endpoint) {
     }
 }
 
+void Client::publishTitleToDHT(const std::string& title, const std::string& magnetLink) {
+    std::string key = "title:" + title;
+
+    lt::entry entry;
+    entry["magnet"] = magnetLink;
+    entry["timestamp"] = static_cast<std::int64_t>(std::time(nullptr));
+}
+
+void Client::searchTitleInDHT(const std::string& title) {
+
+}
 // checks the torrent handle is valid
 // libtorrent sets seeding to true automatically
 // sets the seed flag to false, doesn't let other clients download from it

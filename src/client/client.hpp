@@ -95,13 +95,12 @@ public:
     Client(int port, const std::string& state_file);
     ~Client();
 
-    // Connect to the DHT network using bootstrap nodes
+    // bootstraps into the dht using set endpoints at bootstrap nodes
     void connectToDHT(const std::vector<std::pair<std::string, int>>& bootstrap_nodes);
     
     // Add a torrent to download
     void addTorrent(const std::string& torrentFilePath, const std::string& savePath);
-
-    // Check if a torrent is already added
+    void addTorrent(const std::string& magnetLink);
     bool hasTorrent(const lt::sha1_hash& hash) const;
 
     // turns a normal file into a torrent file
@@ -122,10 +121,8 @@ public:
     // Add a magnet link to the client
     void addMagnet(const std::string& infoHash, const std::string& savePath);
 
-    // Begins seeding a torrent file for other clients to download from
+    // by default a torrent starts seeding when added, these can be used to turn those flags on/off
     void startSeeding(const std::string& torrentFilePath);
-
-    // Stops seeding a torrent file for other clients to download from
     void stopSeeding(const std::string& torrentFilePath);
 
     // Converts a string representation of an info hash to a sha1_hash
@@ -135,15 +132,13 @@ public:
     bool saveDHTState(const std::string& state_file) const;
     bool loadDHTState(const std::string& state_file);
 
-private:
-    // struct PeerInfo {
-    //     std::string ip;
-    //     int port;
-    //     std::string id;  // Optional, if available
-    //     std::time_t last_seen;
-    //     int reputation;
-    // };
+    // Publish a torrent title and magnet link to the DHT
+    void publishTitleToDHT(const std::string& title, const std::string& magnetLink);
+    
+    // Search for torrents by title in the DHT
+    void searchTitleInDHT(const std::string& title);
 
+private:
     // tracks what peers contributed what pieces of each torrent
     std::unordered_map<lt::sha1_hash, std::unique_ptr<PieceTracker>> torrent_trackers_;
     std::mutex torrent_tracker_mutex_;
@@ -166,12 +161,13 @@ private:
     // Initialize the session and set flags, called by start
     void initializeSession();
 
-    // Handle alerts from libtorrent
+    // libtorrent sets alerts to communicate when events happen, such as when a torrent is downloading or when a peer sends a message
     void handleAlerts() override;
 
+    // gossips to the dht network about the reputation of a node
     void sendGossip(std::vector<std::pair<lt::tcp::endpoint, int>> peer_reputation) const;
     
-    // Handler for incoming reputation messages from gossip
+    // callback for incoming gossip message
     void handleReputationMessage(const ReputationMessage& message, const lt::tcp::endpoint& sender);
 
     //threads
