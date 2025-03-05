@@ -8,7 +8,8 @@
 #include <unordered_map>
 #include <libtorrent/socket.hpp>
 #include <boost/asio.hpp>
-#include "../Gossip/gossip.hpp"
+#include "gossip.pb.h"
+#include "gossip/gossip.hpp"
 
 namespace torrent_p2p {
 

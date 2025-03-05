@@ -2,7 +2,7 @@
 #define BOOTSTRAP_NODES_H
 
 #include "node/node.hpp"
-#include "bootstrap_heartbeat.hpp"
+#include "gossip/bootstrap_heartbeat.hpp"
 #include <libtorrent/session.hpp>
 #include <libtorrent/settings_pack.hpp>
 #include <libtorrent/alert_types.hpp>

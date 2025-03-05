@@ -1,4 +1,4 @@
-#include "bootstrap_heartbeat.hpp"
+#include "gossip/bootstrap_heartbeat.hpp"
 #include <iostream>
 
 namespace torrent_p2p {
