@@ -14,14 +14,14 @@
 using namespace torrent_p2p;
 namespace fs = std::filesystem;
 
-// Global flag for graceful shutdown
-volatile sig_atomic_t running = 1;
+// // Global flag for graceful shutdown
+// volatile sig_atomic_t running = 1;
 
-// Signal handler
-void signal_handler(int signal) {
-    std::cout << "Received signal " << signal << ", shutting down..." << std::endl;
-    running = 0;
-}
+// // Signal handler
+// void signal_handler(int signal) {
+//     std::cout << "Received signal " << signal << ", shutting down..." << std::endl;
+//     running = 0;
+// }
 
 // Function to display help information
 void displayHelp() {
@@ -43,8 +43,8 @@ void displayHelp() {
 }
 
 int main(int argc, char* argv[]) {
-    std::signal(SIGINT, signal_handler);
-    std::signal(SIGTERM, signal_handler);
+    // std::signal(SIGINT, signal_handler);
+    // std::signal(SIGTERM, signal_handler);
     
     // Parse command line arguments
     int port = 6882;
@@ -115,6 +115,7 @@ int main(int argc, char* argv[]) {
     std::string input;
     while (running) {
         std::cout << "> ";
+        std::cout.flush();  // Make sure the prompt is displayed
         std::getline(std::cin, input);
 
         std::istringstream iss(input);

@@ -19,7 +19,10 @@
 #include <libtorrent/add_torrent_params.hpp>
 #include <libtorrent/alert_types.hpp>
 #include <libtorrent/torrent_handle.hpp>
-#include <libtorrent/load_torrent.hpp>
+#include <libtorrent/version.hpp>         // For version checking
+
+#include <boost/functional/hash.hpp>      // For boost::hash_combine
+
 #include <filesystem>
 #include <fstream>
 #include <iostream>
@@ -29,10 +32,33 @@
 #include <map>
 #include <vector>
 #include <chrono>
-#include <random>
-#include <stdexcept>
 
 namespace torrent_p2p {
+
+// custom hash function for lt::tcp::endpoint
+// had to create this because compiler in docker did not have a way to hash endpoints automatically
+struct EndpointHash {
+    std::size_t operator()(const lt::tcp::endpoint& ep) const {
+        std::size_t seed = 0;
+        
+        const auto& addr = ep.address();
+        if (addr.is_v4()) {
+            // IPv4 address
+            auto v4addr = addr.to_v4().to_uint();
+            boost::hash_combine(seed, v4addr);
+        } else {
+            // IPv6 address
+            auto v6addr = addr.to_v6().to_bytes();
+            for (auto b : v6addr) {
+                boost::hash_combine(seed, b);
+            }
+        }
+        
+        // Combine with port
+        boost::hash_combine(seed, ep.port());
+        return seed;
+    }
+};
 
 // This struct is used to track which peers were responsible for contributing data to a piece
 // Unfortunately we can't determine exactly which peer sent the bad piece, 
@@ -40,11 +66,14 @@ namespace torrent_p2p {
 // A malicious peer will most likely contribute to mostly bad pieces
 // A good piece will increase reputation slightly a bad piece significantly hurts reputation
 struct PieceTracker {
-    // Track piece contributions
-    std::unordered_map<lt::piece_index_t, std::unordered_map<lt::tcp::endpoint, std::set<int>>> piece_contributors;
+    // Track piece contributions - using our custom hash function for endpoints
+    std::unordered_map<lt::piece_index_t, 
+                      std::unordered_map<lt::tcp::endpoint, 
+                                        std::set<int>, 
+                                        EndpointHash>> piece_contributors;
 
-    // Track peer reputation changes for this torrent
-    std::unordered_map<lt::tcp::endpoint, int> peer_reputation_delta;
+    // Track peer reputation changes for this torrent - using our custom hash function
+    std::unordered_map<lt::tcp::endpoint, int, EndpointHash> peer_reputation_delta;
 
     static constexpr int GOOD_PIECE = 1;
     static constexpr int BAD_PIECE = -5;  // Penalize bad pieces more heavily
@@ -91,7 +120,7 @@ struct PieceTracker {
 
 class Client : public Node {
 public:
-    Client(int port = 6882);
+    Client(int port = 6881);
     Client(int port, const std::string& state_file);
     ~Client();
 
@@ -137,14 +166,14 @@ private:
     std::mutex torrent_tracker_mutex_;
 
     std::mutex peers_mutex_;
-    std::unordered_map<lt::tcp::endpoint, int> peer_cache_; // maps port to reputation, currently not tracking when peer was last seen
+    std::unordered_map<lt::tcp::endpoint, int, EndpointHash> peer_cache_; // maps port to reputation, currently not tracking when peer was last seen
     
     void updatePeerCache();
     void addPeerToCache(const std::string& ip, int port, const std::string& id = "");
     void updatePeerReputation(const std::string& peer_key, int delta);
     
     //std::vector<PeerInfo> getRandomPeers(size_t count);
-    std::vector<std::pair<std::string, int>> bootstrap_nodes_ = {{"172.31.17.201", 6881}};
+    std::vector<std::pair<std::string, int>> bootstrap_nodes_ = {{"172.20.0.2", 6881}};
     std::map<lt::sha1_hash, lt::torrent_handle> torrents_;
 
     // Start/stop the client
@@ -166,6 +195,10 @@ private:
     //threads
     std::unique_ptr<std::thread> alert_thread_;
     std::unique_ptr<std::thread> peer_cache_thread_;
+
+    // this is where we store torrents and downloads on docker images
+    std::string torrent_path_ = "/app/torrents/";
+    std::string download_path_ = "/app/downloads/";
     
     // Ban a node from the DHT network
     void banNode(const lt::tcp::endpoint& endpoint);

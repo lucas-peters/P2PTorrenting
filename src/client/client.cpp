@@ -212,11 +212,25 @@ bool Client::hasTorrent(const lt::sha1_hash& hash) const {
 // if the torrent is file is missing or incomplete it tries to download from peers
 // if the torrent is complete it starts seeding
 // We can bypass this if we want to roll our own torrent protocol but it will be a pain in the ass
+// Make sure that torrentFilePath is only the local path to the torrent, it is automatically appended to "/app/torrents/" for our docker images
 void Client::addTorrent(const std::string& torrentFilePath, const std::string& savePath) {
     try {
-        // load the torrent parameters from file
-        lt::add_torrent_params params = lt::load_torrent_file(torrentFilePath);
-        params.save_path = savePath;
+        // Load the torrent file into a byte vector
+        std::ifstream torrentFileStream(torrent_path_ + torrentFilePath, std::ios_base::binary);
+        std::vector<char> torrentFileBytes((std::istreambuf_iterator<char>(torrentFileStream)),
+                                            std::istreambuf_iterator<char>());
+
+        // Create torrent_info from the byte vector
+        lt::torrent_info torrentInfo(torrentFileBytes.data(), torrentFileBytes.size());
+
+        // Create add_torrent_params from torrent_info
+        lt::add_torrent_params params;
+        params.ti = std::make_shared<lt::torrent_info>(torrentInfo);
+        if (savePath != "") {
+            params.save_path = savePath;
+        } else {
+            params.save_path = download_path_;
+        }
         std::cout << "params.save_path: " << params.save_path << std::endl;
 
         // this loop strips the absolute file path added by load_torrent_file, so thats in the correct format
@@ -290,7 +304,6 @@ void Client::addTorrent(const std::string& torrentFilePath, const std::string& s
         // Publish the torrent title and magnet link to the DHT
         std::string title = params.ti->name();
         std::string magnetLink = lt::make_magnet_uri(*(params.ti));
-        publishTitleToDHT(title, magnetLink);
         
     } catch (const std::exception& e) {
         std::cout << "Error adding torrent: " << e.what() << std::endl;
@@ -722,6 +735,74 @@ void Client::banNode(const lt::tcp::endpoint& endpoint) {
         std::cerr << "Error banning node: " << e.what() << std::endl;
     }
 }
+
+// Implementation of saveDHTState method
+bool Client::saveDHTState(const std::string& state_file) const {
+    if (!session_) {
+        std::cerr << "Cannot save DHT state: session not initialized" << std::endl;
+        return false;
+    }
+    
+    try {
+        // Get the session state with only DHT state
+        lt::session_params params = session_->session_state();
+        
+        // Serialize the session params to a buffer
+        std::vector<char> buffer = lt::write_session_params_buf(params, lt::session::save_dht_state);
+        
+        std::ofstream file(state_file, std::ios::binary);
+        if (!file.is_open()) {
+            std::cerr << "Could not open state file for writing: " << state_file << std::endl;
+            return false;
+        }
+
+        file.write(buffer.data(), buffer.size());
+        std::cout << "Saved DHT state to " << state_file << std::endl;
+        file.close();
+        return true;
+    } catch (const std::exception& e) {
+        std::cerr << "Error saving DHT state: " << e.what() << std::endl;
+        return false;
+    }
+}
+
+// Implementation of loadDHTState method
+bool Client::loadDHTState(const std::string& state_file) {
+    if (!session_) {
+        std::cerr << "Cannot load DHT state: session not initialized" << std::endl;
+        return false;
+    }
+    
+    try {
+        std::ifstream file(state_file, std::ios::binary);
+        if (!file.is_open()) {
+            std::cerr << "Could not open state file for reading: " << state_file << std::endl;
+            return false;
+        }
+        
+        // Get file size
+        file.seekg(0, std::ios::end);
+        std::streampos size = file.tellg();
+        file.seekg(0, std::ios::beg);
+        
+        // Read file content into buffer
+        std::vector<char> buffer(size);
+        file.read(buffer.data(), size);
+        file.close();
+        
+        // Parse session params from buffer
+        lt::session_params params = lt::read_session_params(buffer);
+        session_->apply_settings(params.settings);
+        session_->set_dht_state(params.dht_state);
+        
+        std::cout << "Loaded DHT state from " << state_file << std::endl;
+        return true;
+    } catch (const std::exception& e) {
+        std::cerr << "Error loading DHT state: " << e.what() << std::endl;
+        return false;
+    }
+}
+
 // checks the torrent handle is valid
 // libtorrent sets seeding to true automatically
 // sets the seed flag to false, doesn't let other clients download from it

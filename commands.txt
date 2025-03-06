@@ -6,3 +6,4 @@ add /Users/lucaspeters/Documents/GitHub/P2PTorrenting/6883/DOOM1.torrent /Users/
 
 add /Users/lucaspeters/Documents/GitHub/P2PTorrenting/6882/DOOM1.torrent /Users/lucaspeters/Documents/GitHub/P2PTorrenting/6882
 
+generate /Users/lucaspeters/Documents/GitHub/P2PTorrenting/6882/pedestrian.pdf
