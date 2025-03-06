@@ -100,7 +100,6 @@ public:
     
     // Add a torrent to download
     void addTorrent(const std::string& torrentFilePath, const std::string& savePath);
-    void addTorrent(const std::string& magnetLink);
     bool hasTorrent(const lt::sha1_hash& hash) const;
 
     // turns a normal file into a torrent file
@@ -131,12 +130,6 @@ public:
     // save/load the client's DHT state to/from a file
     bool saveDHTState(const std::string& state_file) const;
     bool loadDHTState(const std::string& state_file);
-
-    // Publish a torrent title and magnet link to the DHT
-    void publishTitleToDHT(const std::string& title, const std::string& magnetLink);
-    
-    // Search for torrents by title in the DHT
-    void searchTitleInDHT(const std::string& title);
 
 private:
     // tracks what peers contributed what pieces of each torrent

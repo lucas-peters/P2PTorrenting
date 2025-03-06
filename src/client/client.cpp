@@ -479,12 +479,6 @@ void Client::handleAlerts() {
                 torrent_trackers_.erase(info_hash);
             }
         }
-        else if (auto* put_alert = lt::alert_cast<lt::dht_put_item_alert>(a)) {
-
-        }
-        else if (auto* get_alert = lt::alert_cast<lt::dht_get_item_alert>(a)) {
-
-        }
     }
 
         
@@ -727,18 +721,6 @@ void Client::banNode(const lt::tcp::endpoint& endpoint) {
     } catch (const std::exception& e) {
         std::cerr << "Error banning node: " << e.what() << std::endl;
     }
-}
-
-void Client::publishTitleToDHT(const std::string& title, const std::string& magnetLink) {
-    std::string key = "title:" + title;
-
-    lt::entry entry;
-    entry["magnet"] = magnetLink;
-    entry["timestamp"] = static_cast<std::int64_t>(std::time(nullptr));
-}
-
-void Client::searchTitleInDHT(const std::string& title) {
-
 }
 // checks the torrent handle is valid
 // libtorrent sets seeding to true automatically

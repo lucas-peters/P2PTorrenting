@@ -1,0 +1,62 @@
+# Base image with C++ build tools
+FROM ubuntu:22.04 AS builder
+
+# Avoid interactive prompts during installation
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    cmake \
+    git \
+    libboost-all-dev \
+    libssl-dev \
+    libprotobuf-dev \
+    protobuf-compiler \
+    libtorrent-rasterbar-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set up working directory
+WORKDIR /app
+
+# Copy source code
+COPY . .
+
+# Remove any existing build directory and create a fresh one
+RUN rm -rf build && \
+    mkdir -p build && \
+    cd build && \
+    cmake .. && \
+    make -j$(nproc) p2p_client
+
+# Create a smaller runtime image
+FROM ubuntu:22.04
+
+# Install runtime dependencies
+RUN apt-get update && apt-get install -y \
+    libboost-system1.74.0 \
+    libboost-thread1.74.0 \
+    libboost-chrono1.74.0 \
+    libtorrent-rasterbar2.0 \
+    libprotobuf23 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set up working directory
+WORKDIR /app
+
+# Create directories for torrents and downloads
+RUN mkdir -p /app/torrents /app/downloads
+
+# Copy the built executable from the builder stage
+COPY --from=builder /app/build/p2p_client .
+
+# Expose the default client port
+EXPOSE 6882/tcp
+EXPOSE 6882/udp
+# Expose the gossip port (port + 1000)
+EXPOSE 7882/tcp
+EXPOSE 7882/udp
+
+# Run the client
+ENTRYPOINT ["./p2p_client"]
+CMD ["--port", "6882"]
