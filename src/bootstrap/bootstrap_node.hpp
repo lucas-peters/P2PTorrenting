@@ -24,7 +24,7 @@ public:
     BootstrapNode(int port = 6881);
     BootstrapNode(int port, const std::string& state_file);
     BootstrapNode(int port, const std::vector<lt::tcp::endpoint>& bootstrap_nodes);
-
+    BootstrapHeartbeat* getHeartbeatManager();
     ~BootstrapNode();
 
 private:

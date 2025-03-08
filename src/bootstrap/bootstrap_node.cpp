@@ -109,9 +109,19 @@ void BootstrapNode::start() {
         std::cout << "[Bootstrap] Creating Gossip object..." << std::endl;
         gossip_ = std::make_unique<torrent_p2p::Gossip>(*session_, port_ + 1000);
         std::cout << "[Bootstrap] Gossip object created successfully" << std::endl;
-        // Initialize heartbeat after gossip is created
+    
+        // Ensure Heartbeat Manager is initialized
         initializeHeartbeat();
+    
+        if (!heartbeat_manager_) {
+            std::cerr << "Error: Heartbeat manager failed to start!" << std::endl;
+        } else {
+            std::cout << "[Bootstrap] Heartbeat Manager is running!" << std::endl;
+        }
     } catch (const std::exception& e) {
+        std::cerr << "[Bootstrap] Exception during Gossip initialization: " << e.what() << std::endl;
+    }
+     catch (const std::exception& e) {
         std::cerr << "[Bootstrap] Exception during Gossip initialization: " << e.what() << std::endl;
     } catch (...) {
         std::cerr << "[Bootstrap] Unknown exception during Gossip initialization" << std::endl;
@@ -208,19 +218,27 @@ void BootstrapNode::handleAlerts() {
     }
 }
 
+BootstrapHeartbeat* BootstrapNode::getHeartbeatManager() {
+    return heartbeat_manager_.get();
+}
+
 void BootstrapNode::initializeHeartbeat() {
-    std::cout << "[Bootstrap] Initiallizing Heartbeat" << std::endl;
-    if (gossip_ && !bootstrap_nodes_.empty()) {
-        gossip_->setHeartbeatHandler([this](const lt::tcp::endpoint& sender) {
-            // Optional: Add additional logic for handling heartbeat responses here
-            std::cout << "Received heartbeat response from: " 
-                      << sender.address() << ":" << sender.port() << std::endl;
-        });
-        
-        // Create heartbeat manager
+    std::cout << "[Bootstrap] Initializing Heartbeat..." << std::endl;
+
+    if (!gossip_) {
+        std::cerr << "Error: Gossip is not initialized!" << std::endl;
+        return;
+    }
+
+    if (!heartbeat_manager_) {
         heartbeat_manager_ = std::make_unique<BootstrapHeartbeat>(*gossip_, bootstrap_nodes_);
         heartbeat_manager_->start();
+        std::cout << "[Bootstrap] Heartbeat Manager started!" << std::endl;
+    } else {
+        std::cout << "[Bootstrap] Heartbeat Manager already running." << std::endl;
     }
 }
+
+
 
 } // namespace torrent_p2p

@@ -156,7 +156,7 @@ private:
     void updatePeerReputation(const std::string& peer_key, int delta);
     
     //std::vector<PeerInfo> getRandomPeers(size_t count);
-    std::vector<std::pair<std::string, int>> bootstrap_nodes_ = {{"172.31.17.201", 6881}};
+    std::vector<std::pair<std::string, int>> bootstrap_nodes_;
     std::map<lt::sha1_hash, lt::torrent_handle> torrents_;
 
     // Start/stop the client
