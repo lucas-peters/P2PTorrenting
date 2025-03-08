@@ -1,5 +1,9 @@
 #include "node.hpp"
 
+// Add explicit include for protobuf-generated headers
+#include "gossip.pb.h"
+#include "index.pb.h"
+
 namespace torrent_p2p {
 Node::Node(int port) : port_(port), running_(false) {}
 
@@ -26,10 +30,11 @@ void Node::start() {
         
         std::cout << "Creating Gossip object..." << std::endl;
         gossip_ = std::make_unique<Gossip>(*session_, port_ + 1000);
-        
         std::cout << "Gossip object created successfully" << std::endl;
-        // Don't call start() here as the Gossip constructor already calls it
-        // gossip_->start();
+
+        std::cout << " Creating Messenger" << std::endl;
+        messenger_ = std::make_unique<Messenger>(*session_, port_ + 2000);
+        std::cout << "Messenger object created successfully" << std::endl;
         
     } catch (const std::exception& e) {
         std::cerr << "Exception during Gossip initialization: " << e.what() << std::endl;
@@ -84,7 +89,7 @@ void Node::stop() {
     }
 }
 
-
+// still need to test this
 bool Node::saveDHTState() const {
     if (!session_) {
         return false;
@@ -113,7 +118,7 @@ bool Node::saveDHTState() const {
     }
 
 }
-
+// still need to test this
 bool Node::loadDHTState(const std::string& state_file) {
     if (!session_) {
         return false;

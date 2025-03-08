@@ -2,16 +2,50 @@
 
 namespace torrent_p2p {
     Index::Index(int port) : Node(port) {
-        start();      // TODO
+        start();
     }
 
+    Index::~Index() {
+        stop();
+    }
+
+    void Index::stop() {
+        running_ = false;
+        Node::stop();
+    }
+
+    void Index::handleAlerts() {
+        if (!session_) return;
+        
+        std::vector<lt::alert*> alerts;
+        session_->pop_alerts(&alerts);
+        
+        for (lt::alert* a : alerts) {
+            if (auto* dht_get = lt::alert_cast<lt::dht_get_peers_alert>(a)) {
+                std::cout << "DHT get peers alert: " << dht_get->info_hash << std::endl;
+            }
+            else if (auto* dht_announce = lt::alert_cast<lt::dht_announce_alert>(a)) {
+                std::cout << "DHT announce alert: " << dht_announce->info_hash << std::endl;
+            }
+        }
+    }
 
 void Index::start() {
     running_ = true;
-    // keeps io_context.run() from exiting immediately;
+
+    if (messenger_) {
+        messenger_->setIndexHandler(
+            [this](const IndexMessage& message, const lt::tcp::endpoint& sender) {
+                this->handleIndexMessage(sender, message);
+            }
+        );
+        std::cout << "Index Handler set successfully" << std::endl;
+    } else {
+        std::cerr << "ERROR: Messenger object not initialized in Index::start()" << std::endl;
+    }
 }
 
-std::vector<std::string> Index::generateKeywords(std::string& title) {
+std::vector<std::string> Index::generateKeywords(const std::string& title) {
     std::vector<std::string> keywords;
     std::string processedTitle = title;
     std::string currentWord;
@@ -65,6 +99,7 @@ std::vector<std::string> Index::generateKeywords(std::string& title) {
 
 void Index::addTorrent(const std::string& title, const std::string& magnet) {
     // If we are already tracking this torrent don't bother
+    std::unique_lock<std::shared_mutex> lock(data_mutex_);
     if (titleToMagnet.find(title) != titleToMagnet.end())
         return;
     
@@ -87,6 +122,7 @@ void Index::addTorrent(const std::string& title, const std::string& magnet) {
 
 std::vector<std::pair<std::string, std::string>> Index::searchTorrent(const std::string& keyword) {
     std::vector<std::pair<std::string, std::string>> pairs;
+    std::shared_lock<std::shared_mutex> lock(data_mutex_);
     if (keywordToTitle.find(keyword) == keywordToTitle.end())
         return pairs;
 
@@ -98,4 +134,38 @@ std::vector<std::pair<std::string, std::string>> Index::searchTorrent(const std:
     }
     return pairs;
 }
+
+void Index::sendGiveMessage(const lt::tcp::endpoint& sender, const std::string& keyword, const std::string& request_identifier) {
+    std::vector<std::pair<std::string, std::string>> pairs = this->searchTorrent(keyword);
+
+    IndexMessage responseMsg;
+
+    GiveMessage* giveMsg = responseMsg.mutable_givetorrent();
+    giveMsg->set_keyword(keyword);
+    giveMsg->set_request_identifier(request_identifier);
+
+    for (auto& pair : pairs) {
+        TorrentResult* resultMsg = giveMsg->add_results();
+        resultMsg->set_title(pair.first);
+        resultMsg->set_magnet(pair.second);
+    }
+
+    if (messenger_) {
+        messenger_->queueMessage(sender, responseMsg);
+        std::cout << "Sent: " << pairs.size() << "search results for keyword: " << keyword << std::endl;
+    } else {
+        std::cerr << "Error: Messenger not intialized, can't send search results" << std::endl;
+    }
+}
+
+void Index::handleIndexMessage(const lt::tcp::endpoint& sender, const IndexMessage& message) {
+    if (message.has_addtorrent()) {
+        const AddMessage& addMsg = message.addtorrent();
+        addTorrent(addMsg.title(), addMsg.magnet());
+    } else if (message.has_wanttorrent()) {
+        const WantMessage& wantMsg = message.wanttorrent();
+        sendGiveMessage(sender, wantMsg.keyword(), wantMsg.request_identifier());
+    }
+}
+
 } // namespace

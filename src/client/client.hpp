@@ -123,25 +123,22 @@ public:
     Client(int port = 6881);
     Client(int port, const std::string& state_file);
     ~Client();
-
-    // bootstraps into the dht using set endpoints at bootstrap nodes
-    //void connectToDHT(const std::vector<std::pair<std::string, int>>& bootstrap_nodes);
     
-    // Add a torrent to download
+    // Torrent helpers
     void addTorrent(const std::string& torrentFilePath, const std::string& savePath);
     bool hasTorrent(const lt::sha1_hash& hash) const;
-
-    // turns a normal file into a torrent file
     void generateTorrentFile(const std::string& savePath);
-    
     // Get progress of a specific torrent
    //double getProgress(const std::string& torrentFilePath);
-
     // Print the status of all torrents
     void printStatus() const;
 
     // Seach DHT network for peers with a specific info hash
     void searchDHT(const std::string& infoHash);
+
+    void addIndex(const std::string& title, const std::string& magnet);
+    void searchIndex(const std::string& keyword);
+    
 
     // Generate a magnet URI for a specific torrent
     std::string createMagnetURI(const std::string& torrentFilePath) const;
@@ -157,40 +154,36 @@ public:
     lt::sha1_hash stringToHash(const std::string& infoHashString) const;
 
     // save/load the client's DHT state to/from a file
-    bool saveDHTState(const std::string& state_file) const;
-    bool loadDHTState(const std::string& state_file);
+    // bool saveDHTState(const std::string& state_file) const;
+    // bool loadDHTState(const std::string& state_file);
 
 private:
-    // tracks what peers contributed what pieces of each torrent
-    std::unordered_map<lt::sha1_hash, std::unique_ptr<PieceTracker>> torrent_trackers_;
-    std::mutex torrent_tracker_mutex_;
-
-    std::mutex peers_mutex_;
-    std::unordered_map<lt::tcp::endpoint, int, EndpointHash> peer_cache_; // maps port to reputation, currently not tracking when peer was last seen
-    
-    void updatePeerCache();
-    void addPeerToCache(const std::string& ip, int port, const std::string& id = "");
-    void updatePeerReputation(const std::string& peer_key, int delta);
-    
-    //std::vector<PeerInfo> getRandomPeers(size_t count);
-    std::vector<std::pair<std::string, int>> bootstrap_nodes_ = {{"172.31.17.201", 6881}};//{{"52.53.157.31", 6881}};
-    std::map<lt::sha1_hash, lt::torrent_handle> torrents_;
-
     // Start/stop the client
     void start() override;
     void stop() override;
 
-    // Initialize the session and set flags, called by start
-    //void initializeSession();
-
     // libtorrent sets alerts to communicate when events happen, such as when a torrent is downloading or when a peer sends a message
     void handleAlerts() override;
+
+    // tracks what peers contributed what pieces of each torrent
+    std::unordered_map<lt::sha1_hash, std::unique_ptr<PieceTracker>> torrent_trackers_;
+    std::mutex torrent_tracker_mutex_;
+
+    // peer cache
+    std::unordered_map<lt::tcp::endpoint, int, EndpointHash> peer_cache_;
+    std::mutex peers_mutex_;
+    void updatePeerCache();
+    void addPeerToCache(const std::string& ip, int port, const std::string& id = "");
+    void updatePeerReputation(const std::string& peer_key, int delta);
+    
+    std::map<lt::sha1_hash, lt::torrent_handle> torrents_;    
 
     // gossips to the dht network about the reputation of a node
     void sendGossip(std::vector<std::pair<lt::tcp::endpoint, int>> peer_reputation) const;
     
-    // callback for incoming gossip message
+    // callbacks
     void handleReputationMessage(const ReputationMessage& message, const lt::tcp::endpoint& sender);
+    void handleIndexMessage(const IndexMessage& message, const lt::tcp::endpoint& sender);
 
     //threads
     std::unique_ptr<std::thread> alert_thread_;

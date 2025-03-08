@@ -19,132 +19,8 @@ Client::~Client() {
     stop();
 }
 
-// void Client::initializeSession() {
-//     lt::settings_pack pack;
-//     pack.set_int(lt::settings_pack::alert_mask,
-//         lt::alert::status_notification
-//         | lt::alert::error_notification
-//         | lt::alert::dht_notification
-//         | lt::alert::port_mapping_notification
-//         | lt::alert::dht_log_notification
-//         | lt::alert::piece_progress_notification
-//         | lt::alert::storage_notification
-//         | lt::alert_category::block_progress);
-
-//     // Force Highest Level Encryption, ChaCha20 instead of RC4
-//     pack.set_int(lt::settings_pack::in_enc_policy, lt::settings_pack::pe_forced);
-//     pack.set_int(lt::settings_pack::out_enc_policy, lt::settings_pack::pe_forced);
-    
-//     // Enable DHT but don't give it access to bitTorrent bootstrap nodes, we are implementing a closed system
-//     pack.set_bool(lt::settings_pack::enable_dht, true);
-//     pack.set_str(lt::settings_pack::dht_bootstrap_nodes, "");  // Disable external bootstrap nodes
-//     pack.set_int(lt::settings_pack::dht_announce_interval, 5);
-//     pack.set_bool(lt::settings_pack::enable_outgoing_utp, true);
-//     pack.set_bool(lt::settings_pack::enable_incoming_utp, true);
-//     pack.set_bool(lt::settings_pack::enable_outgoing_tcp, true);
-//     pack.set_bool(lt::settings_pack::enable_incoming_tcp, true);
-    
-//     // Disable IP restrictions for local testing, by default it doesn't allow duplicate ips. i.e: localhost
-//     pack.set_bool(lt::settings_pack::dht_restrict_routing_ips, false);
-//     pack.set_bool(lt::settings_pack::dht_restrict_search_ips, false);
-//     pack.set_int(lt::settings_pack::dht_max_peers_reply, 100);
-//     pack.set_bool(lt::settings_pack::dht_ignore_dark_internet, false);
-//     pack.set_int(lt::settings_pack::dht_max_fail_count, 5);
-    
-//     // listen on all
-//     pack.set_str(lt::settings_pack::listen_interfaces, "0.0.0.0:" + std::to_string(port_));
-    
-//     session_ = std::make_unique<lt::session>(pack);
-// }
-
-// void Client::connectToDHT(const std::vector<std::pair<std::string, int>>& bootstrap_nodes) {
-//     if (!session_) {
-//         std::cout << "Session not initialized" << std::endl;
-//         return;
-//     }
-
-//     // Add bootstrap nodes to routing table
-//     for (const auto& node : bootstrap_nodes) {
-//         std::cout << "[Client:" << port_ << "] Adding bootstrap node: " << node.first << ":" << node.second << std::endl;
-        
-//         try {
-//             // First, check if the bootstrap node is reachable
-//             std::cout << "[Client:" << port_ << "] Checking if bootstrap node is reachable..." << std::endl;
-//             lt::udp::endpoint ep(lt::make_address_v4(node.first), node.second);
-            
-//             // Add the node to the DHT routing table
-//             session_->add_dht_node(std::make_pair(node.first, node.second));
-            
-//             // Force immediate DHT lookup to this node
-//             std::cout << "[Client:" << port_ << "] Sending direct DHT request to " << node.first << ":" << node.second << std::endl;
-//             session_->dht_direct_request(ep, lt::entry{}, lt::client_data_t{});
-            
-//             // Also announce ourselves with a generated hash
-//             lt::sha1_hash hash;
-//             std::random_device rd;
-//             std::mt19937 gen(rd());
-//             std::uniform_int_distribution<uint32_t> dis;
-//             for (int i = 0; i < 5; i++) {
-//                 reinterpret_cast<uint32_t*>(hash.data())[i] = dis(gen);
-//             }
-//             std::cout << "[Client:" << port_ << "] Announcing to DHT with hash: " << hash << std::endl;
-//             session_->dht_announce(hash, port_);
-            
-//             // Also try to get peers for this hash to force DHT activity
-//             std::cout << "[Client:" << port_ << "] Getting peers for hash: " << hash << std::endl;
-//             session_->dht_get_peers(hash);
-//         } catch (const std::exception& e) {
-//             std::cerr << "[Client:" << port_ << "] Error connecting to node " << node.first << ":" << node.second 
-//                       << " - " << e.what() << std::endl;
-//         }
-//     }
-    
-//     // Start periodic DHT lookups //like a heartbeat
-//     std::thread([this]() {
-//         while (running_) {
-//             std::cout << "[Client:" << port_ << "] Running periodic DHT maintenance..." << std::endl;
-//             if (session_) {
-//                 try {
-//                     // Request DHT stats to see what's happening
-//                     session_->post_dht_stats();
-                    
-//                     // Try to get peers for an empty hash to force DHT activity
-//                     session_->dht_get_peers(lt::sha1_hash());
-                    
-//                     // Get nodes from our DHT routing table
-//                     lt::session_params params = session_->session_state();
-//                     if (params.dht_state.nodes.empty()) {
-//                         std::cout << "[Client:" << port_ << "] WARNING: No DHT nodes in routing table!" << std::endl;
-                        
-//                         // Try to reconnect to bootstrap nodes
-//                         for (const auto& node : bootstrap_nodes_) {
-//                             std::cout << "[Client:" << port_ << "] Re-adding bootstrap node: " << node.first << ":" << node.second << std::endl;
-//                             session_->add_dht_node(std::make_pair(node.first, node.second));
-//                         }
-//                     } else {
-//                         std::cout << "[Client:" << port_ << "] DHT routing table has " << params.dht_state.nodes.size() << " nodes:" << std::endl;
-//                         for (auto & node : params.dht_state.nodes) {
-//                             std::cout << "[Client:" << port_ << "] DHT node: " << node.address() << ":" << node.port() << std::endl;
-//                         }
-//                     }
-//                 } catch (const std::exception& e) {
-//                     std::cerr << "[Client:" << port_ << "] Error in DHT maintenance: " << e.what() << std::endl;
-//                 }
-//             }
-//             std::this_thread::sleep_for(std::chrono::seconds(5));
-//         }
-//     }).detach();
-// }
-
 void Client::start() {
     Node::start();
-    // if (!session_) {
-    //     initializeSession();
-    // }
-    // std::cout << "Starting client..." << std::endl;
-
-    // std::cout << "Connecting to DHT bootstrap nodes..." << std::endl;
-    // connectToDHT(bootstrap_nodes_);
     
     // Start handling alerts in a separate thread
     alert_thread_ = std::make_unique<std::thread>([this]() {
@@ -174,30 +50,18 @@ void Client::start() {
     } else {
         std::cerr << "ERROR: Gossip object not initialized in Client::start()" << std::endl;
     }
-    
-    // try {
-    //     // Make sure the session is fully initialized before creating Gossip
-    //     std::cout << "Waiting for DHT to initialize..." << std::endl;
-    //     std::this_thread::sleep_for(std::chrono::seconds(2)); // Give DHT time to initialize
-        
-    //     std::cout << "Creating Gossip object..." << std::endl;
-    //     gossip_ = std::make_unique<Gossip>(*session_, port_ + 1000);
-        
-    //     std::cout << "Gossip object created successfully" << std::endl;
-    //     // Don't call start() here as the Gossip constructor already calls it
-    //     // gossip_->start();
-        
-    //     // Register the reputation message handler
-    //     gossip_->setReputationHandler(
-    //         [this](const ReputationMessage& message, const lt::tcp::endpoint& sender) {
-    //             this->handleReputationMessage(message, sender);
-    //         }
-    //     );
-    // } catch (const std::exception& e) {
-    //     std::cerr << "Exception during Gossip initialization: " << e.what() << std::endl;
-    // }
 
-    // running_ = true;
+    if (messenger_) {
+        messenger_->setIndexHandler(
+            [this](const IndexMessage& message, const lt::tcp::endpoint& sender) {
+                this->handleIndexMessage(message, sender);
+            }
+        );
+        std::cout << "Index Handler set successfully" << std::endl;
+    } else {
+        std::cerr << "ERROR: Messenger object not initialized in Client::start()" << std::endl;
+    }
+
     std::cout << "Client started on port " << port_ << std::endl;
 }
 
@@ -313,9 +177,10 @@ void Client::addTorrent(const std::string& torrentFilePath, const std::string& s
         std::cout << "Checking files: " << (status.state == lt::torrent_status::checking_files) << std::endl;
         std::cout << "Checking resume data: " << (status.state == lt::torrent_status::checking_resume_data) << std::endl;
 
-        // Publish the torrent title and magnet link to the DHT
+        // Adding to index
         std::string title = params.ti->name();
         std::string magnetLink = lt::make_magnet_uri(*(params.ti));
+        addIndex(title, magnetLink);
         
     } catch (const std::exception& e) {
         std::cout << "Error adding torrent: " << e.what() << std::endl;
@@ -625,44 +490,6 @@ void Client::generateTorrentFile(const std::string& savePath) {
 
 }
 
-// Peer cache needs a way to remove old or stale peers that haven't been seen in a while, not implemented yet
-// void Client::addPeerToCache(const std::string& ip, int port, const std::string& id) {
-//     std::lock_guard<std::mutex> lock(peers_mutex_);
-//     std::string peer_key = ip + ":" + std::to_string(port);
-
-//     auto now = std::time(nullptr);
-
-//     // if peer is in cache update its last seen time
-//     if (peer_cache_.find(peer_key) != peer_cache_.end()) {
-//         std::cout << "Peer " << peer_key << " already in cache" << std::endl;
-//         peer_cache_[peer_key].last_seen = now;
-//         if (!id.empty()) {
-//             peer_cache_[peer_key].id = id;
-//         }
-//         return;
-//     }
-
-//     PeerInfo peer;
-//     peer.ip = ip;
-//     peer.port = port;
-//     peer.id = id;
-//     peer.reputation = 0;
-//     peer.last_seen = now;
-//     peer_cache_[peer_key] = peer;
-//     std::cout << "Added peer " << peer_key << " to cache" << std::endl;
-//     // mutex automatically unlocks when it goes out of scope, lock_guard destructors does this automatically
-// }
-
-// void Client::updatePeerReputation(const std::string& peer_key, int delta) {
-//     std::lock_guard<std::mutex> lock(peers_mutex_);
-
-//     if (peer_cache_.find(peer_key) == peer_cache_.end()) {
-//         return;
-//     }
-
-//     peer_cache_[peer_key] += delta;
-// }
-
 void Client::sendGossip(std::vector<std::pair<lt::tcp::endpoint, int>> peer_reputation) const{
     if (!gossip_) {
         std::cerr << "ERROR: Cannot send gossip - gossip_ is null" << std::endl;
@@ -718,6 +545,56 @@ void Client::handleReputationMessage(const ReputationMessage& message, const lt:
     }
 }
 
+void Client::handleIndexMessage(const IndexMessage& message, const lt::tcp::endpoint& sender) {
+    // TODO
+    if (message.has_givetorrent()) {
+        std::cout << "Search Results: " << std::endl;
+        const GiveMessage& giveMsg = message.givetorrent();
+        for (auto& result : giveMsg.results()) {
+            std::cout << "Title: " << result.title() << " Magnet Link: " << result.magnet() << std::endl;
+        }
+    }
+}
+
+void Client::addIndex(const std::string& title, const std::string& magnet) {
+    if (!messenger_) {
+        std::cerr << "Client Messenger not initialized, cant add index" << std::endl;
+        return;
+    }
+    try {
+    // for now, send to all index nodes. Need a better way to do this
+        for (auto& node : index_nodes_) {
+            lt::tcp::endpoint endpoint(lt::make_address_v4(node.first), node.second);
+            IndexMessage message;
+            AddMessage* addMsg = message.mutable_addtorrent();
+            addMsg->set_title(title);
+            addMsg->set_magnet(magnet);
+            messenger_->queueMessage(endpoint, message);
+        } 
+    } catch (const std::exception& e) {
+        std::cerr << "Error adding Index: " << e.what() << std::endl;
+    }
+}
+
+void Client::searchIndex(const std::string& keyword) {
+    if (!messenger_) {
+        std::cerr << "Client Messenger not initialized, cant search indexes" << std::endl;
+        return;
+    }
+    try {
+        for (auto& node : index_nodes_) {
+            lt::tcp::endpoint endpoint(lt::make_address_v4(node.first), node.second);
+            IndexMessage message;
+            WantMessage* wantMsg = message.mutable_wanttorrent();
+            wantMsg->set_keyword(keyword);
+            wantMsg->set_request_identifier(""); // need to change this
+            messenger_->queueMessage(endpoint, message);
+        }
+    } catch (const std::exception& e) {
+        std::cerr << "Error searching index: " << e.what() << std::endl;
+    }
+}
+
 void Client::updatePeerCache() {
     auto peers = session_->session_state().dht_state.nodes;
     std::lock_guard<std::mutex> lock(peers_mutex_);
@@ -766,73 +643,6 @@ void Client::banNode(const lt::tcp::endpoint& endpoint) {
         }
     } catch (const std::exception& e) {
         std::cerr << "Error banning node: " << e.what() << std::endl;
-    }
-}
-
-// Implementation of saveDHTState method
-bool Client::saveDHTState(const std::string& state_file) const {
-    if (!session_) {
-        std::cerr << "Cannot save DHT state: session not initialized" << std::endl;
-        return false;
-    }
-    
-    try {
-        // Get the session state with only DHT state
-        lt::session_params params = session_->session_state();
-        
-        // Serialize the session params to a buffer
-        std::vector<char> buffer = lt::write_session_params_buf(params, lt::session::save_dht_state);
-        
-        std::ofstream file(state_file, std::ios::binary);
-        if (!file.is_open()) {
-            std::cerr << "Could not open state file for writing: " << state_file << std::endl;
-            return false;
-        }
-
-        file.write(buffer.data(), buffer.size());
-        std::cout << "Saved DHT state to " << state_file << std::endl;
-        file.close();
-        return true;
-    } catch (const std::exception& e) {
-        std::cerr << "Error saving DHT state: " << e.what() << std::endl;
-        return false;
-    }
-}
-
-// Implementation of loadDHTState method
-bool Client::loadDHTState(const std::string& state_file) {
-    if (!session_) {
-        std::cerr << "Cannot load DHT state: session not initialized" << std::endl;
-        return false;
-    }
-    
-    try {
-        std::ifstream file(state_file, std::ios::binary);
-        if (!file.is_open()) {
-            std::cerr << "Could not open state file for reading: " << state_file << std::endl;
-            return false;
-        }
-        
-        // Get file size
-        file.seekg(0, std::ios::end);
-        std::streampos size = file.tellg();
-        file.seekg(0, std::ios::beg);
-        
-        // Read file content into buffer
-        std::vector<char> buffer(size);
-        file.read(buffer.data(), size);
-        file.close();
-        
-        // Parse session params from buffer
-        lt::session_params params = lt::read_session_params(buffer);
-        session_->apply_settings(params.settings);
-        session_->set_dht_state(params.dht_state);
-        
-        std::cout << "Loaded DHT state from " << state_file << std::endl;
-        return true;
-    } catch (const std::exception& e) {
-        std::cerr << "Error loading DHT state: " << e.what() << std::endl;
-        return false;
     }
 }
 

@@ -212,19 +212,21 @@ int main(int argc, char* argv[]) {
         // } 
         else if (command == "dht") {
             std::cout << client->getDHTStats() << std::endl;
-        } else if (command == "gossip") {
-            std::cout << "Sending gossip message...\n";
-            GossipMessage message;
-            message.set_source_ip("127.0.0.1");
-            message.set_source_port(port);
-            lt::tcp::endpoint exclude(lt::make_address_v4("127.0.0.1"), port);
-            client->gossip_->spreadMessage(message, exclude);
-        } else if (command == "save") {
+        }
+        //  else if (command == "gossip") {
+        //     std::cout << "Sending gossip message...\n";
+        //     GossipMessage message;
+        //     message.set_source_ip("127.0.0.1");
+        //     message.set_source_port(port);
+        //     lt::tcp::endpoint exclude(lt::make_address_v4("127.0.0.1"), port);
+        //     client->gossip_->spreadMessage(message, exclude);
+        // } 
+        else if (command == "save") {
             std::string save_file;
             if (iss >> save_file) {
                 try {
                     std::cout << "Saving DHT state to: " << save_file << "\n";
-                    if (client->saveDHTState(save_file)) {
+                    if (client->saveDHTState()) {
                         std::cout << "DHT state saved successfully.\n";
                     } else {
                         std::cerr << "Failed to save DHT state.\n";

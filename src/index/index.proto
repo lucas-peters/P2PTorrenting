@@ -5,28 +5,41 @@ package torrent_p2p;
 message IndexMessage {
     string source_ip = 1;
     uint32 source_port = 2;
-    
+    uint64 timestamp = 3;
+    uint64 lamport_timestamp = 4;
+    string message_id = 5;
 
     oneof message_type {
-        AddMessage addTorrent = 10
-        RemoveMessage removeTorrent = 11
-        WantMessage wantTorrent = 12
-        GiveMessage giveTorrent = 13
+        AddMessage addTorrent = 10;
+        RemoveMessage removeTorrent = 11;
+        WantMessage wantTorrent = 12;
+        GiveMessage giveTorrent = 13;
     }
 }
 
 message AddMessage {
-
+    string title = 1;
+    string magnet = 2;
 }
 
 message RemoveMessage {
-    
+    string title = 1;
+    string magnet = 2;
 }
 
 message WantMessage {
-
+    string keyword = 1;
+    string request_identifier = 2;  // Renamed from request_id to avoid protobuf compatibility issues
 }
  
 message GiveMessage {
-    
+    string keyword = 1;
+    string request_identifier = 2;  // Renamed from request_id to avoid protobuf compatibility issues
+    repeated TorrentResult results = 3;
+    bool more_results = 4;  // Indicates if there are more results available
+}
+
+message TorrentResult {
+    string title = 1;
+    string magnet = 2;
 }

@@ -40,7 +40,7 @@ public:
     void sendGossipMessage(const lt::tcp::endpoint& target, const GossipMessage& message);
     
     // Send a reputation message (convenience method)
-    void sendReputationMessage(const lt::tcp::endpoint& target, const lt::tcp::endpoint& subject, 
+    void sendReputationMessage(const lt::tcp::endpoint& target, const lt::tcp::endpoint& subject,
                               int reputation, const std::string& reason = "");
 
     // message spreading
@@ -50,15 +50,13 @@ public:
     
     // Setting handlers for reputation messages
     using ReputationHandler = std::function<void(const ReputationMessage&, const lt::tcp::endpoint&)>;
-    using IndexHandler = std::function<void(const IndexMessage&, const lt::tcp::endpoint&)>;
-    void setReputationHandler(ReputationHandler handler) { reputation_handler_ = handler; }
-    void setIndexHandler(IndexHandler handler) {index_handler_ = handler};
+    //using IndexHandler = std::function<void(const IndexMessage&, const lt::tcp::endpoint&)>;
+    void setReputationHandler(ReputationHandler handler) { reputation_handler_ = handler; };
+    //void setIndexHandler(IndexHandler handler) {index_handler_ = handler};
 
     std::function<void(const lt::tcp::endpoint&)> heartbeat_handler_;
 
-    void setHeartbeatHandler(std::function<void(const lt::tcp::endpoint&)> handler) {
-        heartbeat_handler_ = handler;
-    }
+    void setHeartbeatHandler(std::function<void(const lt::tcp::endpoint&)> handler) {heartbeat_handler_ = handler;}
 
     void sendMessage(const lt::tcp::endpoint& target, const GossipMessage& message) {
         std::lock_guard<std::mutex> lock(outgoing_queue_mutex_);
@@ -85,7 +83,7 @@ private:
     // Message handlers - can add more to support multiple types of messages
     ReputationHandler reputation_handler_;
     // This handler is used for index Nodes to gossip to each other about added torrents
-    IndexHandler index_handler_;
+    //IndexHandler index_handler_;
     
     // struct to help incoming message queue order messages by lamport timestamp
     struct IncomingMessage {

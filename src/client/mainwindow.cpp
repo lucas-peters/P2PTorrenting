@@ -269,7 +269,7 @@ void MainWindow::saveDHTState()
         return;
     
     try {
-        if (client->saveDHTState(saveFile.toStdString())) {
+        if (client->saveDHTState()) {
             logTextEdit->append("DHT state saved to: " + saveFile);
             statusBar()->showMessage("DHT state saved successfully.");
         } else {

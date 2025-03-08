@@ -11,6 +11,7 @@
 #include <iostream>
 #include <fstream>
 
+#include "index/messenger.hpp"
 #include "gossip/gossip.hpp"
 #include "gossip.pb.h"
 
@@ -36,8 +37,6 @@ public:
     bool loadDHTState(const std::string& state_file);
     
 private:
-    // Stop the node
-    virtual void stop();
     
     // Handle DHT alerts, each node will implement this differently
     virtual void handleAlerts() = 0;
@@ -45,13 +44,18 @@ private:
 protected:
     std::unique_ptr<lt::session> session_;
     std::unique_ptr<Gossip> gossip_;
+    std::unique_ptr<Messenger> messenger_;
+    
     int port_;
     bool running_;
     std::string state_file_;
     std::vector<std::pair<std::string, int>> bootstrap_nodes_ = {{"172.20.0.2", 6881}};
+    std::vector<std::pair<std::string, int>> index_nodes_ = {{}};
 
     // All Node subtypes should be started using these
     virtual void start();
+        // Stop the node
+    virtual void stop();
     void connectToDHT(const std::vector<std::pair<std::string, int>>& bootstrap_nodes);
     void initializeSession();
 

@@ -109,6 +109,10 @@ void Gossip::stop() {
     if (message_processing_thread_ && message_processing_thread_->joinable()) {
         message_processing_thread_->join();
     }
+
+    if (send_thread_ && send_thread_->joinable()) {
+        send_thread_->join();
+    }
     
     if (peer_thread_ && peer_thread_->joinable()) {
         peer_thread_->join();
