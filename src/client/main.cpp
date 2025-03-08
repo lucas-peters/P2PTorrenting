@@ -114,7 +114,7 @@ int main(int argc, char* argv[]) {
     // Command processing loop
     std::string input;
     while (running) {
-        std::cout << "> ";
+        //std::cout << "> ";
         std::cout.flush();  // Make sure the prompt is displayed
         std::getline(std::cin, input);
 
@@ -192,23 +192,25 @@ int main(int argc, char* argv[]) {
             } else {
                 std::cout << "Usage: search <info_hash>\n";
             }
-        } else if (command == "connect") {
-            std::string ip;
-            int node_port;
-            if (iss >> ip >> node_port) {
-                try {
-                    std::vector<std::pair<std::string, int>> bootstrap_nodes = {
-                        {ip, node_port}
-                    };
-                    std::cout << "Connecting to bootstrap node: " << ip << ":" << node_port << "\n";
-                    client->connectToDHT(bootstrap_nodes);
-                } catch (const std::exception& e) {
-                    std::cerr << "Error connecting to bootstrap node: " << e.what() << "\n";
-                }
-            } else {
-                std::cout << "Usage: connect <ip> <port>\n";
-            }
-        } else if (command == "dht") {
+        } 
+        // else if (command == "connect") {
+        //     std::string ip;
+        //     int node_port;
+        //     if (iss >> ip >> node_port) {
+        //         try {
+        //             std::vector<std::pair<std::string, int>> bootstrap_nodes = {
+        //                 {ip, node_port}
+        //             };
+        //             std::cout << "Connecting to bootstrap node: " << ip << ":" << node_port << "\n";
+        //             client->connectToDHT(bootstrap_nodes);
+        //         } catch (const std::exception& e) {
+        //             std::cerr << "Error connecting to bootstrap node: " << e.what() << "\n";
+        //         }
+        //     } else {
+        //         std::cout << "Usage: connect <ip> <port>\n";
+        //     }
+        // } 
+        else if (command == "dht") {
             std::cout << client->getDHTStats() << std::endl;
         } else if (command == "gossip") {
             std::cout << "Sending gossip message...\n";

@@ -38,7 +38,7 @@ services:
       - bootstrap
     stdin_open: true  # Keep STDIN open
     tty: true         # Allocate a pseudo-TTY
-    command: ["--port", "6881", "--connect", "bootstrap", "6881"]
+    command: ["6881"]
 
   client2:
     build:
@@ -86,7 +86,7 @@ services:
       - bootstrap
     stdin_open: true  # Keep STDIN open
     tty: true         # Allocate a pseudo-TTY
-    command: ["--port", "6881", "--connect", "bootstrap", "6881"]
+    command: ["6881"]
 
 networks:
   p2p-network:

@@ -125,7 +125,7 @@ public:
     ~Client();
 
     // bootstraps into the dht using set endpoints at bootstrap nodes
-    void connectToDHT(const std::vector<std::pair<std::string, int>>& bootstrap_nodes);
+    //void connectToDHT(const std::vector<std::pair<std::string, int>>& bootstrap_nodes);
     
     // Add a torrent to download
     void addTorrent(const std::string& torrentFilePath, const std::string& savePath);
@@ -173,7 +173,7 @@ private:
     void updatePeerReputation(const std::string& peer_key, int delta);
     
     //std::vector<PeerInfo> getRandomPeers(size_t count);
-    std::vector<std::pair<std::string, int>> bootstrap_nodes_ = {{"172.20.0.2", 6881}};
+    std::vector<std::pair<std::string, int>> bootstrap_nodes_ = {{"172.31.17.201", 6881}};//{{"52.53.157.31", 6881}};
     std::map<lt::sha1_hash, lt::torrent_handle> torrents_;
 
     // Start/stop the client
@@ -181,7 +181,7 @@ private:
     void stop() override;
 
     // Initialize the session and set flags, called by start
-    void initializeSession();
+    //void initializeSession();
 
     // libtorrent sets alerts to communicate when events happen, such as when a torrent is downloading or when a peer sends a message
     void handleAlerts() override;
