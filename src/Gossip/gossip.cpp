@@ -19,6 +19,7 @@ void Gossip::start() {
         io_context_.get_executor());
     
     // Start io_context thread
+    // io_context_ handles background boost::asio messaging details
     service_thread_ = std::make_unique<std::thread>([this]() {
         try {
             std::cout << "IO context thread starting" << std::endl;
@@ -148,6 +149,7 @@ void Gossip::startAccept() {
             if (!error) {
                 std::cout << "Accepted new connection from " << socket->remote_endpoint().address() 
                           << ":" << socket->remote_endpoint().port() << std::endl;
+                // This function deals with logic once a message has been accepted on the socket
                 handleAccept(socket);
             } else {
                 std::cerr << "Gossip StartAccept: Failed to accept connection: " << error.message() << std::endl;
@@ -163,7 +165,7 @@ void Gossip::startAccept() {
 
 // asynchronously reads messages from the socket and passes them to handleReceivedMessage()
 void Gossip::handleAccept(std::shared_ptr<boost::asio::ip::tcp::socket> socket) {
-    // Get the endpoint of the sender
+    // ee the endpoint of the sender
     lt::tcp::endpoint sender(
         socket->remote_endpoint().address(),
         socket->remote_endpoint().port()
@@ -252,21 +254,44 @@ void Gossip::sendMessageAsync(const lt::tcp::endpoint& target, const GossipMessa
         std::memcpy(buffer->data() + sizeof(message_size), serialized_msg.data(), message_size);
         
         // converting lt's tcp endpoint to asio's TCP endpoint
-        bip::tcp::endpoint tcp_endpoint(target.address(),target.port());
+        // In Docker, we need to use the container's internal network
+        // The gossip port is port_ (which is set to DHT port + 1000 in the constructor)
+        
+        // Get the IP address from the target
+        auto target_address = target.address();
+        
+        // Use the gossip port (7881) instead of the target's port
+        // This is because in Docker, all containers use the same internal port
+        bip::tcp::endpoint tcp_endpoint(target_address, port_);
+        
+        std::cout << "Connecting to gossip endpoint: " << tcp_endpoint.address().to_string() 
+                  << ":" << tcp_endpoint.port() << std::endl;
 
         socket->async_connect(tcp_endpoint,
-            [this, socket, buffer](const boost::system::error_code& error) {
+            [this, socket, buffer, tcp_endpoint](const boost::system::error_code& error) {
                 if (error) {
-                    std::cerr << "Gossip SendMessageAsync: " << "Failed to connect to target" << std::endl;
+                    std::cerr << "Gossip SendMessageAsync: Failed to connect to target " 
+                              << tcp_endpoint.address().to_string() << ":" << tcp_endpoint.port()
+                              << " - Error: " << error.message() << std::endl;
                     return;
                 }
+                
+                std::cout << "Successfully connected to " << tcp_endpoint.address().to_string() 
+                          << ":" << tcp_endpoint.port() << std::endl;
+                
                 // write asynch
                 ba::async_write(*socket, ba::buffer(*buffer),
-                     [socket, buffer](const boost::system::error_code& error, std::size_t bytes_transferred) {
+                     [socket, buffer, tcp_endpoint](const boost::system::error_code& error, std::size_t bytes_transferred) {
                         if (error) {
-                            std::cerr << "Gossip SendMessageAsync: " << "Failed to write message" << std::endl;
+                            std::cerr << "Gossip SendMessageAsync: Failed to write message to "
+                                      << tcp_endpoint.address().to_string() << ":" << tcp_endpoint.port()
+                                      << " - Error: " << error.message() << std::endl;
                             return;
                         }
+                        
+                        std::cout << "Successfully wrote " << bytes_transferred << " bytes to "
+                                  << tcp_endpoint.address().to_string() << ":" << tcp_endpoint.port() << std::endl;
+                        
                         boost::system::error_code ec;
                         socket->shutdown(bip::tcp::socket::shutdown_both, ec);
                         socket->close(ec);

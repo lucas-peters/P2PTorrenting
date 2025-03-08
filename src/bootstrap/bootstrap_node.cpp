@@ -17,99 +17,100 @@ BootstrapNode::~BootstrapNode() {
 }
 
 void BootstrapNode::start() {
-    if (!session_) {
-        lt::settings_pack pack;
-        pack.set_int(lt::settings_pack::alert_mask, 
-            lt::alert::dht_notification + 
-            lt::alert::status_notification +
-            lt::alert::error_notification +
-            lt::alert::dht_log_notification);
+    Node::start();
+    // if (!session_) {
+    //     lt::settings_pack pack;
+    //     pack.set_int(lt::settings_pack::alert_mask, 
+    //         lt::alert::dht_notification + 
+    //         lt::alert::status_notification +
+    //         lt::alert::error_notification +
+    //         lt::alert::dht_log_notification);
         
-        // Force Highest Level Encryption, ChaCha20 instead of RC4
-        pack.set_int(lt::settings_pack::in_enc_policy, lt::settings_pack::pe_forced);
-        pack.set_int(lt::settings_pack::out_enc_policy, lt::settings_pack::pe_forced);
+    //     // Force Highest Level Encryption, ChaCha20 instead of RC4
+    //     pack.set_int(lt::settings_pack::in_enc_policy, lt::settings_pack::pe_forced);
+    //     pack.set_int(lt::settings_pack::out_enc_policy, lt::settings_pack::pe_forced);
             
-        // Enable DHT with local-only settings
-        pack.set_bool(lt::settings_pack::enable_dht, true);
-        pack.set_str(lt::settings_pack::dht_bootstrap_nodes, "");  // Disable external bootstrap nodes
-        pack.set_int(lt::settings_pack::dht_announce_interval, 5);
-        pack.set_bool(lt::settings_pack::enable_outgoing_utp, true);
-        pack.set_bool(lt::settings_pack::enable_incoming_utp, true);
-        pack.set_bool(lt::settings_pack::enable_outgoing_tcp, true);
-        pack.set_bool(lt::settings_pack::enable_incoming_tcp, true);
+    //     // Enable DHT with local-only settings
+    //     pack.set_bool(lt::settings_pack::enable_dht, true);
+    //     pack.set_str(lt::settings_pack::dht_bootstrap_nodes, "");  // Disable external bootstrap nodes
+    //     pack.set_int(lt::settings_pack::dht_announce_interval, 5);
+    //     pack.set_bool(lt::settings_pack::enable_outgoing_utp, true);
+    //     pack.set_bool(lt::settings_pack::enable_incoming_utp, true);
+    //     pack.set_bool(lt::settings_pack::enable_outgoing_tcp, true);
+    //     pack.set_bool(lt::settings_pack::enable_incoming_tcp, true);
         
-        // Disable IP restrictions for local testing, by default it blocks having 2 nodes in the routing table from the same ip
-        pack.set_bool(lt::settings_pack::dht_restrict_routing_ips, false);
-        pack.set_bool(lt::settings_pack::dht_restrict_search_ips, false);
-        pack.set_int(lt::settings_pack::dht_max_peers_reply, 100);
-        pack.set_bool(lt::settings_pack::dht_ignore_dark_internet, false);
-        pack.set_int(lt::settings_pack::dht_max_fail_count, 100);  // More forgiving of failures
+    //     // Disable IP restrictions for local testing, by default it blocks having 2 nodes in the routing table from the same ip
+    //     pack.set_bool(lt::settings_pack::dht_restrict_routing_ips, false);
+    //     pack.set_bool(lt::settings_pack::dht_restrict_search_ips, false);
+    //     pack.set_int(lt::settings_pack::dht_max_peers_reply, 100);
+    //     pack.set_bool(lt::settings_pack::dht_ignore_dark_internet, false);
+    //     pack.set_int(lt::settings_pack::dht_max_fail_count, 100);  // More forgiving of failures
         
-        // Listen on all interfaces to accept connections from any IP
-        pack.set_str(lt::settings_pack::listen_interfaces, "0.0.0.0:" + std::to_string(port_));        
-        std::cout << "[Bootstrap] Starting on port " << port_ << " listening on all interfaces" << std::endl;
+    //     // Listen on all interfaces to accept connections from any IP
+    //     pack.set_str(lt::settings_pack::listen_interfaces, "0.0.0.0:" + std::to_string(port_));        
+    //     std::cout << "[Bootstrap] Starting on port " << port_ << " listening on all interfaces" << std::endl;
         
-        // Set up the session
-        session_ = std::make_unique<lt::session>(pack);
+    //     // Set up the session
+    //     session_ = std::make_unique<lt::session>(pack);
         
-        // Verify that we're actually listening
-        // auto endpoints = session_->get_listen_status();
-        // if (endpoints.empty()) {
-        //     std::cerr << "[Bootstrap] WARNING: Not listening on any interfaces!" << std::endl;
-        // } else {
-        //     for (const auto& ep : endpoints) {
-        //         std::cout << "[Bootstrap] Listening on: " << ep.address() << ":" << ep.port() << std::endl;
-        //     }
-        // }
+    //     // Verify that we're actually listening
+    //     // auto endpoints = session_->get_listen_status();
+    //     // if (endpoints.empty()) {
+    //     //     std::cerr << "[Bootstrap] WARNING: Not listening on any interfaces!" << std::endl;
+    //     // } else {
+    //     //     for (const auto& ep : endpoints) {
+    //     //         std::cout << "[Bootstrap] Listening on: " << ep.address() << ":" << ep.port() << std::endl;
+    //     //     }
+    //     // }
         
-        // Start periodic DHT announcements
-        announceTimer_ = std::make_unique<std::thread>([this]() {
-            while (running_) {
-                try {
-                    if (session_) {
-                        std::cout << "[Bootstrap] Requesting DHT stats..." << std::endl;
-                        session_->post_dht_stats();
-                        
-                        // Force DHT bootstrap
-                        session_->dht_get_peers(lt::sha1_hash());
-                        
-                        // Announce ourselves with a generated hash
-                        lt::sha1_hash hash;
-                        std::random_device rd;
-                        std::mt19937 gen(rd());
-                        std::uniform_int_distribution<uint32_t> dis;
-                        for (int i = 0; i < 5; i++) {
-                            reinterpret_cast<uint32_t*>(hash.data())[i] = dis(gen);
-                        }
-                        std::cout << "[Bootstrap] Announcing hash: " << hash << " on port " << port_ << std::endl;
-                        session_->dht_announce(hash, port_);
-                        
-                        // Print current DHT routing table
-                        lt::session_params params = session_->session_state();
-                        std::cout << "[Bootstrap] DHT routing table has " << params.dht_state.nodes.size() << " nodes" << std::endl;
-                        for (auto & node : params.dht_state.nodes) {
-                            std::cout << "[Bootstrap] DHT node: " << node.address() << ":" << node.port() << std::endl;
-                        }
+    // Start periodic DHT announcements
+    announceTimer_ = std::make_unique<std::thread>([this]() {
+        while (running_) {
+            try {
+                if (session_) {
+                    std::cout << "[Bootstrap] Requesting DHT stats..." << std::endl;
+                    session_->post_dht_stats();
+                    
+                    // Force DHT bootstrap
+                    session_->dht_get_peers(lt::sha1_hash());
+                    
+                    // Announce ourselves with a generated hash
+                    lt::sha1_hash hash;
+                    std::random_device rd;
+                    std::mt19937 gen(rd());
+                    std::uniform_int_distribution<uint32_t> dis;
+                    for (int i = 0; i < 5; i++) {
+                        reinterpret_cast<uint32_t*>(hash.data())[i] = dis(gen);
                     }
-                } catch (const std::exception& e) {
-                    std::cerr << "[Bootstrap] Error in announce timer: " << e.what() << std::endl;
+                    std::cout << "[Bootstrap] Announcing hash: " << hash << " on port " << port_ << std::endl;
+                    session_->dht_announce(hash, port_);
+                    
+                    // Print current DHT routing table
+                    lt::session_params params = session_->session_state();
+                    std::cout << "[Bootstrap] DHT routing table has " << params.dht_state.nodes.size() << " nodes" << std::endl;
+                    for (auto & node : params.dht_state.nodes) {
+                        std::cout << "[Bootstrap] DHT node: " << node.address() << ":" << node.port() << std::endl;
+                    }
                 }
-                std::this_thread::sleep_for(std::chrono::seconds(5));
+            } catch (const std::exception& e) {
+                std::cerr << "[Bootstrap] Error in announce timer: " << e.what() << std::endl;
             }
-        });
-    }
+            std::this_thread::sleep_for(std::chrono::seconds(5));
+        }
+    });
+    
     
     running_ = true;
     
-    try {
-        std::cout << "[Bootstrap] Creating Gossip object..." << std::endl;
-        gossip_ = std::make_unique<torrent_p2p::Gossip>(*session_, port_ + 1000);
-        std::cout << "[Bootstrap] Gossip object created successfully" << std::endl;
-    } catch (const std::exception& e) {
-        std::cerr << "[Bootstrap] Exception during Gossip initialization: " << e.what() << std::endl;
-    } catch (...) {
-        std::cerr << "[Bootstrap] Unknown exception during Gossip initialization" << std::endl;
-    }
+    // try {
+    //     std::cout << "[Bootstrap] Creating Gossip object..." << std::endl;
+    //     gossip_ = std::make_unique<torrent_p2p::Gossip>(*session_, port_ + 1000);
+    //     std::cout << "[Bootstrap] Gossip object created successfully" << std::endl;
+    // } catch (const std::exception& e) {
+    //     std::cerr << "[Bootstrap] Exception during Gossip initialization: " << e.what() << std::endl;
+    // } catch (...) {
+    //     std::cerr << "[Bootstrap] Unknown exception during Gossip initialization" << std::endl;
+    // }
     
     // Start handling alerts in a separate thread
     std::thread([this]() {

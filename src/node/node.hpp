@@ -39,9 +39,6 @@ public:
     std::unique_ptr<Gossip> gossip_;
 
 private:
-    // Start the node, needs to be implemented slightly different for each type of node
-    virtual void start() = 0;
-    
     // Stop the node
     virtual void stop();
     
@@ -50,10 +47,14 @@ private:
 
 protected:
     std::unique_ptr<lt::session> session_;
-    std::unique_ptr<torrent_p2p::Gossip> gossip_manager_;
     int port_;
     bool running_;
     std::string state_file_;
+    void connectToDHT(const std::vector<std::pair<std::string, int>>& bootstrap_nodes);
+    std::vector<std::pair<std::string, int>> bootstrap_nodes_ = {{"172.20.0.2", 6881}};
+    void initializeSession();
+
+    virtual void start();
     
 
 }; // namespace torrent_p2p

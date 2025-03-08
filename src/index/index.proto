@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package torrent_p2p;
+
+message IndexMessage {
+    string source_ip = 1;
+    uint32 source_port = 2;
+    
+
+    oneof message_type {
+        AddMessage addTorrent = 10
+        RemoveMessage removeTorrent = 11
+        WantMessage wantTorrent = 12
+        GiveMessage giveTorrent = 13
+    }
+}
+
+message AddMessage {
+
+}
+
+message RemoveMessage {
+    
+}
+
+message WantMessage {
+
+}
+ 
+message GiveMessage {
+    
+}
