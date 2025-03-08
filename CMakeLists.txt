@@ -17,6 +17,8 @@ add_subdirectory(third_party/abseil-cpp)
 find_package(LibtorrentRasterbar REQUIRED)
 find_package(Boost REQUIRED COMPONENTS system thread chrono)
 find_package(Protobuf REQUIRED)
+# Add Qt for GUI
+find_package(Qt5 COMPONENTS Widgets Core Gui REQUIRED)
 
 # Print debug info
 message(STATUS "LibtorrentRasterbar include dirs: ${LibtorrentRasterbar_INCLUDE_DIRS}")
@@ -109,3 +111,30 @@ target_link_libraries(p2p_client PRIVATE
 )
 
 target_include_directories(p2p_client PRIVATE src/client PUBLIC src)
+
+# Add GUI client
+add_executable(p2p_gui_client
+    src/client/gui_main.cpp
+    src/client/client.cpp
+    src/client/mainwindow.cpp
+    src/client/torrentlistmodel.cpp
+)
+
+# Tell CMake to run moc when necessary
+set_target_properties(p2p_gui_client PROPERTIES
+    AUTOMOC ON
+    AUTOUIC ON
+    AUTORCC ON
+)
+
+target_link_libraries(p2p_gui_client PRIVATE
+    node
+    LibtorrentRasterbar::torrent-rasterbar
+    Boost::thread
+    Boost::chrono
+    Qt5::Widgets
+    Qt5::Core
+    Qt5::Gui
+)
+
+target_include_directories(p2p_gui_client PRIVATE src/client PUBLIC src)
