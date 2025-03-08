@@ -29,6 +29,8 @@ class Gossip {
 public:
     // Constructor takes a reference to the libtorrent session
     Gossip(lt::session& session, int port = 6789);
+    // Constructor with explicit host IP
+    Gossip(lt::session& session, int port, const std::string& host_ip);
     ~Gossip();
 
     void start();
@@ -54,6 +56,7 @@ private:
     bool running_ = false;
     int port_;
     lt::session& session_;
+    std::string host_ip_ = "127.0.0.1"; // Default to localhost if not specified
 
     // threads
     boost::asio::io_context io_context_;

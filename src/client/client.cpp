@@ -162,11 +162,18 @@ void Client::start() {
         }
     });
 
-    gossip_->setReputationHandler(
+    // Ensure gossip_ is initialized before setting the handler
+    if (gossip_) {
+        std::cout << "Setting reputation handler for Gossip..." << std::endl;
+        gossip_->setReputationHandler(
             [this](const ReputationMessage& message, const lt::tcp::endpoint& sender) {
                 this->handleReputationMessage(message, sender);
             }
         );
+        std::cout << "Reputation handler set successfully" << std::endl;
+    } else {
+        std::cerr << "ERROR: Gossip object not initialized in Client::start()" << std::endl;
+    }
     
     // try {
     //     // Make sure the session is fully initialized before creating Gossip
@@ -484,7 +491,7 @@ void Client::handleAlerts() {
         else if (auto * tfa = lt::alert_cast<lt::torrent_finished_alert>(a)) {
             // Get the info hash directly - works with both older and newer libtorrent versions
             lt::sha1_hash info_hash = tfa->handle.info_hash();
-
+            
             if (torrent_trackers_.find(info_hash) != torrent_trackers_.end()) {
                 auto updates = torrent_trackers_[info_hash]->get_reputation_updates();
                 
@@ -657,10 +664,31 @@ void Client::generateTorrentFile(const std::string& savePath) {
 // }
 
 void Client::sendGossip(std::vector<std::pair<lt::tcp::endpoint, int>> peer_reputation) const{
+    if (!gossip_) {
+        std::cerr << "ERROR: Cannot send gossip - gossip_ is null" << std::endl;
+        return;
+    }
+    
+    if (peer_reputation.empty()) {
+        std::cout << "No gossip to send - peer_reputation vector is empty" << std::endl;
+        return;
+    }
+    
+    std::cout << "Sending gossip for " << peer_reputation.size() << " peers" << std::endl;
+    lt::tcp::endpoint empty_endpoint(lt::address_v4::any(), 0);
+    
     for (auto& peer : peer_reputation) {
-        lt::tcp::endpoint empty_endpoint(lt::address_v4::any(), 0);
-        std::cout << "In client, sending message to gossip..." << std::endl;
-        gossip_->spreadMessage(gossip_->createGossipMessage(peer.first, peer.second), empty_endpoint);
+        std::cout << "Sending gossip about peer " << peer.first.address().to_string() 
+                  << ":" << peer.first.port() << " with reputation " << peer.second << std::endl;
+        try {
+            auto message = gossip_->createGossipMessage(peer.first, peer.second);
+            std::cout << "Created gossip message" << std::endl;
+            
+            gossip_->spreadMessage(message, empty_endpoint);
+            std::cout << "Gossip message sent successfully" << std::endl;
+        } catch (const std::exception& e) {
+            std::cerr << "Exception while sending gossip: " << e.what() << std::endl;
+        }
     }
 }
 

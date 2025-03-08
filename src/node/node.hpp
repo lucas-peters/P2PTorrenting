@@ -39,9 +39,6 @@ public:
     std::unique_ptr<Gossip> gossip_;
 
 private:
-    // Start the node, needs to be implemented slightly different for each type of node
-    
-    
     // Stop the node
     virtual void stop();
     
@@ -54,7 +51,7 @@ protected:
     bool running_;
     std::string state_file_;
     void connectToDHT(const std::vector<std::pair<std::string, int>>& bootstrap_nodes);
-    std::vector<std::pair<std::string, int>> bootstrap_nodes_ = {{"172.31.17.201", 6881}};
+    std::vector<std::pair<std::string, int>> bootstrap_nodes_ = {{"172.20.0.2", 6881}};
     void initializeSession();
 
     virtual void start();
