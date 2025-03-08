@@ -54,6 +54,17 @@ public:
     void setReputationHandler(ReputationHandler handler) { reputation_handler_ = handler; }
     void setIndexHandler(IndexHandler handler) {index_handler_ = handler};
 
+    std::function<void(const lt::tcp::endpoint&)> heartbeat_handler_;
+
+    void setHeartbeatHandler(std::function<void(const lt::tcp::endpoint&)> handler) {
+        heartbeat_handler_ = handler;
+    }
+
+    void sendMessage(const lt::tcp::endpoint& target, const GossipMessage& message) {
+        std::lock_guard<std::mutex> lock(outgoing_queue_mutex_);
+        outgoing_messages_.push({target, message});
+    }
+
 private:
     bool running_ = false;
     int port_;

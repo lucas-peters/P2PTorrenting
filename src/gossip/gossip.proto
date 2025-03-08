@@ -14,6 +14,7 @@ message GossipMessage {
   // Different message types
   oneof message_type {
     ReputationMessage reputation = 10;
+    HeartbeatMessage heartbeat = 11;
     // Add more message types here as needed
   }
 }
@@ -23,4 +24,14 @@ message ReputationMessage {
   string subject_ip = 1;
   uint32 subject_port = 2;
   int32 reputation = 3;
+}
+
+//Bootstrap Heartbeat Message
+message HeartbeatMessage {
+    enum Type {
+        PING = 0;
+        PONG = 1;
+    }
+    Type type = 1;
+    int64 timestamp = 2;
 }

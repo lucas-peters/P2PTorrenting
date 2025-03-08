@@ -29,7 +29,8 @@ include_directories(
     ${CMAKE_CURRENT_BINARY_DIR}
 )
 
-set(PROTO_FILES src/gossip/gossip.proto)
+set(PROTO_FILES 
+    src/gossip/gossip.proto)
 protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS ${PROTO_FILES})
 
 # Add lamport clock library
@@ -39,6 +40,7 @@ add_library(lamport STATIC
 
 add_library(gossip STATIC
     src/gossip/gossip.cpp
+    src/gossip/bootstrap_heartbeat.cpp
     ${PROTO_SRCS}
 )
 
@@ -59,6 +61,18 @@ target_link_libraries(gossip PRIVATE
     absl::log_internal_log_sink_set
     absl::log_globals
     absl::log_initialize
+    absl::log_severity
+    absl::log_entry
+    absl::log_sink
+    absl::log_sink_registry
+    absl::check
+    absl::log_internal_nullguard
+    absl::log_internal_proto
+    absl::log_internal_nullstream
+    absl::log_internal_globals
+    absl::log_internal_append_truncated
+    absl::log_internal_strip
+    absl::log_internal_voidify
     protobuf::libprotobuf
 )
 
@@ -94,6 +108,8 @@ target_link_libraries(p2p_bootstrap PRIVATE
     LibtorrentRasterbar::torrent-rasterbar
     Boost::thread
     Boost::chrono
+    gossip
+    protobuf::libprotobuf
 )
 
 target_include_directories(p2p_bootstrap PRIVATE src/bootstrap PUBLIC src)
