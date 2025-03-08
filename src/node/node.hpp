@@ -34,10 +34,7 @@ public:
     // Save/load the DHT state to/from a file
     bool saveDHTState() const;
     bool loadDHTState(const std::string& state_file);
-    //lt::sha1_hash getMyNodeId() const;
-    // putting this in public to test with main, we should hide this object behind an API
-    std::unique_ptr<Gossip> gossip_;
-
+    
 private:
     // Stop the node
     virtual void stop();
@@ -47,14 +44,18 @@ private:
 
 protected:
     std::unique_ptr<lt::session> session_;
+    std::unique_ptr<Gossip> gossip_;
     int port_;
     bool running_;
     std::string state_file_;
-    void connectToDHT(const std::vector<std::pair<std::string, int>>& bootstrap_nodes);
     std::vector<std::pair<std::string, int>> bootstrap_nodes_ = {{"172.20.0.2", 6881}};
+
+    // All Node subtypes should be started using these
+    virtual void start();
+    void connectToDHT(const std::vector<std::pair<std::string, int>>& bootstrap_nodes);
     void initializeSession();
 
-    virtual void start();
+    
     
 
 }; // namespace torrent_p2p
