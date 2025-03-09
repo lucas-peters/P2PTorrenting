@@ -35,6 +35,33 @@ set(PROTO_FILES
     src/index/index.proto)
 protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS ${PROTO_FILES})
 
+# Define common Abseil dependencies to avoid repetition
+set(ABSL_DEPS
+    absl::log
+    absl::base
+    absl::strings
+    absl::raw_logging_internal
+    absl::log_internal_check_op
+    absl::log_internal_message
+    absl::log_internal_conditions
+    absl::log_internal_format
+    absl::log_internal_log_sink_set
+    absl::log_globals
+    absl::log_initialize
+    absl::log_severity
+    absl::log_entry
+    absl::log_sink
+    absl::log_sink_registry
+    absl::check
+    absl::log_internal_nullguard
+    absl::log_internal_proto
+    absl::log_internal_nullstream
+    absl::log_internal_globals
+    absl::log_internal_append_truncated
+    absl::log_internal_strip
+    absl::log_internal_voidify
+)
+
 # Add lamport clock library
 add_library(lamport STATIC
     src/gossip/lamport.cpp
@@ -51,30 +78,7 @@ target_link_libraries(gossip PRIVATE
     LibtorrentRasterbar::torrent-rasterbar
     Boost::thread
     Boost::chrono
-    absl::log
-    absl::base
-    absl::strings
-    absl::raw_logging_internal
-    # Add missing Abseil logging libraries
-    absl::log_internal_check_op
-    absl::log_internal_message
-    absl::log_internal_conditions
-    absl::log_internal_format
-    absl::log_internal_log_sink_set
-    absl::log_globals
-    absl::log_initialize
-    absl::log_severity
-    absl::log_entry
-    absl::log_sink
-    absl::log_sink_registry
-    absl::check
-    absl::log_internal_nullguard
-    absl::log_internal_proto
-    absl::log_internal_nullstream
-    absl::log_internal_globals
-    absl::log_internal_append_truncated
-    absl::log_internal_strip
-    absl::log_internal_voidify
+    ${ABSL_DEPS}
     protobuf::libprotobuf
 )
 
@@ -91,35 +95,13 @@ add_library(index STATIC
     src/index/messenger.cpp
 )
 
-target_link_libraries(index PRIVATE
+target_link_libraries(index PUBLIC
     LibtorrentRasterbar::torrent-rasterbar
     Boost::thread
     Boost::chrono
     gossip
     protobuf::libprotobuf
-    absl::log
-    absl::base
-    absl::strings
-    absl::raw_logging_internal
-    absl::log_internal_check_op
-    absl::log_internal_message
-    absl::log_internal_conditions
-    absl::log_internal_format
-    absl::log_internal_log_sink_set
-    absl::log_globals
-    absl::log_initialize
-    absl::log_severity
-    absl::log_entry
-    absl::log_sink
-    absl::log_sink_registry
-    absl::check
-    absl::log_internal_nullguard
-    absl::log_internal_proto
-    absl::log_internal_nullstream
-    absl::log_internal_globals
-    absl::log_internal_append_truncated
-    absl::log_internal_strip
-    absl::log_internal_voidify
+    ${ABSL_DEPS}
 )
 
 target_include_directories(index PUBLIC
@@ -129,7 +111,7 @@ target_include_directories(index PUBLIC
 )
 
 add_library(node STATIC src/node/node.cpp)
-target_link_libraries(node PRIVATE
+target_link_libraries(node PUBLIC
     LibtorrentRasterbar::torrent-rasterbar
     Boost::thread
     Boost::chrono
@@ -151,10 +133,6 @@ add_executable(p2p_bootstrap
 
 target_link_libraries(p2p_bootstrap PRIVATE
     node
-    LibtorrentRasterbar::torrent-rasterbar
-    Boost::thread
-    Boost::chrono
-    gossip
     protobuf::libprotobuf
 )
 
@@ -167,35 +145,7 @@ add_executable(p2p_client
 
 target_link_libraries(p2p_client PRIVATE
     node
-    index
-    LibtorrentRasterbar::torrent-rasterbar
-    Boost::thread
-    Boost::chrono
     protobuf::libprotobuf
-    absl::log
-    absl::base
-    absl::strings
-    absl::raw_logging_internal
-    # Add missing Abseil logging libraries
-    absl::log_internal_check_op
-    absl::log_internal_message
-    absl::log_internal_conditions
-    absl::log_internal_format
-    absl::log_internal_log_sink_set
-    absl::log_globals
-    absl::log_initialize
-    absl::log_severity
-    absl::log_entry
-    absl::log_sink
-    absl::log_sink_registry
-    absl::check
-    absl::log_internal_nullguard
-    absl::log_internal_proto
-    absl::log_internal_nullstream
-    absl::log_internal_globals
-    absl::log_internal_append_truncated
-    absl::log_internal_strip
-    absl::log_internal_voidify
 )
 
 target_include_directories(p2p_client PRIVATE src/client PUBLIC src)
@@ -217,36 +167,9 @@ set_target_properties(p2p_gui_client PROPERTIES
 
 target_link_libraries(p2p_gui_client PRIVATE
     node
-    index
-    LibtorrentRasterbar::torrent-rasterbar
-    Boost::thread
-    Boost::chrono
     Qt5::Widgets
     Qt5::Core
     Qt5::Gui
-    absl::log
-    absl::base
-    absl::strings
-    absl::raw_logging_internal
-    absl::log_internal_check_op
-    absl::log_internal_message
-    absl::log_internal_conditions
-    absl::log_internal_format
-    absl::log_internal_log_sink_set
-    absl::log_globals
-    absl::log_initialize
-    absl::log_severity
-    absl::log_entry
-    absl::log_sink
-    absl::log_sink_registry
-    absl::check
-    absl::log_internal_nullguard
-    absl::log_internal_proto
-    absl::log_internal_nullstream
-    absl::log_internal_globals
-    absl::log_internal_append_truncated
-    absl::log_internal_strip
-    absl::log_internal_voidify
     protobuf::libprotobuf
 )
 
@@ -259,33 +182,6 @@ add_executable(p2p_index
 
 target_link_libraries(p2p_index PRIVATE
     node
-    index
-    LibtorrentRasterbar::torrent-rasterbar
-    Boost::thread
-    Boost::chrono
-    absl::log
-    absl::base
-    absl::strings
-    absl::raw_logging_internal
-    absl::log_internal_check_op
-    absl::log_internal_message
-    absl::log_internal_conditions
-    absl::log_internal_format
-    absl::log_internal_log_sink_set
-    absl::log_globals
-    absl::log_initialize
-    absl::log_severity
-    absl::log_entry
-    absl::log_sink
-    absl::log_sink_registry
-    absl::check
-    absl::log_internal_nullguard
-    absl::log_internal_proto
-    absl::log_internal_nullstream
-    absl::log_internal_globals
-    absl::log_internal_append_truncated
-    absl::log_internal_strip
-    absl::log_internal_voidify
     protobuf::libprotobuf
 )
 
