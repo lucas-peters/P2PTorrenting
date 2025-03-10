@@ -190,7 +190,8 @@ private:
     std::unique_ptr<std::thread> peer_cache_thread_;
 
     // this is where we store torrents and downloads on docker images
-    std::string torrent_path_ = "/app/torrents/";
+    //std::string torrent_path_ = "/app/torrents/";
+    std::string torrent_path_ = "/Users/lucaspeters/Documents/GitHub/P2PTorrenting/6882/";
     std::string download_path_ = "/app/downloads/";
     
     // Ban a node from the DHT network

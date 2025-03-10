@@ -9,10 +9,12 @@ using json = nlohmann::json;
 namespace torrent_p2p {
 Node::Node(int port, const std::string& env) : port_(port), running_(false) {
     loadEnvConfig(env);
+    setIP(env);
 }
 
 Node::Node(int port, const std::string& env, const std::string& state_file) : port_(port), running_(false), state_file_(state_file) {
     loadEnvConfig(env);
+    setIP(env);
     loadDHTState(state_file);
 }
 
@@ -122,7 +124,7 @@ void Node::start() {
         std::cout << "Gossip object created successfully" << std::endl;
 
         std::cout << " Creating Messenger" << std::endl;
-        messenger_ = std::make_unique<Messenger>(*session_, port_ + 2000);
+        messenger_ = std::make_unique<Messenger>(*session_, port_ + 2000, ip_);
         std::cout << "Messenger object created successfully" << std::endl;
         
     } catch (const std::exception& e) {
@@ -341,6 +343,21 @@ void Node::connectToDHT(const std::vector<std::pair<std::string, int>>& bootstra
     }).detach();
 }
 
+void Node::setIP(const std::string& env) {
+    // get ip from env if running on aws or docker
+    if (env == "aws" || env == "docker") {
+        const char* env_ip = std::getenv("PUBLIC_IP");
+        if (env_ip && *env_ip) {
+            std::cout << "Using public IP from environment: " << env_ip << std::endl;
+            ip_ = std::string(env_ip);
+            return;
+        }
+    }
+    
+    // If running purely local, ip will be the same as the bootstrap node
+    ip_ = bootstrap_nodes_[0].first;
+    std::cout << "SET ip_: " << ip_ << std::endl;
+}
 // lt::sha1_hash Node::getMyNodeId() const {
 //     lt::sha1_hash node_id;
     

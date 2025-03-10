@@ -40,10 +40,10 @@ struct MessageComparator {
 class Messenger {
 
 public:
-    Messenger(lt::session& session, int port);
+    Messenger(lt::session& session, int port, std::string ip);
     ~Messenger() { stop(); }
     
-    using IndexHandler = std::function<void(const IndexMessage&, const lt::tcp::endpoint&)>;
+    using IndexHandler = std::function<void(const lt::tcp::endpoint&, const IndexMessage&)>;
     void setIndexHandler(IndexHandler handler) {index_handler_ = handler;}
     
     void queueMessage(const lt::tcp::endpoint& target, const IndexMessage& msg);
@@ -53,6 +53,7 @@ public:
 private:
     bool running_ = false;
     int port_;
+    std::string ip_;
     lt::session& session_;
 
     void start();

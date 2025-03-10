@@ -13,6 +13,7 @@
 #include <sstream>
 #include <cstdlib>
 #include <nlohmann/json.hpp>
+#include <boost/asio.hpp>
 
 #include "index/messenger.hpp"
 #include "gossip/gossip.hpp"
@@ -51,6 +52,7 @@ protected:
     std::unique_ptr<Messenger> messenger_;
     
     int port_;
+    std::string ip_;
     bool running_;
     std::string state_file_;
     // Predefined list of static endpoints set in config.json, loaded on start up based on --env flag
@@ -64,7 +66,9 @@ protected:
     void connectToDHT(const std::vector<std::pair<std::string, int>>& bootstrap_nodes);
     void initializeSession();
 
-}; // namespace torrent_p2p
+    void setIP(const std::string& env);
+
+};
 
 } // namespace torrent_p2p
 

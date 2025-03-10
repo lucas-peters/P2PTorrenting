@@ -45,7 +45,7 @@ void Index::start() {
 
     if (messenger_) {
         messenger_->setIndexHandler(
-            [this](const IndexMessage& message, const lt::tcp::endpoint& sender) {
+            [this](const lt::tcp::endpoint& sender, const IndexMessage& message) {
                 this->handleIndexMessage(sender, message);
             }
         );
@@ -103,6 +103,10 @@ std::vector<std::string> Index::generateKeywords(const std::string& title) {
 
         keywords.push_back(currentWord);
     }
+    std::cout << "Keywords Generated: " << std::endl;
+    for(auto& keyword: keywords) {
+        std::cout << keyword << std::endl;
+    }
 
     return keywords;
 }
@@ -133,13 +137,17 @@ void Index::addTorrent(const std::string& title, const std::string& magnet) {
 std::vector<std::pair<std::string, std::string>> Index::searchTorrent(const std::string& keyword) {
     std::vector<std::pair<std::string, std::string>> pairs;
     std::shared_lock<std::shared_mutex> lock(data_mutex_);
-    if (keywordToTitle.find(keyword) == keywordToTitle.end())
+    if (keywordToTitle.find(keyword) == keywordToTitle.end()) {
+        std::cout << "No matching torrents found for keyword: " << keyword << std::endl;
         return pairs;
+    }
+        
 
     std::vector<std::string> titles;
 
     titles = keywordToTitle[keyword];
     for (auto & title : titles) {
+        std::cout << "Found torrent match: " << title << std::endl;
         pairs.push_back({title, titleToMagnet[title]});
     }
     return pairs;
@@ -170,9 +178,11 @@ void Index::sendGiveMessage(const lt::tcp::endpoint& sender, const std::string& 
 
 void Index::handleIndexMessage(const lt::tcp::endpoint& sender, const IndexMessage& message) {
     if (message.has_addtorrent()) {
+        std::cout << "Recieved addTorrent message" << std::endl;
         const AddMessage& addMsg = message.addtorrent();
         addTorrent(addMsg.title(), addMsg.magnet());
     } else if (message.has_wanttorrent()) {
+        std::cout << "Received wantTorrent mesesage" << std::endl;
         const WantMessage& wantMsg = message.wanttorrent();
         sendGiveMessage(sender, wantMsg.keyword(), wantMsg.request_identifier());
     }

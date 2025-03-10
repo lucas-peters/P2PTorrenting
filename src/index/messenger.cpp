@@ -4,7 +4,7 @@
 // should consider making them inherit, but I don't want to break anything rn
 namespace torrent_p2p {
 
-Messenger::Messenger(lt::session& session, int port) : session_(session), port_(port) {
+Messenger::Messenger(lt::session& session, int port, std::string ip) : session_(session), port_(port), ip_(ip) {
     start();   
 }
 
@@ -276,6 +276,8 @@ void Messenger::processOutgoingMessages() {
 
     for (auto& msg : messages_to_process) {
         // attaching lamport clock timestamp to outgoing message
+        msg.second.set_source_ip(ip_);
+        msg.second.set_source_port(port_);
         msg.second.set_lamport_timestamp(lamport_clock_.getClock());
         lamport_clock_.incrementClock();
         sendMessageAsync(msg.first, msg.second);
@@ -306,15 +308,15 @@ void Messenger::processIncomingMessages() {
     
     // Process each message
     for (const auto& incoming : messages_to_process) {
-        const lt::tcp::endpoint& sender = incoming.first;
         const IndexMessage& message = incoming.second;
+        const lt::tcp::endpoint sender(lt::make_address_v4(message.source_ip()), message.source_port());
         
         try {
             // updating lamport clock
             if (message.lamport_timestamp() > 0) {
                 lamport_clock_.updateClock(message.lamport_timestamp());
             }
-            index_handler_(message, sender);
+            index_handler_(sender, message);
             // Check which message type is set in the oneof field
             // if (message.has_reputation()) {
             //     // Handle reputation message
