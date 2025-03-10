@@ -59,4 +59,4 @@ EXPOSE 7882/udp
 
 # Run the client
 ENTRYPOINT ["./p2p_client"]
-CMD ["--port", "6882"]
+CMD ["6882"]

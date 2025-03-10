@@ -1,0 +1,6 @@
+# Base image with C++ build tools
+FROM ubuntu:22.04 AS builder
+
+# Avoid interactive prompts during installation
+ENV DEBIAN_FRONTEND=noninteractive
+

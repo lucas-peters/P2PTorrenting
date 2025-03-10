@@ -1,10 +1,103 @@
 #include "node.hpp"
 
-namespace torrent_p2p {
-Node::Node(int port) : port_(port), running_(false) {}
+// Add explicit include for protobuf-generated headers
+#include "gossip.pb.h"
+#include "index.pb.h"
 
-Node::Node(int port, const std::string& state_file) : port_(port), running_(false), state_file_(state_file) {
+using json = nlohmann::json;
+
+namespace torrent_p2p {
+Node::Node(int port, const std::string& env) : port_(port), running_(false) {
+    loadEnvConfig(env);
+}
+
+Node::Node(int port, const std::string& env, const std::string& state_file) : port_(port), running_(false), state_file_(state_file) {
+    loadEnvConfig(env);
     loadDHTState(state_file);
+}
+
+void Node::loadEnvConfig(const std::string& env) {
+    std::string config_path;
+    
+    // Check if CONFIG_PATH environment variable is set (highest priority)
+    const char* envPath = std::getenv("CONFIG_PATH");
+    if (envPath) {
+        config_path = envPath;
+        std::cout << "Using config path from environment variable: " << config_path << std::endl;
+    } else if (env == "aws" || env == "docker") {
+        // In Docker/AWS, use the container path
+        config_path = "/app/config.json";
+        std::cout << "Using Docker/AWS config path: " << config_path << std::endl;
+    } else {
+        // For local development, use the project root from CMake
+        config_path = std::string(PROJECT_ROOT) + "/config.json";
+        std::cout << "Using local config path: " << config_path << std::endl;
+    }
+    
+    try {
+        // Open the config file
+        std::ifstream file(config_path);
+        if (!file.is_open()) {
+            std::cerr << "Failed to open config file: " << config_path << std::endl;
+            return;
+        }
+        
+        // Parse the JSON
+        json config;
+        file >> config;
+        
+        // Check if the environment exists
+        if (!config["environments"].contains(env)) {
+            std::cerr << "Environment not found: " << env << std::endl;
+            return;
+        }
+        
+        // Get the environment data
+        const auto& env_data = config["environments"][env];
+        
+        // Parse bootstrap nodes
+        bootstrap_nodes_.clear();
+        if (env_data.contains("bootstrap_nodes") && env_data["bootstrap_nodes"].is_array()) {
+            for (const auto& node : env_data["bootstrap_nodes"]) {
+                if (node.is_array() && node.size() == 2 && 
+                    node[0].is_string() && node[1].is_number()) {
+                    bootstrap_nodes_.emplace_back(node[0].get<std::string>(), node[1].get<int>());
+                } else {
+                    std::cerr << "Invalid bootstrap node format" << std::endl;
+                }
+            }
+        }
+        
+        // Parse index nodes
+        index_nodes_.clear();
+        if (env_data.contains("index_nodes") && env_data["index_nodes"].is_array()) {
+            for (const auto& node : env_data["index_nodes"]) {
+                if (node.is_array() && node.size() == 2 && 
+                    node[0].is_string() && node[1].is_number()) {
+                    index_nodes_.emplace_back(node[0].get<std::string>(), node[1].get<int>());
+                } else {
+                    std::cerr << "Invalid index node format" << std::endl;
+                }
+            }
+        }
+        
+        // Print loaded configuration
+        std::cout << "Loaded configuration for environment: " << env << std::endl;
+        std::cout << "Bootstrap nodes:" << std::endl;
+        for (const auto& node : bootstrap_nodes_) {
+            std::cout << "  " << node.first << ":" << node.second << std::endl;
+        }
+        std::cout << "Index nodes:" << std::endl;
+        for (const auto& node : index_nodes_) {
+            std::cout << "  " << node.first << ":" << node.second << std::endl;
+        }
+    }
+    catch (const json::exception& e) {
+        std::cerr << "JSON parsing error: " << e.what() << std::endl;
+    }
+    catch (const std::exception& e) {
+        std::cerr << "Error parsing config: " << e.what() << std::endl;
+    }
 }
 
 Node::~Node() {
@@ -26,10 +119,11 @@ void Node::start() {
         
         std::cout << "Creating Gossip object..." << std::endl;
         gossip_ = std::make_unique<Gossip>(*session_, port_ + 1000);
-        
         std::cout << "Gossip object created successfully" << std::endl;
-        // Don't call start() here as the Gossip constructor already calls it
-        // gossip_->start();
+
+        std::cout << " Creating Messenger" << std::endl;
+        messenger_ = std::make_unique<Messenger>(*session_, port_ + 2000);
+        std::cout << "Messenger object created successfully" << std::endl;
         
     } catch (const std::exception& e) {
         std::cerr << "Exception during Gossip initialization: " << e.what() << std::endl;
@@ -84,7 +178,7 @@ void Node::stop() {
     }
 }
 
-
+// still need to test this
 bool Node::saveDHTState() const {
     if (!session_) {
         return false;
@@ -113,7 +207,7 @@ bool Node::saveDHTState() const {
     }
 
 }
-
+// still need to test this
 bool Node::loadDHTState(const std::string& state_file) {
     if (!session_) {
         return false;

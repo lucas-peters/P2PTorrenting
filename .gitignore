@@ -35,3 +35,5 @@ build/
 6882/
 6883/
 .vscode/
+*.torrent
+*.pdf

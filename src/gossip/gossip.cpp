@@ -109,6 +109,10 @@ void Gossip::stop() {
     if (message_processing_thread_ && message_processing_thread_->joinable()) {
         message_processing_thread_->join();
     }
+
+    if (send_thread_ && send_thread_->joinable()) {
+        send_thread_->join();
+    }
     
     if (peer_thread_ && peer_thread_->joinable()) {
         peer_thread_->join();
@@ -360,7 +364,8 @@ void Gossip::processIncomingMessages() {
             if (message.lamport_timestamp() > 0) {
                 lamport_clock_.updateClock(message.lamport_timestamp());
             }
-            // Check which message type is set in the oneof field
+            
+            // Check the message types in the oneof field
             if (message.has_reputation()) {
                 // Handle reputation message
                 if (reputation_handler_) {
@@ -368,10 +373,28 @@ void Gossip::processIncomingMessages() {
                 } else {
                     std::cerr << "Gossip: Received reputation message but no handler is registered" << std::endl;
                 }
+            } else if (message.has_heartbeat()) {
+                // Handle heartbeat messages
+                const auto& heartbeat = message.heartbeat();
+                
+                if (heartbeat.type() == HeartbeatMessage::PING) {
+                    // Respond with a PONG
+                    GossipMessage pong_msg;
+                    pong_msg.set_timestamp(std::time(nullptr));
+                    pong_msg.set_message_id("heartbeat_pong_" + std::to_string(std::time(nullptr)));
+                    
+                    HeartbeatMessage* pong = pong_msg.mutable_heartbeat();
+                    pong->set_type(HeartbeatMessage::PONG);
+                    pong->set_timestamp(heartbeat.timestamp());
+                    
+                    sendMessageAsync(sender, pong_msg);
+                } else if (heartbeat.type() == HeartbeatMessage::PONG) {
+                    // Notify heartbeat handler if exists
+                    if (heartbeat_handler_) {
+                        heartbeat_handler_(sender);
+                    }
+                }
             }
-            // Add handlers for other message types as they're added to the protocol
-            // else if (message.has_content()) { ... }
-            
             else {
                 std::cerr << "Gossip: Received message with unknown type" << std::endl;
             }

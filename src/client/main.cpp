@@ -50,6 +50,7 @@ int main(int argc, char* argv[]) {
     int port = 6882;
     std::string state_file = "";
     bool load_state = false;
+    std::string env = "lucas";
     
     for (int i = 1; i < argc; i++) {
         std::string arg = argv[i];
@@ -62,33 +63,60 @@ int main(int argc, char* argv[]) {
                     std::cerr << "Error parsing port number: " << e.what() << std::endl;
                     return 1;
                 }
+            } else {
+                std::cerr << "Missing port number after " << arg << std::endl;
+                return 1;
             }
         } else if (arg == "--state" || arg == "-s") {
             if (i + 1 < argc) {
                 state_file = argv[i + 1];
                 load_state = true;
                 i++;
+            } else {
+                std::cerr << "Missing state file path after " << arg << std::endl;
+                return 1;
+            }
+        } else if (arg == "--env" || arg == "-e") {
+            if (i + 1 < argc) {
+                env = argv[i + 1];
+                i++;
+                // Validate environment
+                if (env != "lucas" && env != "docker" && env != "aws" && env != "shanaya") {
+                    std::cerr << "Invalid environment: " << env << std::endl;
+                    std::cerr << "Valid environments are: lucas, docker, aws, shanaya" << std::endl;
+                    return 1;
+                }
+            } else {
+                std::cerr << "Missing environment name after " << arg << std::endl;
+                return 1;
             }
         } else if (arg == "--help" || arg == "-h") {
             std::cout << "Usage: " << argv[0] << " [options]\n";
             std::cout << "Options:\n";
             std::cout << "  --port, -p <port>    Specify port number (default: 6882)\n";
             std::cout << "  --state, -s <file>   Load DHT state from file\n";
+            std::cout << "  --env, -e <env>      Specify environment (default: lucas)\n";
+            std::cout << "                       Valid environments: lucas, docker, aws, shanaya\n";
             std::cout << "  --help, -h           Display this help message\n";
             return 0;
+        } else {
+            std::cerr << "Unknown argument: " << arg << std::endl;
+            std::cout << "Usage: " << argv[0] << " [options]\n";
+            std::cout << "Use --help for more information.\n";
+            return 1;
         }
     }
 
-    std::cout << "Starting client on port: " << port << std::endl;
+    std::cout << "Starting client on port: " << port << " in environment " << env << std::endl;
 
     // Initialize client
     std::unique_ptr<Client> client;
     
     if (load_state && !state_file.empty()) {
         std::cout << "Loading DHT state from: " << state_file << std::endl;
-        client = std::make_unique<Client>(port, state_file);
+        client = std::make_unique<Client>(port, state_file, env);
     } else {
-        client = std::make_unique<Client>(port);
+        client = std::make_unique<Client>(port, env);
     }
     
     // Display welcome message and commands
@@ -212,19 +240,21 @@ int main(int argc, char* argv[]) {
         // } 
         else if (command == "dht") {
             std::cout << client->getDHTStats() << std::endl;
-        } else if (command == "gossip") {
-            std::cout << "Sending gossip message...\n";
-            GossipMessage message;
-            message.set_source_ip("127.0.0.1");
-            message.set_source_port(port);
-            lt::tcp::endpoint exclude(lt::make_address_v4("127.0.0.1"), port);
-            client->gossip_->spreadMessage(message, exclude);
-        } else if (command == "save") {
+        }
+        //  else if (command == "gossip") {
+        //     std::cout << "Sending gossip message...\n";
+        //     GossipMessage message;
+        //     message.set_source_ip("127.0.0.1");
+        //     message.set_source_port(port);
+        //     lt::tcp::endpoint exclude(lt::make_address_v4("127.0.0.1"), port);
+        //     client->gossip_->spreadMessage(message, exclude);
+        // } 
+        else if (command == "save") {
             std::string save_file;
             if (iss >> save_file) {
                 try {
                     std::cout << "Saving DHT state to: " << save_file << "\n";
-                    if (client->saveDHTState(save_file)) {
+                    if (client->saveDHTState()) {
                         std::cout << "DHT state saved successfully.\n";
                     } else {
                         std::cerr << "Failed to save DHT state.\n";
