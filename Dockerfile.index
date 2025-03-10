@@ -41,6 +41,7 @@ RUN apt-get update && apt-get install -y \
     libssl-dev \
     libcurl4-openssl-dev \
     libprotobuf-dev \
+    libtorrent-rasterbar-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy built executable and necessary files
@@ -53,7 +54,7 @@ COPY --from=builder /app/build/p2p_index /app/
 COPY --from=builder /app/config.json /app/
 
 # Expose ports for DHT, Gossip, and Messenger
-EXPOSE 6883 7883 8883
+EXPOSE 6881 7881 8881
 
 ENTRYPOINT ["./p2p_index"]
-CMD ["--port", "6883", "--env", "docker"]
+CMD ["--port", "6881", "--env", "docker"]

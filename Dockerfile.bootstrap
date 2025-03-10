@@ -55,12 +55,7 @@ COPY --from=builder /app/build/p2p_bootstrap .
 COPY --from=builder /app/config.json /app/
 
 # Expose the default bootstrap node port
-EXPOSE 6881/tcp
-EXPOSE 6881/udp
-# Expose the gossip port
-EXPOSE 7881/tcp
-EXPOSE 7881/udp
-
+EXPOSE 6881 7881 8881
 # Run the bootstrap node
 ENTRYPOINT ["./p2p_bootstrap"]
 CMD ["--port", "6881", "--env", "docker"]

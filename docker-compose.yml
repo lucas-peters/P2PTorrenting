@@ -12,6 +12,8 @@ services:
       - "6881:6881/udp"
       - "7881:7881/tcp"
       - "7881:7881/udp"
+      - "8881:8881/tcp"
+      - "8881:8881/udp"
     restart: unless-stopped
     volumes:
       - ./bootstrap_data:/app/data
@@ -31,6 +33,8 @@ services:
       - "6882:6881/udp"
       - "7882:7881/tcp"
       - "7882:7881/udp"
+      - "8882:8881/tcp"
+      - "8882:8881/udp"
     volumes:
       - ./docker_directories/client1_torrents:/app/torrents
       - ./docker_directories/client1_downloads:/app/downloads
@@ -57,6 +61,8 @@ services:
       - "6883:6881/udp"
       - "7883:7881/tcp"
       - "7883:7881/udp"
+      - "8883:8881/tcp"
+      - "8883:8881/udp"
     volumes:
       - ./docker_directories/client2_torrents:/app/torrents
       - ./docker_directories/client2_downloads:/app/downloads
@@ -83,6 +89,36 @@ services:
       - "6884:6881/udp"
       - "7884:7881/tcp"
       - "7884:7881/udp"
+      - "8884:8881/tcp"
+      - "8884:8881/udp"
+    volumes:
+      - ./docker_directories/client3_torrents:/app/torrents
+      - ./docker_directories/client3_downloads:/app/downloads
+      - ./docker_directories/client3_data:/app/data
+    restart: unless-stopped
+    depends_on:
+      - bootstrap
+    stdin_open: true  # Keep STDIN open
+    tty: true         # Allocate a pseudo-TTY
+    #command: ["--port 6881 --env docker"]
+    environment:
+      - GOSSIP_HOST=172.20.0.5
+
+  index:
+    build:
+      context: .
+      dockerfile: Dockerfile.index
+    container_name: index
+    networks:
+      p2p-network:
+        ipv4_address: 172.20.0.6
+    ports:
+      - "6885:6881/tcp"
+      - "6885:6881/udp"
+      - "7885:7881/tcp"
+      - "7885:7881/udp"
+      - "8885:8881/tcp"
+      - "8885:8881/udp"
     volumes:
       - ./docker_directories/client3_torrents:/app/torrents
       - ./docker_directories/client3_downloads:/app/downloads

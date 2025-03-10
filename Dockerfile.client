@@ -61,12 +61,8 @@ COPY --from=builder /app/build/p2p_client .
 COPY --from=builder /app/config.json /app/
 
 # Expose the default client port
-EXPOSE 6882/tcp
-EXPOSE 6882/udp
-# Expose the gossip port (port + 1000)
-EXPOSE 7882/tcp
-EXPOSE 7882/udp
+EXPOSE 6881 7881 8881
 
 # Run the client
 ENTRYPOINT ["./p2p_client"]
-CMD ["--port", "6882", "--env", "docker"]
+CMD ["--port", "6881", "--env", "docker"]

@@ -26,7 +26,7 @@ namespace fs = std::filesystem;
 // Function to display help information
 void displayHelp() {
     std::cout << "\n===== P2P Torrenting Client - Command Reference =====\n";
-    std::cout << "  add <torrent_file> <save_path>    - Add a torrent file to download\n";
+    std::cout << "  add <torrent_file>                - Add a torrent file to download\n";
     std::cout << "  magnet <info_hash> <save_path>    - Add a torrent via magnet link\n";
     std::cout << "  generate <file_path>              - Generate a torrent file from a file/directory\n";
     std::cout << "  status                            - Display status of all torrents\n";
@@ -157,17 +157,16 @@ int main(int argc, char* argv[]) {
                 // Clear screen - works on most terminals
                 std::cout << "\033[2J\033[1;1H";
             } else if (command == "add") {
-                std::string torrent_file, save_path;
-                if (iss >> torrent_file >> save_path) {
+                std::string torrent_file;
+                if (iss >> torrent_file ) {
                     try {
                         std::cout << "Adding torrent: " << torrent_file << "\n";
-                        std::cout << "Save path: " << save_path << "\n";
-                        client->addTorrent(torrent_file, save_path);
+                        client->addTorrent(torrent_file);
                     } catch (const std::exception& e) {
                         std::cerr << "Error adding torrent: " << e.what() << "\n";
                     }
                 } else {
-                    std::cout << "Usage: add <torrent_file> <save_path>\n";
+                    std::cout << "Usage: add <torrent_file>\n";
                 }
             } else if (command == "magnet") {
                 std::string info_hash, save_path;

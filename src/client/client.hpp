@@ -125,9 +125,9 @@ public:
     ~Client();
     
     // Torrent helpers
-    void addTorrent(const std::string& torrentFilePath, const std::string& savePath);
+    void addTorrent(const std::string& torrentFilePath);
     bool hasTorrent(const lt::sha1_hash& hash) const;
-    void generateTorrentFile(const std::string& savePath);
+    void generateTorrentFile(const std::string& fileName);
     // Get progress of a specific torrent
    //double getProgress(const std::string& torrentFilePath);
     // Print the status of all torrents
@@ -164,6 +164,8 @@ private:
 
     // libtorrent sets alerts to communicate when events happen, such as when a torrent is downloading or when a peer sends a message
     void handleAlerts() override;
+
+    void setSavePaths(const std::string& env);
 
     // tracks what peers contributed what pieces of each torrent
     std::unordered_map<lt::sha1_hash, std::unique_ptr<PieceTracker>> torrent_trackers_;
