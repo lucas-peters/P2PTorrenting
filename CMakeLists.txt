@@ -92,10 +92,47 @@ target_include_directories(gossip PUBLIC
     $<INSTALL_INTERFACE:include>
 )
 
+# Add messenger library
+add_library(messenger STATIC
+    src/index/messenger.cpp
+)
+
+target_link_libraries(messenger PUBLIC
+    LibtorrentRasterbar::torrent-rasterbar
+    Boost::thread
+    Boost::chrono
+    gossip
+    lamport
+    protobuf::libprotobuf
+    ${ABSL_DEPS}
+)
+
+target_include_directories(messenger PUBLIC
+    src
+    ${PROTOBUF_INCLUDE_DIRS}
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
+)
+
+# Add node library
+add_library(node STATIC src/node/node.cpp)
+target_link_libraries(node PUBLIC
+    LibtorrentRasterbar::torrent-rasterbar
+    Boost::thread
+    Boost::chrono
+    gossip
+    lamport
+    messenger
+)
+
+target_include_directories(node PUBLIC 
+    src
+    ${PROTOBUF_INCLUDE_DIRS}
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
+)
+
 # Add index library
 add_library(index STATIC
     src/index/index.cpp
-    src/index/messenger.cpp
 )
 
 target_link_libraries(index PUBLIC
@@ -105,25 +142,11 @@ target_link_libraries(index PUBLIC
     gossip
     protobuf::libprotobuf
     ${ABSL_DEPS}
+    node
+    messenger
 )
 
 target_include_directories(index PUBLIC
-    src
-    ${PROTOBUF_INCLUDE_DIRS}
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
-)
-
-add_library(node STATIC src/node/node.cpp)
-target_link_libraries(node PUBLIC
-    LibtorrentRasterbar::torrent-rasterbar
-    Boost::thread
-    Boost::chrono
-    gossip
-    lamport
-    index
-)
-
-target_include_directories(node PUBLIC 
     src
     ${PROTOBUF_INCLUDE_DIRS}
     $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
@@ -184,7 +207,7 @@ add_executable(p2p_index
 )
 
 target_link_libraries(p2p_index PRIVATE
-    node
+    index
     protobuf::libprotobuf
 )
 
