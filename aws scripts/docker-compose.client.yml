@@ -1,0 +1,132 @@
+services:
+  client1:
+    image: lucaspeters/client
+    container_name: client1
+    networks:
+      p2p-network:
+        ipv4_address: 172.20.0.10
+    ports:
+      - "6881:6881/tcp"
+      - "6881:6881/udp"
+      - "7881:7881/tcp"
+      - "7881:7881/udp"
+      - "8881:8881/tcp"
+      - "8881:8881/udp"
+    restart: unless-stopped
+    volumes:
+      - ./client1_data:/app/data
+      - ./client1_torrents:/app/torrents
+      - ./client1_downloads:/app/downloads
+    environment:
+      - GOSSIP_HOST=172.20.0.10
+      - PUBLIC_IP=${PUBLIC_IP:-172.20.0.10}
+    command: --port 6881 --env aws --ip PUBLIC_IP
+    stdin_open: true
+    tty: true
+
+  client2:
+    image: lucaspeters/client
+    container_name: client2
+    networks:
+      p2p-network:
+        ipv4_address: 172.20.0.11
+    ports:
+      - "6882:6881/tcp"
+      - "6882:6881/udp"
+      - "7882:7881/tcp"
+      - "7882:7881/udp"
+      - "8882:8881/tcp"
+      - "8882:8881/udp"
+    restart: unless-stopped
+    volumes:
+      - ./client2_data:/app/data
+      - ./client2_torrents:/app/torrents
+      - ./client2_downloads:/app/downloads
+    environment:
+      - GOSSIP_HOST=172.20.0.11
+      - PUBLIC_IP=${PUBLIC_IP:-172.20.0.11}
+    command: --port 6881 --env aws --ip PUBLIC_IP
+    stdin_open: true
+    tty: true
+
+  client3:
+    image: lucaspeters/client
+    container_name: client3
+    networks:
+      p2p-network:
+        ipv4_address: 172.20.0.12
+    ports:
+      - "6883:6881/tcp"
+      - "6883:6881/udp"
+      - "7883:7881/tcp"
+      - "7883:7881/udp"
+      - "8883:8881/tcp"
+      - "8883:8881/udp"
+    restart: unless-stopped
+    volumes:
+      - ./client3_data:/app/data
+      - ./client3_torrents:/app/torrents
+      - ./client3_downloads:/app/downloads
+    environment:
+      - GOSSIP_HOST=172.20.0.12
+      - PUBLIC_IP=${PUBLIC_IP:-172.20.0.12}
+    command: --port 6881 --env aws --ip PUBLIC_IP
+    stdin_open: true
+    tty: true
+
+  client4:
+    image: lucaspeters/client
+    container_name: client4
+    networks:
+      p2p-network:
+        ipv4_address: 172.20.0.13
+    ports:
+      - "6884:6881/tcp"
+      - "6884:6881/udp"
+      - "7884:7881/tcp"
+      - "7884:7881/udp"
+      - "8884:8881/tcp"
+      - "8884:8881/udp"
+    restart: unless-stopped
+    volumes:
+      - ./client4_data:/app/data
+      - ./client4_torrents:/app/torrents
+      - ./client4_downloads:/app/downloads
+    environment:
+      - GOSSIP_HOST=172.20.0.13
+      - PUBLIC_IP=${PUBLIC_IP:-172.20.0.13}
+    command: --port 6881 --env aws --ip PUBLIC_IP
+    stdin_open: true
+    tty: true
+
+  client5:
+    image: lucaspeters/client
+    container_name: client5
+    networks:
+      p2p-network:
+        ipv4_address: 172.20.0.14
+    ports:
+      - "6885:6881/tcp"
+      - "6885:6881/udp"
+      - "7885:7881/tcp"
+      - "7885:7881/udp"
+      - "8885:8881/tcp"
+      - "8885:8881/udp"
+    restart: unless-stopped
+    volumes:
+      - ./client5_data:/app/data
+      - ./client5_torrents:/app/torrents
+      - ./client5_downloads:/app/downloads
+    environment:
+      - GOSSIP_HOST=172.20.0.14
+      - PUBLIC_IP=${PUBLIC_IP:-172.20.0.14}
+    command: --port 6881 --env aws --ip PUBLIC_IP
+    stdin_open: true
+    tty: true
+
+networks:
+  p2p-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

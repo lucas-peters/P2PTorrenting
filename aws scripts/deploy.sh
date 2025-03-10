@@ -11,42 +11,42 @@ SECURITY_GROUP_NAME="p2p-swarm-sg"
 AMI_ID="ami-01eb4eefd88522422"  # Amazon Linux 2 AMI (adjust for your region)
 REPOSITORY_URL="https://github.com/lucas-peters/P2PTorrenting"  # Your Git repository URL
 
-# Create security group if it doesn't exist
-echo "Creating security group..."
-aws ec2 create-security-group \
-  --group-name $SECURITY_GROUP_NAME \
-  --description "Security group for P2P torrent swarm" \
-  --region $REGION 2>/dev/null || true
+# # Create security group if it doesn't exist
+# echo "Creating security group..."
+# aws ec2 create-security-group \
+#   --group-name $SECURITY_GROUP_NAME \
+#   --description "Security group for P2P torrent swarm" \
+#   --region $REGION 2>/dev/null || true
 
-# Add inbound rules for your P2P application
-aws ec2 authorize-security-group-ingress \
-  --group-name $SECURITY_GROUP_NAME \
-  --protocol tcp \
-  --port 22 \
-  --cidr 0.0.0.0/0 \
-  --region $REGION 2>/dev/null || true
+# # Add inbound rules for your P2P application
+# aws ec2 authorize-security-group-ingress \
+#   --group-name $SECURITY_GROUP_NAME \
+#   --protocol tcp \
+#   --port 22 \
+#   --cidr 0.0.0.0/0 \
+#   --region $REGION 2>/dev/null || true
 
-# Add rules for P2P ports: Bootstrap, Index, and related ports
-for PORT in 6881 6882 6883 7881 7882 7883 8881 8882 8883; do
-  aws ec2 authorize-security-group-ingress \
-    --group-name $SECURITY_GROUP_NAME \
-    --protocol tcp \
-    --port $PORT \
-    --cidr 0.0.0.0/0 \
-    --region $REGION 2>/dev/null || true
-done
+# # Add rules for P2P ports: Bootstrap, Index, and related ports
+# for PORT in 6881 6882 6883 7881 7882 7883 8881 8882 8883; do
+#   aws ec2 authorize-security-group-ingress \
+#     --group-name $SECURITY_GROUP_NAME \
+#     --protocol tcp \
+#     --port $PORT \
+#     --cidr 0.0.0.0/0 \
+#     --region $REGION 2>/dev/null || true
+# done
 
-for PORT in 6881 6882 6883 7881 7882 7883 8881 8882 8883; do
-  aws ec2 authorize-security-group-ingress \
-    --group-name $SECURITY_GROUP_NAME \
-    --protocol udp \
-    --port $PORT \
-    --cidr 0.0.0.0/0 \
-    --region $REGION 2>/dev/null || true
-done
+# for PORT in 6881 6882 6883 7881 7882 7883 8881 8882 8883; do
+#   aws ec2 authorize-security-group-ingress \
+#     --group-name $SECURITY_GROUP_NAME \
+#     --protocol udp \
+#     --port $PORT \
+#     --cidr 0.0.0.0/0 \
+#     --region $REGION 2>/dev/null || true
+# done
 
-# Clear previous IP file if it exists
-> static_ips.txt
+# Ensure static_ips.txt exists (create if not) but don't clear it
+touch static_ips.txt
 
 # Create 5 instances
 for i in {1..5}; do
@@ -109,8 +109,8 @@ sleep 60
 # Copy setup scripts to each instance
 echo "Copying setup script to instances..."
 for IP in $(cat static_ips.txt); do
-  scp -i "$KEY_PAIR_NAME.pem" -o StrictHostKeyChecking=no setup.sh ec2-user@$IP:~/setup.sh
-  ssh -i "$KEY_PAIR_NAME.pem" -o StrictHostKeyChecking=no ec2-user@$IP "chmod +x ~/setup.sh && ~/setup.sh"
+  scp -i "$KEY_PAIR_NAME.pem" -o StrictHostKeyChecking=no client-setup.sh ec2-user@$IP:~/client-setup.sh
+  ssh -i "$KEY_PAIR_NAME.pem" -o StrictHostKeyChecking=no ec2-user@$IP "chmod +x ~/client-setup.sh && ~/client-setup.sh"
 done
 
 echo "Initial setup complete on all instances."

@@ -57,12 +57,11 @@ check_image_update() {
 }
 
 # Check and pull the latest images if needed
-check_image_update "lucaspeters/bootstrap:latest"
-check_image_update "lucaspeters/index:latest"
+check_image_update "lucaspeters/client:latest"
 
 # Get the public IP of the EC2 instance
 echo "Detecting public IP address..."
-PUBLIC_IP=$(curl -s http://169.254.169.254/latest/meta-data/public-ipv4)
+PUBLIC_IP=$(curl -s http://checkip.amazonaws.com)
 echo "Public IP: $PUBLIC_IP"
 
 # Export the PUBLIC_IP as an environment variable
@@ -70,7 +69,7 @@ export PUBLIC_IP
 
 # Run docker-compose with the bootstrap configuration
 echo "Starting containers with docker-compose..."
-sudo docker-compose -f docker-compose.bootstrap.yml up -d
+sudo docker-compose -f docker-compose.client.yml up -d
 
 # Check if containers are running
 echo "Checking container status..."

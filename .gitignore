@@ -38,3 +38,4 @@ build/
 *.torrent
 *.pdf
 env_stuff/
+*.pem
