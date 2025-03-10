@@ -4,16 +4,21 @@ FROM ubuntu:22.04 AS builder
 # Avoid interactive prompts during installation
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Install dependencies
+# Install only the dependencies needed for p2p_bootstrap (no Qt needed)
 RUN apt-get update && apt-get install -y \
     build-essential \
     cmake \
     git \
-    libboost-all-dev \
+    libboost-system-dev \
+    libboost-thread-dev \
+    libboost-chrono-dev \
+    libboost-program-options-dev \
     libssl-dev \
     libprotobuf-dev \
     protobuf-compiler \
     libtorrent-rasterbar-dev \
+    nlohmann-json3-dev \
+    qtbase5-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Set up working directory
@@ -22,21 +27,22 @@ WORKDIR /app
 # Copy source code
 COPY . .
 
-# Remove any existing build directory and create a fresh one
+# Build only p2p_bootstrap
 RUN rm -rf build && \
     mkdir -p build && \
     cd build && \
-    cmake .. && \
+    cmake .. -DBUILD_BOOTSTRAP_ONLY=ON && \
     make -j$(nproc) p2p_bootstrap
 
 # Create a smaller runtime image
 FROM ubuntu:22.04
 
-# Install runtime dependencies
+# Install only runtime dependencies
 RUN apt-get update && apt-get install -y \
     libboost-system1.74.0 \
     libboost-thread1.74.0 \
     libboost-chrono1.74.0 \
+    libboost-program-options1.74.0 \
     libtorrent-rasterbar2.0 \
     libprotobuf23 \
     && rm -rf /var/lib/apt/lists/*
@@ -46,6 +52,7 @@ WORKDIR /app
 
 # Copy the built executable from the builder stage
 COPY --from=builder /app/build/p2p_bootstrap .
+COPY --from=builder /app/config.json /app/
 
 # Expose the default bootstrap node port
 EXPOSE 6881/tcp
@@ -53,6 +60,7 @@ EXPOSE 6881/udp
 # Expose the gossip port
 EXPOSE 7881/tcp
 EXPOSE 7881/udp
+
 # Run the bootstrap node
 ENTRYPOINT ["./p2p_bootstrap"]
-CMD ["6881"]
+CMD ["--port", "6881", "--env", "docker"]

@@ -53,7 +53,7 @@ void Client::start() {
 
     if (messenger_) {
         messenger_->setIndexHandler(
-            [this](const IndexMessage& message, const lt::tcp::endpoint& sender) {
+            [this](const lt::tcp::endpoint& sender, const IndexMessage& message) {
                 this->handleIndexMessage(message, sender);
             }
         );
@@ -564,8 +564,9 @@ void Client::addIndex(const std::string& title, const std::string& magnet) {
     try {
     // for now, send to all index nodes. Need a better way to do this
         for (auto& node : index_nodes_) {
-            lt::tcp::endpoint endpoint(lt::make_address_v4(node.first), node.second);
+            lt::tcp::endpoint endpoint(lt::make_address_v4(node.first), node.second + 2000);
             IndexMessage message;
+            message.set_source_ip(ip_);
             AddMessage* addMsg = message.mutable_addtorrent();
             addMsg->set_title(title);
             addMsg->set_magnet(magnet);
@@ -583,9 +584,11 @@ void Client::searchIndex(const std::string& keyword) {
     }
     try {
         for (auto& node : index_nodes_) {
-            lt::tcp::endpoint endpoint(lt::make_address_v4(node.first), node.second);
+            lt::tcp::endpoint endpoint(lt::make_address_v4(node.first), node.second + 2000);
             IndexMessage message;
+            message.set_source_ip(ip_); // port set by Messenger so that its consistent
             WantMessage* wantMsg = message.mutable_wanttorrent();
+            std::cout << "Sending search messeage to endpoint: " << endpoint.address() << ":" << endpoint.port() << std::endl;
             wantMsg->set_keyword(keyword);
             wantMsg->set_request_identifier(""); // need to change this
             messenger_->queueMessage(endpoint, message);

@@ -11,6 +11,18 @@
 #include "gossip.pb.h"
 #include "gossip/gossip.hpp"
 
+// Custom hash function for lt::tcp::endpoint
+namespace std {
+    template<>
+    struct hash<lt::tcp::endpoint> {
+        std::size_t operator()(const lt::tcp::endpoint& endpoint) const {
+            std::size_t h1 = std::hash<std::string>()(endpoint.address().to_string());
+            std::size_t h2 = std::hash<int>()(endpoint.port());
+            return h1 ^ (h2 << 1); // Combine the hashes
+        }
+    };
+}
+
 namespace torrent_p2p {
 
 class BootstrapHeartbeat {

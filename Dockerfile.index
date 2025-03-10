@@ -4,3 +4,56 @@ FROM ubuntu:22.04 AS builder
 # Avoid interactive prompts during installation
 ENV DEBIAN_FRONTEND=noninteractive
 
+# Install build dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    cmake \
+    git \
+    libboost-system-dev \
+    libboost-thread-dev \
+    libboost-chrono-dev \
+    libboost-program-options-dev \
+    libssl-dev \
+    libprotobuf-dev \
+    protobuf-compiler \
+    libtorrent-rasterbar-dev \
+    nlohmann-json3-dev \
+    qtbase5-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy source code
+WORKDIR /app
+COPY . .
+
+# Build the project
+RUN rm -rf build && \
+    mkdir -p build && \
+    cd build && \
+    cmake .. && \
+    make -j$(nproc) p2p_index
+
+# Create runtime image
+FROM ubuntu:22.04
+
+# Install runtime dependencies
+RUN apt-get update && apt-get install -y \
+    libboost-all-dev \
+    libssl-dev \
+    libcurl4-openssl-dev \
+    libprotobuf-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy built executable and necessary files
+WORKDIR /app
+
+# Create directories for data
+RUN mkdir -p /app/torrents /app/downloads
+
+COPY --from=builder /app/build/p2p_index /app/
+COPY --from=builder /app/config.json /app/
+
+# Expose ports for DHT, Gossip, and Messenger
+EXPOSE 6883 7883 8883
+
+ENTRYPOINT ["./p2p_index"]
+CMD ["--port", "6883", "--env", "docker"]
