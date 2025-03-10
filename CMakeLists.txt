@@ -4,6 +4,10 @@ project(P2PTorrenting)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# Used for nodes to find config file
+set(PROJECT_ROOT_DIR "${CMAKE_SOURCE_DIR}")
+add_definitions(-DPROJECT_ROOT="${PROJECT_ROOT_DIR}")
+
 # Use Abseil from submodule
 message(STATUS "Using Abseil from submodule")
 # Prevent Abseil from overriding our compiler flags

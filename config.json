@@ -1,0 +1,20 @@
+{
+  "environments": {
+    "lucas": {
+      "bootstrap_nodes": [["172.31.17.201", 6881]],
+      "index_nodes": [["172.31.17.201", 6883]]
+    },
+    "shanaya": {
+      "bootstrap_nodes": [["172.31.17.201", 6881]],
+      "index_nodes": [["172.31.17.201", 6883]]
+    },
+    "docker": {
+      "bootstrap_nodes": [["172.20.0.2", 6881]],
+      "index_nodes": [["172.20.0.6", 6881]]
+    },
+    "aws": {
+      "bootstrap_nodes": [["172.31.17.201", 6881]],
+      "index_nodes": [["172.31.17.202", 6881]]
+    }
+  }
+}

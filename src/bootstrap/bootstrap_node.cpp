@@ -3,18 +3,18 @@
 
 namespace torrent_p2p {
 
-BootstrapNode::BootstrapNode(int port) : Node(port) {
+BootstrapNode::BootstrapNode(int port, const std::string& env) : Node(port, env) {
     start();
 }
 
-BootstrapNode::BootstrapNode(int port, const std::string& state_file) : Node(port, state_file) {
+BootstrapNode::BootstrapNode(int port, const std::string& env, const std::string& state_file) : Node(port, env, state_file) {
     start();
     // The base class constructor already loads the DHT state, so we don't need to call loadDHTState again
 }
 
-BootstrapNode::BootstrapNode(int port, const std::vector<lt::tcp::endpoint>& bootstrap_nodes): Node(port), bootstrap_nodes_(bootstrap_nodes) {
-    start();
-}
+// BootstrapNode::BootstrapNode(int port, const std::vector<lt::tcp::endpoint>& bootstrap_nodes): Node(port), bootstrap_nodes_(bootstrap_nodes) {
+//     start();
+// }
 
 BootstrapNode::~BootstrapNode() {
     stop();
@@ -106,17 +106,17 @@ void BootstrapNode::start() {
     
     running_ = true;
     
-    try {
-        std::cout << "[Bootstrap] Creating Gossip object..." << std::endl;
-        gossip_ = std::make_unique<torrent_p2p::Gossip>(*session_, port_ + 1000);
-        std::cout << "[Bootstrap] Gossip object created successfully" << std::endl;
-        // Initialize heartbeat after gossip is created
-        initializeHeartbeat();
-    } catch (const std::exception& e) {
-        std::cerr << "[Bootstrap] Exception during Gossip initialization: " << e.what() << std::endl;
-    } catch (...) {
-        std::cerr << "[Bootstrap] Unknown exception during Gossip initialization" << std::endl;
-    }
+    // try {
+    //     std::cout << "[Bootstrap] Creating Gossip object..." << std::endl;
+    //     gossip_ = std::make_unique<torrent_p2p::Gossip>(*session_, port_ + 1000);
+    //     std::cout << "[Bootstrap] Gossip object created successfully" << std::endl;
+    //     // Initialize heartbeat after gossip is created
+    //     initializeHeartbeat();
+    // } catch (const std::exception& e) {
+    //     std::cerr << "[Bootstrap] Exception during Gossip initialization: " << e.what() << std::endl;
+    // } catch (...) {
+    //     std::cerr << "[Bootstrap] Unknown exception during Gossip initialization" << std::endl;
+    // }
     
     // Start handling alerts in a separate thread
     std::thread([this]() {

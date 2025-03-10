@@ -21,9 +21,9 @@ namespace torrent_p2p {
 
 class BootstrapNode : public Node {
 public:
-    BootstrapNode(int port = 6881);
-    BootstrapNode(int port, const std::string& state_file);
-    BootstrapNode(int port, const std::vector<lt::tcp::endpoint>& bootstrap_nodes);
+    BootstrapNode(int port = 6881, const std::string& env = "aws");
+    BootstrapNode(int port, const std::string& env, const std::string& state_file);
+    //BootstrapNode(int port, const std::vector<lt::tcp::endpoint>& bootstrap_nodes, const std::string& env);
 
     ~BootstrapNode();
 
