@@ -7,12 +7,12 @@
 using json = nlohmann::json;
 
 namespace torrent_p2p {
-Node::Node(int port, const std::string& env) : port_(port), running_(false) {
+Node::Node(int port, const std::string& env, const std::string& ip) : port_(port), ip_(ip), running_(false) {
     loadEnvConfig(env);
     setIP(env);
 }
 
-Node::Node(int port, const std::string& env, const std::string& state_file) : port_(port), running_(false), state_file_(state_file) {
+Node::Node(int port, const std::string& env, const std::string& ip, const std::string& state_file) : port_(port), ip_(ip), running_(false), state_file_(state_file) {
     loadEnvConfig(env);
     setIP(env);
     loadDHTState(state_file);
@@ -112,7 +112,7 @@ void Node::start() {
     }
 
     std::cout << "Connecting to DHT bootstrap nodes..." << std::endl;
-    connectToDHT(bootstrap_nodes_);
+    connectToDHT();
 
     try {
         // Make sure the session is fully initialized before creating Gossip
@@ -264,14 +264,14 @@ std::string Node::getDHTStats() const {
     return "DHT stats requested";
 }
 
-void Node::connectToDHT(const std::vector<std::pair<std::string, int>>& bootstrap_nodes) {
+void Node::connectToDHT() {
     if (!session_) {
         std::cout << "Session not initialized" << std::endl;
         return;
     }
 
     // Add bootstrap nodes to routing table
-    for (const auto& node : bootstrap_nodes) {
+    for (const auto& node : bootstrap_nodes_) {
         std::cout << "[Node:" << port_ << "] Adding bootstrap node: " << node.first << ":" << node.second << std::endl;
         
         try {
@@ -344,19 +344,25 @@ void Node::connectToDHT(const std::vector<std::pair<std::string, int>>& bootstra
 }
 
 void Node::setIP(const std::string& env) {
-    // get ip from env if running on aws or docker
-    if (env == "aws" || env == "docker") {
-        const char* env_ip = std::getenv("PUBLIC_IP");
-        if (env_ip && *env_ip) {
-            std::cout << "Using public IP from environment: " << env_ip << std::endl;
-            ip_ = std::string(env_ip);
-            return;
-        }
+    // Check if PUBLIC_IP environment variable is set (highest priority)
+    const char* publicIP = std::getenv("PUBLIC_IP");
+    if (publicIP) {
+        ip_ = publicIP;
+        std::cout << "Using public IP from environment variable: " << ip_ << std::endl;
+    }
+    // If no public IP is set and ip_ is "None", use the bootstrap node IP
+    else if (ip_ == "None" && !bootstrap_nodes_.empty()) {
+        ip_ = bootstrap_nodes_[0].first;
     }
     
-    // If running purely local, ip will be the same as the bootstrap node
-    ip_ = bootstrap_nodes_[0].first;
-    std::cout << "SET ip_: " << ip_ << std::endl;
+    // For AWS/Docker environments, warn if no public IP is set
+    if ((env == "aws" || env == "docker") && !publicIP) {
+        std::cout << "WARNING: Running in " << env << " environment without PUBLIC_IP environment variable." << std::endl;
+        std::cout << "DHT will use internal IP which may not be accessible from outside." << std::endl;
+        std::cout << "Set PUBLIC_IP environment variable to your instance's public IP." << std::endl;
+    }
+    
+    std::cout << "Using IP: " << ip_ << std::endl;
 }
 // lt::sha1_hash Node::getMyNodeId() const {
 //     lt::sha1_hash node_id;

@@ -1,0 +1,53 @@
+services:
+  bootstrap:
+    image: lucaspeters/bootstrap:latest
+    container_name: bootstrap
+    networks:
+      p2p-network:
+        ipv4_address: 172.20.0.2
+    ports:
+      - "6881:6881/tcp"
+      - "6881:6881/udp"
+      - "7881:7881/tcp"
+      - "7881:7881/udp"
+      - "8881:8881/tcp"
+      - "8881:8881/udp"
+    restart: unless-stopped
+    volumes:
+      - ./bootstrap_data:/app/data
+    environment:
+      - GOSSIP_HOST=172.20.0.2
+      - PUBLIC_IP=${PUBLIC_IP:-172.20.0.2}  # Use external IP if provided, otherwise default to internal
+    command: --port 6881 --env docker
+
+  index:
+    image: lucaspeters/index:latest
+    container_name: index
+    networks:
+      p2p-network:
+        ipv4_address: 172.20.0.6
+    ports:
+      - "6885:6881/tcp"
+      - "6885:6881/udp"
+      - "7885:7881/tcp"
+      - "7885:7881/udp"
+      - "8885:8881/tcp"
+      - "8885:8881/udp"
+    volumes:
+      - ./index_data:/app/data
+    restart: unless-stopped
+    depends_on:
+      - bootstrap
+    stdin_open: true  # Keep STDIN open
+    tty: true         # Allocate a pseudo-TTY
+    command: --port 6881 --env docker
+    environment:
+      - GOSSIP_HOST=172.20.0.6
+      - PUBLIC_IP=${PUBLIC_IP:-172.20.0.6}
+
+networks:
+  p2p-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

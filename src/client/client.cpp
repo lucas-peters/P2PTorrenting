@@ -6,12 +6,13 @@
 
 namespace torrent_p2p {
 
-Client::Client(int port, const std::string& env) : Node(port, env) {
+Client::Client(int port, const std::string& env, const std::string& ip) : Node(port, env, ip) {
     setSavePaths(env);
     start();
 }
 
-Client::Client(int port, const std::string& env, const std::string& state_file) : Node(port, env, state_file) {
+Client::Client(int port, const std::string& env, const std::string& ip, 
+    const std::string& state_file) : Node(port, env, ip, state_file) {
     setSavePaths(env);
     start();
     // The base class constructor already loads the DHT state, so we don't need to call loadDHTState again

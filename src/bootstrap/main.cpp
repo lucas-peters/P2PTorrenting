@@ -34,6 +34,7 @@ int main(int argc, char* argv[]) {
     // Default values
     int port = 6881;
     std::string env = "lucas";
+    std::string ip = "None";
     
     // Parse command line arguments
     for (int i = 1; i < argc; i++) {
@@ -65,6 +66,14 @@ int main(int argc, char* argv[]) {
                 std::cerr << "Missing environment name after " << arg << std::endl;
                 return 1;
             }
+        } else if (arg == "--ip" || arg == "-i") {
+            if (i + 1 < argc) {
+                ip = argv[i + 1];
+                i++;
+            } else {
+                std::cerr << "Missing ip after " << arg << std::endl;
+                return 1;
+            }
         } else if (arg == "--help" || arg == "-h") {
             displayHelp(argv[0]);
             return 0;
@@ -84,7 +93,7 @@ int main(int argc, char* argv[]) {
     std::cout << "  - 0.0.0.0:" << port << " (all interfaces)" << std::endl;
     
     try {
-        BootstrapNode node(port, env);
+        BootstrapNode node(port, env, ip);
         std::atomic<bool> running{true};
         // Keep the program running until signal is received
         while (running) {

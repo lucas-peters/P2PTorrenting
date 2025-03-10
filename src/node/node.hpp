@@ -26,10 +26,10 @@ namespace torrent_p2p {
 
 class Node {
 public:
-    Node(int port = 6881, const std::string& env = "aws");
+    Node(int port = 6881, const std::string& env = "aws", const std::string& ip = "None");
 
     // Constructor to load from save state file
-    Node(int port, const std::string& env, const std::string& state_file);
+    Node(int port, const std::string& env, const std::string& ip, const std::string& state_file);
     ~Node();
     // Get the node's DHT state
     std::string getDHTStats() const;
@@ -63,7 +63,7 @@ protected:
     virtual void start();
         // Stop the node
     virtual void stop();
-    void connectToDHT(const std::vector<std::pair<std::string, int>>& bootstrap_nodes);
+    void connectToDHT();
     void initializeSession();
 
     void setIP(const std::string& env);

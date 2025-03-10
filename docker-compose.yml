@@ -19,6 +19,7 @@ services:
       - ./bootstrap_data:/app/data
     environment:
       - GOSSIP_HOST=172.20.0.2
+      - PUBLIC_IP=${PUBLIC_IP:-172.20.0.2}  # Use external IP if provided, otherwise default to internal
 
   client1:
     build:

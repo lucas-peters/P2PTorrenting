@@ -51,6 +51,7 @@ int main(int argc, char* argv[]) {
     std::string state_file = "";
     bool load_state = false;
     std::string env = "lucas";
+    std::string ip = "None";
     
     for (int i = 1; i < argc; i++) {
         std::string arg = argv[i];
@@ -90,6 +91,14 @@ int main(int argc, char* argv[]) {
                 std::cerr << "Missing environment name after " << arg << std::endl;
                 return 1;
             }
+        } else if (arg == "--ip" || arg == "-i") {
+            if (i + 1 < argc) {
+                ip = argv[i + 1];
+                i++;
+            } else {
+                std::cerr << "Missing ip after " << arg << std::endl;
+                return 1;
+            }
         } else if (arg == "--help" || arg == "-h") {
             std::cout << "Usage: " << argv[0] << " [options]\n";
             std::cout << "Options:\n";
@@ -114,9 +123,10 @@ int main(int argc, char* argv[]) {
     
     if (load_state && !state_file.empty()) {
         std::cout << "Loading DHT state from: " << state_file << std::endl;
-        client = std::make_unique<Client>(port, state_file, env);
+        client = std::make_unique<Client>(port, env, ip, state_file);
     } else {
-        client = std::make_unique<Client>(port, env);
+        std::cout << "Client 3 args" << std::endl;
+        client = std::make_unique<Client>(port, env, ip);
     }
     
     // Display welcome message and commands

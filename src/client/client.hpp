@@ -120,8 +120,8 @@ struct PieceTracker {
 
 class Client : public Node {
 public:
-    Client(int port = 6881, const std::string& env = "aws");
-    Client(int port, const std::string& env, const std::string& state_file);
+    Client(int port = 6881, const std::string& env = "aws", const std::string& ip = "None");
+    Client(int port, const std::string& env, const std::string& ip, const std::string& state_file);
     ~Client();
     
     // Torrent helpers

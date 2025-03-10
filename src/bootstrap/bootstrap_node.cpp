@@ -3,11 +3,11 @@
 
 namespace torrent_p2p {
 
-BootstrapNode::BootstrapNode(int port, const std::string& env) : Node(port, env) {
+BootstrapNode::BootstrapNode(int port, const std::string& env, const std::string& ip) : Node(port, env) {
     start();
 }
 
-BootstrapNode::BootstrapNode(int port, const std::string& env, const std::string& state_file) : Node(port, env, state_file) {
+BootstrapNode::BootstrapNode(int port, const std::string& env, const std::string& ip, const std::string& state_file) : Node(port, env, state_file) {
     start();
     // The base class constructor already loads the DHT state, so we don't need to call loadDHTState again
 }

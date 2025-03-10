@@ -18,7 +18,7 @@ RUN apt-get update && apt-get install -y \
     protobuf-compiler \
     libtorrent-rasterbar-dev \
     nlohmann-json3-dev \
-    qtbase5-dev \
+    # qtbase5-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Set up working directory
@@ -45,9 +45,9 @@ RUN apt-get update && apt-get install -y \
     libboost-program-options1.74.0 \
     libtorrent-rasterbar2.0 \
     libprotobuf23 \
-    libqt5core5a \
-    libqt5gui5 \
-    libqt5widgets5 \
+    # libqt5core5a \
+    # libqt5gui5 \
+    # libqt5widgets5 \
     && rm -rf /var/lib/apt/lists/*
 
 # Set up working directory

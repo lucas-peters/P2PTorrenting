@@ -17,8 +17,8 @@ namespace torrent_p2p {
 class Index : public Node {
 
 public:
-    Index(int port = 6883, const std::string& env = "aws");
-    Index(int port, const std::string& env, const std::string& state_file);
+    Index(int port = 6883, const std::string& env = "aws", const std::string& ip = "None");
+    Index(int port, const std::string& env, const std::string& ip, const std::string& state_file);
     ~Index();
 
     void addTorrent(const std::string& title, const std::string& magnet);
