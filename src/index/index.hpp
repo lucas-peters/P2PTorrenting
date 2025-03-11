@@ -38,6 +38,9 @@ private:
 
     mutable std::shared_mutex data_mutex_;
 
+    size_t getResponsibleNodeIndex(const std::string& title, size_t nodeCount);
+    bool isResponsibleForTorrent(const std::string& title, uint32_t myNodeId, size_t totalNodes);
+
     // bloom filtering to allow for faster searching on other nodes. Instead of waiting for messages
     //BloomFilter bloom_filter_;
     //std::vector<std::pair<lt::tcp::endpoint, Bloomfilter> other_blooms;

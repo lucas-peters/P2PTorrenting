@@ -163,7 +163,7 @@ void Node::initializeSession() {
     pack.set_bool(lt::settings_pack::dht_restrict_search_ips, false);
     pack.set_int(lt::settings_pack::dht_max_peers_reply, 100);
     pack.set_bool(lt::settings_pack::dht_ignore_dark_internet, false);
-    pack.set_int(lt::settings_pack::dht_max_fail_count, 5);
+    pack.set_int(lt::settings_pack::dht_max_fail_count, 100);
     
     // listen on all
     pack.set_str(lt::settings_pack::listen_interfaces, "0.0.0.0:" + std::to_string(port_));
