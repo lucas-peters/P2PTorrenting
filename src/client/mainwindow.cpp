@@ -198,7 +198,7 @@ void MainWindow::addTorrent()
         return;
     
     try {
-        client->addTorrent(torrentFile.toStdString(), savePath.toStdString());
+        client->addTorrent(torrentFile.toStdString());
         logTextEdit->append("Added torrent: " + torrentFile);
         refreshStatus();
     } catch (const std::exception& e) {

@@ -6,17 +6,27 @@
 
 namespace torrent_p2p {
 
-Client::Client(int port, const std::string& env) : Node(port, env) {
+Client::Client(int port, const std::string& env, const std::string& ip) : Node(port, env, ip) {
+    setSavePaths(env);
     start();
 }
 
-Client::Client(int port, const std::string& env, const std::string& state_file) : Node(port, env, state_file) {
+Client::Client(int port, const std::string& env, const std::string& ip, 
+    const std::string& state_file) : Node(port, env, ip, state_file) {
+    setSavePaths(env);
     start();
     // The base class constructor already loads the DHT state, so we don't need to call loadDHTState again
 }
 
 Client::~Client() {
     stop();
+}
+
+void Client::setSavePaths(const std::string& env) {
+    if (env == "docker" || env == "aws") {
+        torrent_path_ = "/app/torrents/";
+        download_path_ = "/app/downloads/";
+    }
 }
 
 void Client::start() {
@@ -89,7 +99,7 @@ bool Client::hasTorrent(const lt::sha1_hash& hash) const {
 // if the torrent is complete it starts seeding
 // We can bypass this if we want to roll our own torrent protocol but it will be a pain in the ass
 // Make sure that torrentFilePath is only the local path to the torrent, it is automatically appended to "/app/torrents/" for our docker images
-void Client::addTorrent(const std::string& torrentFilePath, const std::string& savePath) {
+void Client::addTorrent(const std::string& torrentFilePath) {
     try {
         // Load the torrent file into a byte vector
         std::ifstream torrentFileStream(torrent_path_ + torrentFilePath, std::ios_base::binary);
@@ -102,16 +112,15 @@ void Client::addTorrent(const std::string& torrentFilePath, const std::string& s
         // Create add_torrent_params from torrent_info
         lt::add_torrent_params params;
         params.ti = std::make_shared<lt::torrent_info>(torrentInfo);
-        if (savePath != "") {
-            params.save_path = savePath;
-        } else {
-            params.save_path = download_path_;
-        }
+        std::cout << "params.ti->name(): " << params.ti->name() << std::endl;
+        params.save_path = download_path_;
         std::cout << "params.save_path: " << params.save_path << std::endl;
 
         // this loop strips the absolute file path added by load_torrent_file, so thats in the correct format
         for (lt::file_index_t i(0); i < params.ti->files().end_file(); ++i) {
             std::string file_path = params.ti->files().file_path(i);
+            std::cout << "In this fucking loop" << std::endl;
+            std::cout << file_path << std::endl;
             
             // Get just the filename without any path
             std::string filename = file_path;
@@ -137,7 +146,7 @@ void Client::addTorrent(const std::string& torrentFilePath, const std::string& s
                      << " (Size: " << params.ti->files().file_size(i) << " bytes)" << std::endl;
             
             // Check if file exists at the expected location
-            std::string full_path = savePath + "/" + params.ti->files().file_path(i);
+            std::string full_path = download_path_ + params.ti->files().file_path(i);
             std::error_code ec;
             if (std::filesystem::exists(full_path, ec)) {
                 auto file_size = std::filesystem::file_size(full_path, ec);
@@ -177,10 +186,10 @@ void Client::addTorrent(const std::string& torrentFilePath, const std::string& s
         std::cout << "Checking files: " << (status.state == lt::torrent_status::checking_files) << std::endl;
         std::cout << "Checking resume data: " << (status.state == lt::torrent_status::checking_resume_data) << std::endl;
 
-        // Adding to index
-        std::string title = params.ti->name();
+
+        //std::cout << "Adding to index title: " << title << std::endl;
         std::string magnetLink = lt::make_magnet_uri(*(params.ti));
-        addIndex(title, magnetLink);
+        addIndex(params.ti->name(), magnetLink);
         
     } catch (const std::exception& e) {
         std::cout << "Error adding torrent: " << e.what() << std::endl;
@@ -444,38 +453,28 @@ lt::sha1_hash Client::stringToHash(const std::string& infoHashString) const {
     return hash;
 }
 
-void Client::generateTorrentFile(const std::string& savePath) {
+void Client::generateTorrentFile(const std::string& fileName) {
     // output location, might change this
     try {
         // find last . to change extension to .torrent
-        int pos = savePath.find_last_of(".");
-        std::string torrentFilePath = savePath.substr(0, pos) + ".torrent";
+        int pos = fileName.find_last_of(".");
+        std::string rawName = fileName.substr(0, pos);
+        std::string torrentFilePath = torrent_path_ + rawName + ".torrent";
+
         // need to get file size for libtorrents file system
-        std::filesystem::path filePath(savePath);
+        std::filesystem::path filePath(download_path_ + fileName);
         int fileSize = std::filesystem::file_size(filePath);
 
         // adding file to libtorrent file_storage, and using that object to create a torrent
         lt::file_storage fs;
-        fs.add_file(savePath, fileSize);
-        std::cout << "added file to fs" << std::endl;
+        fs.add_file(fileName, fileSize);
         lt::create_torrent torrent(fs, PIECE_LENGTH);
-        std::cout << "created torrent" << std::endl;
+
         std::cout << "Generating hashes..." << std::endl;
-
-        // Open the file *here*, just before generating hashes.  This guarantees
-        // it's open in the correct mode and won't be interfered with.
-        std::ifstream inputFile(savePath, std::ios::binary);
-        if (!inputFile) {
-            throw std::runtime_error("Could not open input file for hashing: " + savePath);
-        }
-
-        // Set the file to be read when generating hashes
-        lt::set_piece_hashes(torrent, ".");
-
-        inputFile.close(); // Close the file *after* set_piece_hashes.
+        lt::set_piece_hashes(torrent, download_path_);
         std::cout << "Hashes generated." << std::endl;
+
         lt::entry ent = torrent.generate();
-        std::cout << "generated torrent" << std::endl;
 
         std::ofstream out(torrentFilePath, std::ios::binary);
         if (!out) {
@@ -487,7 +486,6 @@ void Client::generateTorrentFile(const std::string& savePath) {
     } catch (const std::exception& e) {
         std::cout << "Error: " << e.what() << std::endl;
     }
-
 }
 
 void Client::sendGossip(std::vector<std::pair<lt::tcp::endpoint, int>> peer_reputation) const{

@@ -26,7 +26,7 @@ namespace fs = std::filesystem;
 // Function to display help information
 void displayHelp() {
     std::cout << "\n===== P2P Torrenting Client - Command Reference =====\n";
-    std::cout << "  add <torrent_file> <save_path>    - Add a torrent file to download\n";
+    std::cout << "  add <torrent_file>                - Add a torrent file to download\n";
     std::cout << "  magnet <info_hash> <save_path>    - Add a torrent via magnet link\n";
     std::cout << "  generate <file_path>              - Generate a torrent file from a file/directory\n";
     std::cout << "  status                            - Display status of all torrents\n";
@@ -51,6 +51,7 @@ int main(int argc, char* argv[]) {
     std::string state_file = "";
     bool load_state = false;
     std::string env = "lucas";
+    std::string ip = "None";
     
     for (int i = 1; i < argc; i++) {
         std::string arg = argv[i];
@@ -90,6 +91,14 @@ int main(int argc, char* argv[]) {
                 std::cerr << "Missing environment name after " << arg << std::endl;
                 return 1;
             }
+        } else if (arg == "--ip" || arg == "-i") {
+            if (i + 1 < argc) {
+                ip = argv[i + 1];
+                i++;
+            } else {
+                std::cerr << "Missing ip after " << arg << std::endl;
+                return 1;
+            }
         } else if (arg == "--help" || arg == "-h") {
             std::cout << "Usage: " << argv[0] << " [options]\n";
             std::cout << "Options:\n";
@@ -114,9 +123,10 @@ int main(int argc, char* argv[]) {
     
     if (load_state && !state_file.empty()) {
         std::cout << "Loading DHT state from: " << state_file << std::endl;
-        client = std::make_unique<Client>(port, state_file, env);
+        client = std::make_unique<Client>(port, env, ip, state_file);
     } else {
-        client = std::make_unique<Client>(port, env);
+        std::cout << "Client 3 args" << std::endl;
+        client = std::make_unique<Client>(port, env, ip);
     }
     
     // Display welcome message and commands
@@ -157,17 +167,16 @@ int main(int argc, char* argv[]) {
                 // Clear screen - works on most terminals
                 std::cout << "\033[2J\033[1;1H";
             } else if (command == "add") {
-                std::string torrent_file, save_path;
-                if (iss >> torrent_file >> save_path) {
+                std::string torrent_file;
+                if (iss >> torrent_file ) {
                     try {
                         std::cout << "Adding torrent: " << torrent_file << "\n";
-                        std::cout << "Save path: " << save_path << "\n";
-                        client->addTorrent(torrent_file, save_path);
+                        client->addTorrent(torrent_file);
                     } catch (const std::exception& e) {
                         std::cerr << "Error adding torrent: " << e.what() << "\n";
                     }
                 } else {
-                    std::cout << "Usage: add <torrent_file> <save_path>\n";
+                    std::cout << "Usage: add <torrent_file>\n";
                 }
             } else if (command == "magnet") {
                 std::string info_hash, save_path;

@@ -45,9 +45,9 @@ RUN apt-get update && apt-get install -y \
     libboost-program-options1.74.0 \
     libtorrent-rasterbar2.0 \
     libprotobuf23 \
-    libqt5core5a \
-    libqt5gui5 \
-    libqt5widgets5 \
+    # libqt5core5a \
+    # libqt5gui5 \
+    # libqt5widgets5 \
     && rm -rf /var/lib/apt/lists/*
 
 # Set up working directory
@@ -61,12 +61,8 @@ COPY --from=builder /app/build/p2p_client .
 COPY --from=builder /app/config.json /app/
 
 # Expose the default client port
-EXPOSE 6882/tcp
-EXPOSE 6882/udp
-# Expose the gossip port (port + 1000)
-EXPOSE 7882/tcp
-EXPOSE 7882/udp
+EXPOSE 6881 7881 8881
 
 # Run the client
 ENTRYPOINT ["./p2p_client"]
-CMD ["--port", "6882", "--env", "docker"]
+CMD ["--port", "6881", "--env", "docker"]

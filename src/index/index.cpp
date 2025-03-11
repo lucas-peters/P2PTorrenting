@@ -1,14 +1,15 @@
 # include "index.hpp"
 
 namespace torrent_p2p {
-    Index::Index(int port, const std::string& env) : Node(port, env) {
+    Index::Index(int port, const std::string& env, const std::string& ip) : Node(port, env, ip) {
         // Call the base class start() method first to initialize messenger_
         Node::start();
         // Then call our own start() method
         start();
     }
 
-    Index::Index(int port, const std::string& env, const std::string& state_file) : Node(port, env, state_file) {
+    Index::Index(int port, const std::string& env, const std::string& ip,
+        const std::string& state_file) : Node(port, env, ip, state_file) {
         // Call the base class start() method first to initialize messenger_
         Node::start();
         // Then call our own start() method

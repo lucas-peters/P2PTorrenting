@@ -34,6 +34,7 @@ int main(int argc, char* argv[]) {
     // Default values
     int port = 6883;
     std::string env = "lucas";
+    std::string ip = "None";
     
     // Parse command line arguments
     for (int i = 1; i < argc; i++) {
@@ -65,6 +66,14 @@ int main(int argc, char* argv[]) {
                 std::cerr << "Missing environment name after " << arg << std::endl;
                 return 1;
             }
+        } else if (arg == "--ip" || arg == "-i") {
+            if (i + 1 < argc) {
+                ip = argv[i + 1];
+                i++;
+            } else {
+                std::cerr << "Missing ip after " << arg << std::endl;
+                return 1;
+            }
         } else if (arg == "--help" || arg == "-h") {
             displayHelp(argv[0]);
             return 0;
@@ -79,7 +88,7 @@ int main(int argc, char* argv[]) {
     std::cout << "Press Ctrl+C to exit" << std::endl;
 
     try {
-        Index node(port, env);
+        Index node(port, env, ip);
         // Spin the loop, so Node doesn't die
         while(running) {
             std::this_thread::sleep_for(std::chrono::seconds(60));
