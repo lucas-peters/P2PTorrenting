@@ -18,7 +18,7 @@ RUN apt-get update && apt-get install -y \
     protobuf-compiler \
     libtorrent-rasterbar-dev \
     nlohmann-json3-dev \
-    # qtbase5-dev \
+    qtbase5-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Set up working directory
