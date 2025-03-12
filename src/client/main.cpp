@@ -10,8 +10,10 @@
 #include <vector>
 #include <map>
 #include <functional>
+#include <drogon/drogon.h>
 
 using namespace torrent_p2p;
+using namespace drogon;
 namespace fs = std::filesystem;
 
 // // Global flag for graceful shutdown
@@ -42,17 +44,105 @@ void displayHelp() {
     std::cout << "====================================================\n";
 }
 
-int main(int argc, char* argv[]) {
-    // std::signal(SIGINT, signal_handler);
-    // std::signal(SIGTERM, signal_handler);
+
+// Function to start REST API in a separate thread
+void startRestApi(std::unique_ptr<Client>& client) {
+    app().registerHandler("/hello",
+        [](const drogon::HttpRequestPtr& req, std::function<void(const drogon::HttpResponsePtr &)> &&callback) {
+            auto resp = drogon::HttpResponse::newHttpResponse();
+            resp->setStatusCode(drogon::k200OK);
+            resp->setBody("Hello, World!");
+            callback(resp);
+        },
+        {drogon::Get}
+    );
     
-    // Parse command line arguments
+    app().registerHandler("/add-torrent",
+        [&client](const HttpRequestPtr& req, std::function<void(const HttpResponsePtr &)> &&callback) {
+            auto json = req->getJsonObject();
+            if (!json || !json->isMember("file")) {
+                auto resp = HttpResponse::newHttpResponse();
+                resp->setStatusCode(HttpStatusCode::k400BadRequest);
+                resp->setBody("Missing 'file' parameter");
+                callback(resp);
+                return;
+            }
+
+            std::string file_path = (*json)["file"].asString();
+            client->addTorrent(file_path);
+
+            auto resp = HttpResponse::newHttpResponse();
+            resp->setStatusCode(HttpStatusCode::k200OK);
+            resp->setBody("Torrent added successfully");
+            callback(resp);
+        },
+        {Post}
+    );
+
+    app().registerHandler("/generate-torrent",
+        [&client](const HttpRequestPtr& req, std::function<void(const HttpResponsePtr &)> &&callback) {
+            auto json = req->getJsonObject();
+            if (!json || !json->isMember("path")) {
+                auto resp = HttpResponse::newHttpResponse();
+                resp->setStatusCode(HttpStatusCode::k400BadRequest);
+                resp->setBody("Missing 'path' parameter");
+                callback(resp);
+                return;
+            }
+
+            std::string path = (*json)["path"].asString();
+            client->generateTorrentFile(path);
+
+            auto resp = HttpResponse::newHttpResponse();
+            resp->setStatusCode(HttpStatusCode::k200OK);
+            resp->setBody("Torrent file generated");
+            callback(resp);
+        },
+        {Post}
+    );
+
+    app().registerHandler("/status",
+        [&client](const HttpRequestPtr&, std::function<void(const HttpResponsePtr &)> &&callback) {
+            client->printStatus();
+            auto resp = HttpResponse::newHttpResponse();
+            resp->setStatusCode(HttpStatusCode::k200OK);
+            resp->setBody("Status printed to console");
+            callback(resp);
+        },
+        {Get}
+    );
+
+    app().registerHandler("/search/{info_hash}",
+        [&client](const HttpRequestPtr&, std::function<void(const HttpResponsePtr &)> &&callback, std::string info_hash) {
+            client->searchDHT(info_hash);
+            auto resp = HttpResponse::newHttpResponse();
+            resp->setStatusCode(HttpStatusCode::k200OK);
+            resp->setBody("DHT search initiated");
+            callback(resp);
+        },
+        {Get}
+    );
+
+    app().registerHandler("/dht-stats",
+        [&client](const HttpRequestPtr&, std::function<void(const HttpResponsePtr &)> &&callback) {
+            auto resp = HttpResponse::newHttpResponse();
+            resp->setStatusCode(HttpStatusCode::k200OK);
+            resp->setBody(client->getDHTStats());
+            callback(resp);
+        },
+        {Get}
+    );
+
+    app().addListener("0.0.0.0", 8080).run();
+}
+
+int main(int argc, char* argv[]) {
     int port = 6882;
     std::string state_file = "";
     bool load_state = false;
     std::string env = "lucas";
     std::string ip = "None";
-    
+
     for (int i = 1; i < argc; i++) {
         std::string arg = argv[i];
         if (arg == "--port" || arg == "-p") {
@@ -137,12 +227,18 @@ int main(int argc, char* argv[]) {
 
     // Starting a background thread that prints DHT stats
     std::atomic<bool> running{true};
+
+    std::thread apiThread([&client]() {
+        startRestApi(client); 
+    });    
+
+    // CLI loop
     std::thread user_thread([&client, &running]() {
         // Command processing loop
         std::string input;
         while (running) {
             std::cout << "> ";
-            std::cout.flush();  // Make sure the prompt is displayed
+            std::cout.flush();
             std::getline(std::cin, input);
 
             std::istringstream iss(input);
@@ -152,20 +248,19 @@ int main(int argc, char* argv[]) {
             if (command.empty()) {
                 continue;
             }
-            
-            // Convert command to lowercase for case-insensitive matching
+
             std::transform(command.begin(), command.end(), command.begin(), 
                         [](unsigned char c){ return std::tolower(c); });
 
             if (command == "quit" || command == "exit") {
                 std::cout << "Shutting down client...\n";
                 running = false;
+                app().quit();  // Stop the REST API server
                 break;
             } else if (command == "help") {
                 displayHelp();
             } else if (command == "clear" || command == "cls") {
-                // Clear screen - works on most terminals
-                std::cout << "\033[2J\033[1;1H";
+                std::cout << "\033[2J\033[1;1H";  // Clear terminal screen
             } else if (command == "add") {
                 std::string torrent_file;
                 if (iss >> torrent_file ) {
@@ -219,34 +314,9 @@ int main(int argc, char* argv[]) {
                     std::cout << "Usage: search <info_hash>\n";
                 }
             } 
-            // else if (command == "connect") {
-            //     std::string ip;
-            //     int node_port;
-            //     if (iss >> ip >> node_port) {
-            //         try {
-            //             std::vector<std::pair<std::string, int>> bootstrap_nodes = {
-            //                 {ip, node_port}
-            //             };
-            //             std::cout << "Connecting to bootstrap node: " << ip << ":" << node_port << "\n";
-            //             client->connectToDHT(bootstrap_nodes);
-            //         } catch (const std::exception& e) {
-            //             std::cerr << "Error connecting to bootstrap node: " << e.what() << "\n";
-            //         }
-            //     } else {
-            //         std::cout << "Usage: connect <ip> <port>\n";
-            //     }
-            // } 
             else if (command == "dht") {
                 std::cout << client->getDHTStats() << std::endl;
             }
-            //  else if (command == "gossip") {
-            //     std::cout << "Sending gossip message...\n";
-            //     GossipMessage message;
-            //     message.set_source_ip("127.0.0.1");
-            //     message.set_source_port(port);
-            //     lt::tcp::endpoint exclude(lt::make_address_v4("127.0.0.1"), port);
-            //     client->gossip_->spreadMessage(message, exclude);
-            // } 
             else if (command == "save") {
                 std::string save_file;
                 if (iss >> save_file) {
