@@ -196,18 +196,18 @@ void Client::addTorrent(const std::string& torrentFilePath) {
     }
 }
 
-void Client::addMagnet(const std::string& infoHashString, const std::string& savePath) {
+void Client::addMagnet(const std::string& magnet) {
     if (!session_) {
         std::cout << "Session not initialized" << std::endl;
         return;
     }
 
     try {
-        lt::sha1_hash hash = stringToHash(infoHashString);
+        lt::sha1_hash hash = stringToHash(magnet);
         
         // Check if we already have this torrent
         if (hasTorrent(hash)) {
-            std::cout << "Torrent already exists" << std::endl;
+            std::cout << "Torrent already exists in session" << std::endl;
             return;
         }
         
@@ -215,7 +215,7 @@ void Client::addMagnet(const std::string& infoHashString, const std::string& sav
         std::string magnetUri = "magnet:?xt=urn:btih:" + hash.to_string();
         
         lt::add_torrent_params params = lt::parse_magnet_uri(magnetUri);
-        params.save_path = savePath;
+        params.save_path = download_path_;
         
         lt::torrent_handle handle = session_->add_torrent(params);
         torrents_[hash] = handle;

@@ -1,0 +1,5561 @@
+Starting bootstrap node on port 6881 in environment docker
+Press Ctrl+C to exit
+Available on:
+  - 127.0.0.1:6881 (localhost)
+  - 0.0.0.0:6881 (all interfaces)
+Using public IP from environment variable: 172.20.0.3
+Using IP: 172.20.0.3
+Using Docker/AWS config path: /app/config.json
+Loaded configuration for environment: docker
+Bootstrap nodes:
+  172.20.0.2:6881
+  172.20.0.4:6881
+  172.20.0.5:6881
+  172.20.0.6:6881
+Index nodes:
+  172.20.0.11:6881
+  172.20.0.12:6881
+  172.20.0.13:6881
+  172.20.0.14:6881
+  172.20.0.15:6881
+Connecting to DHT bootstrap nodes...
+[Node:6881] Adding bootstrap node: 172.20.0.2:6881
+[Node:6881] Checking if bootstrap node is reachable...
+[Node:6881] Sending direct DHT request to 172.20.0.2:6881
+[Node:6881] Announcing to DHT with hash: 7e701936efc74148784f4ce33f5003155c902ec6
+[Node:6881] Getting peers for hash: 7e701936efc74148784f4ce33f5003155c902ec6
+[Node:6881] Adding bootstrap node: 172.20.0.4:6881
+[Node:6881] Checking if bootstrap node is reachable...
+[Node:6881] Sending direct DHT request to 172.20.0.4:6881
+[Node:6881] Announcing to DHT with hash: b13f0878236ed3bcdb2d34b9fa5d2e3afc5b1a03
+[Node:6881] Getting peers for hash: b13f0878236ed3bcdb2d34b9fa5d2e3afc5b1a03
+[Node:6881] Adding bootstrap node: 172.20.0.5:6881
+[Node:6881] Checking if bootstrap node is reachable...
+[Node:6881] Sending direct DHT request to 172.20.0.5:6881
+[Node:6881] Announcing to DHT with hash: b5aadbb2a9bcd946bc8bd92ac63d17d555862dcd
+[Node:6881] Getting peers for hash: b5aadbb2a9bcd946bc8bd92ac63d17d555862dcd
+[Node:6881] Adding bootstrap node: 172.20.0.6:6881
+[Node:6881] Checking if bootstrap node is reachable...
+[Node:6881] Sending direct DHT request to 172.20.0.6:6881
+[Node:6881] Announcing to DHT with hash: d0456b4eb2be6f9ca76868e9c4a492b53bf275a5
+[Node:6881] Getting peers for hash: d0456b4eb2be6f9ca76868e9c4a492b53bf275a5
+Waiting for DHT to initialize...
+Creating Gossip object...
+Starting gossip on port 7881
+Started io_context thread
+Starting TCP acceptor on port 7881
+Creating new TCP acceptor on port 7881
+IO context thread starting
+TCP acceptor created and listening on port 7881
+Waiting for incoming connections on port 7881...
+TCP acceptor started successfully
+Started peer thread
+Started send thread
+Outgoing Queue Size: Started message processing thread
+0
+Gossip object created successfully
+ Creating Messenger
+Started io_context thread
+Starting TCP acceptor on port 8881
+Creating new TCP acceptor on port 8881
+There are 0 in the message queue
+IO context thread starting
+TCP acceptor created and listening on port 8881
+Waiting for incoming connections on port 8881...
+TCP acceptor started successfully
+Started send thread
+Started message processing thread
+Messenger object created successfully
+[Bootstrap] Initializing Heartbeat
+[Bootstrap] Added endpoint: 172.20.0.2:6881
+[Bootstrap] Added endpoint: 172.20.0.4:6881
+[Bootstrap] Added endpoint: 172.20.0.5:6881
+[Bootstrap] Added endpoint: 172.20.0.6:6881
+[Bootstrap] Requesting DHT stats...
+[Bootstrap] Announcing hash: 9b4e4f715e75d36c7f535c6ae523dbdf13f3488b on port 6881
+CREATED HEARTBEAT OBJECT
+[Bootstrap] Heartbeat manager created successfully
+HEARTBEAT THREAD STARTED
+[Bootstrap] Heartbeat started successfully
+Inside heartbeat loop
+----Sending Heartbeat----
+spreading message
+selected random peers
+[Bootstrap] Successfully listening on port messages pushed to queue
+6881
+[Bootstrap] Node fully started and running
+[Bootstrap] Successfully listening on port 6881
+[Bootstrap] Successfully listening on port 6881
+[Bootstrap] Successfully listening on port 6881
+=== DHT Stats ===
+DHT stats requested
+=================
+
+[Bootstrap] DHT nodes in routing table: 9
+[Bootstrap] Routing table details:
+  Bucket 0: 9===== Current heartbeat status ===== nodes
+
+==================================
+[Bootstrap] DHT routing table has 9 nodes
+[Bootstrap] DHT node: 172.20.0.6:6881
+[Bootstrap] DHT node: 172.20.0.2:6881
+[Bootstrap] DHT node: 172.20.0.5:6881
+[Bootstrap] DHT node: 172.20.0.4:6881
+[Bootstrap] DHT node: 172.20.0.15:6881
+[Bootstrap] DHT node: 172.20.0.13:6881
+[Bootstrap] DHT node: 172.20.0.11:6881
+[Bootstrap] DHT node: 172.20.0.14:6881
+[Bootstrap] DHT node: 172.20.0.12:6881
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Accepted new connection from 172.20.0.2:35076
+Received Gossip from: 172.20.0.2:35076
+Waiting for incoming connections on port 7881...
+spreading message
+selected random peers
+peer: 172.20.0.4:7881
+peer: 172.20.0.2:7881
+peer: 172.20.0.15:7881
+messages pushed to queue
+Received and forwarded message from 172.20.0.2:35076
+There are 0 in the message queue
+Outgoing Queue Size: 3
+Received ping from source: 7881:172.20.0.4making a pong
+spreading message
+Spreading ping from source: 172.20.0.4:7881
+Connecting to gossip endpoint: 172.20.0.4:7881
+selected random peers
+Message sent asynchronously to: 172.20.0.4:7881
+Spreading ping from source: 172.20.0.4:7881
+Connecting to gossip endpoint: 172.20.0.2:7881
+Message sent asynchronously to: 172.20.0.2:7881
+Spreading ping from source: 172.20.0.4:7881
+Connecting to gossip endpoint: 172.20.0.15:7881
+Successfully connected to 172.20.0.4:7881
+Successfully connected to 172.20.0.2:7881
+Successfully wrote 78 bytes to 172.20.0.4:7881
+Successfully wrote 78 bytes to 172.20.0.2:7881
+Message sent asynchronously to: 172.20.0.15:7881
+peer: 172.20.0.4:7881
+peer: 172.20.0.2:7881
+peer: 172.20.0.13:7881
+messages pushed to queue
+Outgoing Queue Size: 3
+Spreading pong from source: 172.20.0.3:7881
+Connecting to gossip endpoint: 172.20.0.4:7881
+Message sent asynchronously to: 172.20.0.4:7881
+Spreading pong from source: 172.20.0.3:7881
+Connecting to gossip endpoint: 172.20.0.2:7881
+Successfully connected to 172.20.0.4:7881
+Successfully wrote 80 bytes to 172.20.0.4:7881
+Message sent asynchronously to: 172.20.0.2:7881
+Spreading pong from source: 172.20.0.3:7881
+Connecting to gossip endpoint: 172.20.0.13:7881
+Successfully connected to 172.20.0.2:7881
+Message sent asynchronously to: 172.20.0.13:7881
+Successfully wrote 80 bytes to 172.20.0.2:7881
+Accepted new connection from 172.20.0.2:35088
+Received Gossip from: 172.20.0.2:35088
+Waiting for incoming connections on port 7881...
+spreading message
+selected random peers
+peer: 172.20.0.12:7881
+peer: 172.20.0.15:7881
+peer: 172.20.0.2:7881
+messages pushed to queue
+Received and forwarded message from 172.20.0.2:35088
+There are 0 in the message queue
+Received pong from source: 7881:172.20.0.2[Bootstrap] Received heartbeat response from: 172.20.0.2:7881
+received heartbeat from: 172.20.0.2:7881
+Outgoing Queue Size: 3
+Spreading pong from source: 172.20.0.2:7881
+Connecting to gossip endpoint: 172.20.0.12:7881
+Message sent asynchronously to: 172.20.0.12:7881
+Spreading pong from source: 172.20.0.2:7881
+Connecting to gossip endpoint: 172.20.0.15:7881
+Message sent asynchronously to: 172.20.0.15:7881
+Spreading pong from source: 172.20.0.2:7881
+Connecting to gossip endpoint: 172.20.0.2:7881
+Message sent asynchronously to: 172.20.0.2:7881
+Accepted new connection from 172.20.0.2:35104
+Received Gossip from: 172.20.0.2:35104
+Waiting for incoming connections on port 7881...
+Successfully connected to 172.20.0.2:7881
+Accepted new connection from 172.20.0.2:35108
+Received Gossip from: 172.20.0.2:35108
+Waiting for incoming connections on port 7881...
+Successfully wrote 80 bytes to 172.20.0.2:7881
+spreading message
+selected random peers
+peer: 172.20.0.4:7881
+peer: 172.20.0.13:7881
+peer: 172.20.0.6:7881
+messages pushed to queue
+Received and forwarded message from 172.20.0.2:35104
+spreading message
+selected random peers
+peer: 172.20.0.15:7881
+peer: 172.20.0.4:7881
+peer: 172.20.0.2:7881
+messages pushed to queue
+Received and forwarded message from 172.20.0.2:35108
+There are 0 in the message queue
+Received pong from source: 7881:172.20.0.3[Bootstrap] Received heartbeat response from: 172.20.0.3:7881
+received heartbeat from: 172.20.0.3:7881
+Received pong from source: 7881:172.20.0.6[Bootstrap] Received heartbeat response from: 172.20.0.6:7881
+received heartbeat from: 172.20.0.6:7881
+
+[Bootstrap] DHT nodes in routing table: 9
+[Bootstrap] Routing table details:
+  Bucket 0: 9 nodes
+Outgoing Queue Size: 6
+Spreading pong from source: 172.20.0.3:7881
+Connecting to gossip endpoint: 172.20.0.4:7881
+Message sent asynchronously to: 172.20.0.4:7881
+Spreading pong from source: 172.20.0.3:7881
+Connecting to gossip endpoint: 172.20.0.13:7881
+Message sent asynchronously to: 172.20.0.13:7881
+Spreading pong from source: 172.20.0.3:7881
+Connecting to gossip endpoint: 172.20.0.6:7881
+Successfully connected to 172.20.0.4:7881
+Successfully wrote 80 bytes to 172.20.0.4:7881
+Successfully connected to 172.20.0.6:7881
+Successfully wrote 80 bytes to 172.20.0.6:7881
+Message sent asynchronously to: 172.20.0.6:7881
+Spreading pong from source: 172.20.0.6:7881
+Connecting to gossip endpoint: 172.20.0.15:7881
+Message sent asynchronously to: 172.20.0.15:7881
+Spreading pong from source: 172.20.0.6:7881
+Connecting to gossip endpoint: 172.20.0.4:7881
+Message sent asynchronously to: 172.20.0.4:7881
+Spreading pong from source: 172.20.0.6:7881
+Connecting to gossip endpoint: 172.20.0.2:7881
+Successfully connected to 172.20.0.4:7881
+Successfully wrote 80 bytes to 172.20.0.4:7881
+Successfully connected to 172.20.0.2:7881
+Successfully wrote 80 bytes to 172.20.0.2:7881
+Message sent asynchronously to: 172.20.0.2:7881
+There are 0 in the message queue
+Accepted new connection from 172.20.0.4:50666
+Received Gossip from: 172.20.0.4:50666
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.6:34970
+Received Gossip from: 172.20.0.6:34970
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.6:34980
+Received Gossip from: 172.20.0.6:34980
+Waiting for incoming connections on port 7881...
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Accepted new connection from 172.20.0.15:35318
+Received Gossip from: 172.20.0.15:35318
+Waiting for incoming connections on port 7881...
+spreading message
+selected random peers
+peer: 172.20.0.5:7881
+peer: 172.20.0.15:7881
+peer: 172.20.0.12:7881
+messages pushed to queue
+Received and forwarded message from 172.20.0.15:35318
+Accepted new connection from 172.20.0.6:34984
+Received Gossip from: 172.20.0.6:34984
+Waiting for incoming connections on port 7881...
+There are 0 in the message queue
+Outgoing Queue Size: 3
+Connecting to gossip endpoint: 172.20.0.5:7881
+Message sent asynchronously to: 172.20.0.5:7881
+Connecting to gossip endpoint: 172.20.0.15:7881
+Message sent asynchronously to: 172.20.0.15:7881
+Connecting to gossip endpoint: 172.20.0.12:7881
+Message sent asynchronously to: 172.20.0.12:7881
+Successfully connected to 172.20.0.5:7881
+Successfully connected to 172.20.0.15:7881
+Successfully wrote 66 bytes to 172.20.0.5:7881
+Successfully wrote 66 bytes to 172.20.0.15:7881
+Accepted new connection from 172.20.0.2:35122
+Received Gossip from: 172.20.0.2:35122
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.15:35328
+Received Gossip from: 172.20.0.15:35328
+Waiting for incoming connections on port 7881...
+spreading message
+selected random peers
+peer: 172.20.0.5:7881
+peer: 172.20.0.6:7881
+peer: 172.20.0.12:7881
+messages pushed to queue
+Received and forwarded message from 172.20.0.15:35328
+Accepted new connection from 172.20.0.13:37662
+Received Gossip from: 172.20.0.13:37662
+Waiting for incoming connections on port 7881...
+spreading message
+selected random peers
+peer: 172.20.0.14:7881
+peer: 172.20.0.15:7881
+peer: 172.20.0.6:7881
+messages pushed to queue
+Received and forwarded message from 172.20.0.13:37662
+Accepted new connection from 172.20.0.6:34990
+Received Gossip from: 172.20.0.6:34990
+Waiting for incoming connections on port 7881...
+There are 0 in the message queue
+Outgoing Queue Size: 6
+Connecting to gossip endpoint: 172.20.0.5:7881
+Message sent asynchronously to: 172.20.0.5:7881
+Connecting to gossip endpoint: 172.20.0.6:7881
+Successfully connected to 172.20.0.5:7881
+Message sent asynchronously to: 172.20.0.6:7881
+Connecting to gossip endpoint: 172.20.0.12:7881
+Message sent asynchronously to: 172.20.0.12:7881
+Connecting to gossip endpoint: Successfully wrote 172.20.0.1488 bytes to :7881
+172.20.0.5:7881
+Successfully connected to 172.20.0.6:7881
+Message sent asynchronously to: 172.20.0.14:7881
+Connecting to gossip endpoint: 172.20.0.15:7881
+Message sent asynchronously to: 172.20.0.15:7881
+Connecting to gossip endpoint: 172.20.0.6:7881
+Message sent asynchronously to: 172.20.0.6:7881
+Successfully wrote 88 bytes to 172.20.0.6:7881
+Successfully connected to 172.20.0.15:7881
+Successfully connected to 172.20.0.6:7881
+Successfully wrote 88 bytes to 172.20.0.15:7881
+Successfully wrote 88 bytes to 172.20.0.6:7881
+Accepted new connection from 172.20.0.2:35136
+Received Gossip from: 172.20.0.2:35136
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.15:35332
+Received Gossip from: 172.20.0.15:35332
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.5:36938
+Received Gossip from: 172.20.0.5:36938
+Waiting for incoming connections on port 7881...
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: There are 0
+0 in the message queue
+Accepted new connection from 172.20.0.11:53774
+Received Gossip from: 172.20.0.11:53774
+Waiting for incoming connections on port 7881...
+Outgoing Queue Size: 0
+Accepted new connection from 172.20.0.15:35344
+Received Gossip from: 172.20.0.15:35344
+Waiting for incoming connections on port 7881...
+spreading message
+selected random peers
+peer: 172.20.0.4:7881
+peer: 172.20.0.15:7881
+peer: 172.20.0.6:7881
+messages pushed to queue
+Received and forwarded message from 172.20.0.15:35344
+There are 0 in the message queue
+Accepted new connection from 172.20.0.4:50668
+Received Gossip from: 172.20.0.4:50668
+Waiting for incoming connections on port 7881...
+Outgoing Queue Size: 3
+Connecting to gossip endpoint: 172.20.0.4:7881
+Message sent asynchronously to: 172.20.0.4:7881
+Connecting to gossip endpoint: 172.20.0.15:7881
+Message sent asynchronously to: 172.20.0.15:7881
+Connecting to gossip endpoint: 172.20.0.6:7881
+Message sent asynchronously to: 172.20.0.6:7881
+Successfully connected to 172.20.0.4:7881
+Successfully connected to 172.20.0.15:7881
+Accepted new connection from 172.20.0.6:34998
+Received Gossip from: 172.20.0.6:34998
+Waiting for incoming connections on port 7881...
+Successfully connected to 172.20.0.6:7881
+Successfully wrote 88 bytes to 172.20.0.4:7881
+Successfully wrote 88 bytes to 172.20.0.15:7881
+Successfully wrote 88 bytes to 172.20.0.6:7881
+There are 0 in the message queue
+Accepted new connection from 172.20.0.13:37664
+Received Gossip from: 172.20.0.13:37664
+Waiting for incoming connections on port 7881...
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+----Sending Heartbeat----
+spreading message
+[Bootstrap] Requesting DHT stats...
+selected random peers
+peer: 172.20.0.4:7881
+peer: 172.20.0.2:7881
+peer: [Bootstrap] Announcing hash: 172.20.0.12:7881
+messages pushed to queue
+07053e5bbaa00b863aaf022eb39ca02c91aee834===== Current heartbeat status =====
+ on port Node: 172.20.0.6:7881 | Last seen: 6881
+4 seconds ago
+Node: 172.20.0.3:7881 | Last seen: 4 seconds ago
+Node: 172.20.0.2:7881 | Last seen: 4 seconds ago
+==================================
+Accepted new connection from 172.20.0.4:60862
+Received Gossip from: 172.20.0.4:60862
+Waiting for incoming connections on port 7881...
+spreading message
+selected random peers
+peer: 172.20.0.13:7881
+peer: 172.20.0.11:7881
+peer: 172.20.0.6:7881
+messages pushed to queue
+Received and forwarded message from 172.20.0.4:60862
+[Bootstrap] DHT routing table has 9 nodes
+[Bootstrap] DHT node: 172.20.0.6:6881
+[Bootstrap] DHT node: 172.20.0.2:6881
+[Bootstrap] DHT node: 172.20.0.5:6881
+[Bootstrap] DHT node: 172.20.0.4:6881
+[Bootstrap] DHT node: 172.20.0.15:6881
+[Bootstrap] DHT node: 172.20.0.13:6881
+[Bootstrap] DHT node: 172.20.0.11:6881
+[Bootstrap] DHT node: 172.20.0.14:6881
+[Bootstrap] DHT node: 172.20.0.12:6881
+Accepted new connection from 172.20.0.14:54214
+Received Gossip from: 172.20.0.14:54214
+Waiting for incoming connections on port 7881...
+There are 0 in the message queue
+Received ping from source: 7881:172.20.0.6making a pong
+spreading message
+selected random peers
+peer: 172.20.0.4:7881
+peer: 172.20.0.11:7881
+peer: 172.20.0.5:7881
+messages pushed to queue
+Accepted new connection from 172.20.0.11:53262
+Received Gossip from: 172.20.0.11:53262
+Waiting for incoming connections on port 7881...
+Outgoing Queue Size: 9
+Spreading ping from source: 172.20.0.3:7881
+Connecting to gossip endpoint: 172.20.0.4:7881
+Accepted new connection from 172.20.0.2:37938
+Received Gossip from: 172.20.0.2:37938
+Waiting for incoming connections on port 7881...
+Successfully connected to 172.20.0.4:7881
+Successfully wrote 78 bytes to 172.20.0.4:7881
+Message sent asynchronously to: 172.20.0.4:7881
+Spreading ping from source: 172.20.0.3:7881
+Connecting to gossip endpoint: 172.20.0.2:7881
+Message sent asynchronously to: 172.20.0.2:7881
+Successfully connected to 172.20.0.2:7881
+Successfully wrote 78 bytes to 172.20.0.2:7881
+Spreading ping from source: 172.20.0.3:7881
+Connecting to gossip endpoint: 172.20.0.12:7881
+Message sent asynchronously to: 172.20.0.12:7881
+Successfully connected to 172.20.0.12:7881
+Accepted new connection from 172.20.0.12:55484
+Received Gossip from: 172.20.0.12:55484
+Spreading ping from source: 172.20.0.6:7881
+Connecting to gossip endpoint: 172.20.0.13:7881
+Waiting for incoming connections on port 7881...
+Successfully wrote 78 bytes to 172.20.0.12:7881
+Successfully connected to 172.20.0.13:7881
+Successfully wrote 78 bytes to 172.20.0.13:7881
+Message sent asynchronously to: 172.20.0.13:7881
+Spreading ping from source: 172.20.0.6:7881
+Connecting to gossip endpoint: 172.20.0.11:7881
+Message sent asynchronously to: 172.20.0.11:7881
+Successfully connected to 172.20.0.11:7881
+Spreading ping from source: 172.20.0.6:7881
+Connecting to gossip endpoint: 172.20.0.6:7881
+Successfully wrote 78 bytes to 172.20.0.11:7881
+Message sent asynchronously to: 172.20.0.6:7881
+Spreading pong from source: 172.20.0.3:7881
+Connecting to gossip endpoint: 172.20.0.4:7881
+Successfully connected to 172.20.0.6:7881
+Successfully wrote 78 bytes to 172.20.0.6:7881
+Message sent asynchronously to: 172.20.0.4:7881
+Spreading pong from source: 172.20.0.3:7881
+Connecting to gossip endpoint: 172.20.0.11:7881
+Message sent asynchronously to: 172.20.0.11:7881
+Spreading pong from source: 172.20.0.3:7881
+Connecting to gossip endpoint: 172.20.0.5:7881
+Successfully connected to 172.20.0.4:7881
+Successfully wrote 80 bytes to 172.20.0.4:7881
+Successfully connected to 172.20.0.11:7881
+Successfully wrote 80 bytes to 172.20.0.11:7881
+Message sent asynchronously to: 172.20.0.5:7881
+Successfully connected to 172.20.0.5:7881
+Successfully wrote 80 bytes to 172.20.0.5:7881
+Accepted new connection from 172.20.0.4:60866
+Received Gossip from: 172.20.0.4:60866
+Waiting for incoming connections on port 7881...
+spreading message
+selected random peers
+peer: 172.20.0.15:7881
+peer: 172.20.0.4:7881
+peer: 172.20.0.14:7881
+messages pushed to queue
+Received and forwarded message from 172.20.0.4:60866
+There are 0 in the message queue
+Received ping from source: 7881:172.20.0.3making a pong
+spreading message
+selected random peers
+peer: 172.20.0.14:7881
+peer: 172.20.0.11:7881
+peer: 172.20.0.4:7881
+messages pushed to queue
+Accepted new connection from 172.20.0.6:54474
+Received Gossip from: 172.20.0.6:54474
+Waiting for incoming connections on port 7881...
+spreading message
+selected random peers
+peer: 172.20.0.2:7881
+peer: 172.20.0.15:7881
+peer: 172.20.0.12:7881
+messages pushed to queue
+Received and forwarded message from 172.20.0.6:54474
+Accepted new connection from 172.20.0.11:53270
+Received Gossip from: 172.20.0.11:53270
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.11:53286
+Received Gossip from: 172.20.0.11:53286
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.2:37940
+Received Gossip from: 172.20.0.2:37940
+Waiting for incoming connections on port 7881...
+spreading message
+selected random peers
+Outgoing Queue Size: 9
+Spreading ping from source: 172.20.0.3:7881
+Connecting to gossip endpoint: 172.20.0.15:7881
+Message sent asynchronously to: 172.20.0.15:7881
+Spreading ping from source: 172.20.0.3:7881
+Connecting to gossip endpoint: 172.20.0.4:7881
+Message sent asynchronously to: 172.20.0.4:7881
+Spreading ping from source: 172.20.0.3:7881
+Connecting to gossip endpoint: 172.20.0.14:7881
+Message sent asynchronously to: 172.20.0.14:7881
+Spreading pong from source: 172.20.0.3:7881
+Connecting to gossip endpoint: 172.20.0.14:7881
+Message sent asynchronously to: 172.20.0.14:7881
+Spreading pong from source: 172.20.0.3:7881
+Connecting to gossip endpoint: 172.20.0.11:7881
+Message sent asynchronously to: 172.20.0.11:7881
+Spreading pong from source: 172.20.0.3:7881
+Connecting to gossip endpoint: 172.20.0.4:7881
+Message sent asynchronously to: 172.20.0.4:7881
+Spreading pong from source: 172.20.0.4:7881
+Connecting to gossip endpoint: 172.20.0.2:7881
+Message sent asynchronously to: 172.20.0.2:7881
+Spreading pong from source: 172.20.0.4:7881
+Connecting to gossip endpoint: 172.20.0.15:7881
+Message sent asynchronously to: 172.20.0.15:7881
+Spreading pong from source: 172.20.0.4:7881
+Connecting to gossip endpoint: 172.20.0.12:7881
+Message sent asynchronously to: 172.20.0.12:7881
+peer: 172.20.0.13:7881
+peer: 172.20.0.6:7881
+peer: 172.20.0.11:7881
+messages pushed to queue
+Received and forwarded message from 172.20.0.2:37940
+Successfully connected to 172.20.0.15:7881
+Successfully connected to 172.20.0.4:7881
+Successfully connected to 172.20.0.14:7881
+Successfully connected to 172.20.0.14:7881
+Successfully connected to 172.20.0.11:7881
+Successfully connected to 172.20.0.4:7881
+Successfully connected to 172.20.0.2:7881
+Successfully connected to 172.20.0.15:7881
+Successfully connected to 172.20.0.12:7881
+Successfully wrote 78 bytes to 172.20.0.15:7881
+Successfully wrote 78 bytes to 172.20.0.4:7881
+There are 0 in the message queue
+Received pong from source: 7881:172.20.0.2[Bootstrap] Received heartbeat response from: 172.20.0.2:7881
+Successfully wrote 78 bytes to 172.20.0.14:7881
+Successfully wrote 80 bytes to 172.20.0.14:7881
+Successfully wrote 80 bytes to 172.20.0.11:7881
+Successfully wrote 80 bytes to 172.20.0.4:7881
+Successfully wrote 80 bytes to 172.20.0.2:7881
+Successfully wrote 80 bytes to 172.20.0.15:7881
+Successfully wrote 80 bytes to 172.20.0.12:7881
+Accepted new connection from 172.20.0.15:39680
+Received Gossip from: 172.20.0.15:39680
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.15:39682
+Received Gossip from: 172.20.0.15:39682
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.13:60114
+Received Gossip from: 172.20.0.13:60114
+Waiting for incoming connections on port 7881...
+spreading message
+selected random peers
+peer: 172.20.0.11:7881
+peer: 172.20.0.14:7881
+peer: 172.20.0.15:7881
+messages pushed to queue
+Received and forwarded message from 172.20.0.15:39682
+received heartbeat from: 172.20.0.2:7881
+Received pong from source: 7881:172.20.0.4[Bootstrap] Received heartbeat response from: 172.20.0.4:7881
+received heartbeat from: 172.20.0.4:7881
+Accepted new connection from 172.20.0.14:54218
+Received Gossip from: 172.20.0.14:54218
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.4:60878
+Received Gossip from: 172.20.0.4:60878
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.5:36100
+Received Gossip from: 172.20.0.5:36100
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.5:36114
+Received Gossip from: 172.20.0.5:36114
+Waiting for incoming connections on port 7881...
+spreading message
+selected random peers
+peer: 172.20.0.15:7881
+peer: 172.20.0.11:7881
+peer: 172.20.0.4:7881
+messages pushed to queue
+Received and forwarded message from 172.20.0.5:36114
+Accepted new connection from 172.20.0.11:53294
+Received Gossip from: 172.20.0.11:53294
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.2:37944
+Received Gossip from: 172.20.0.2:37944
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.2:37946
+Received Gossip from: 172.20.0.2:37946
+Waiting for incoming connections on port 7881...
+Outgoing Queue Size: 9
+Spreading pong from source: 172.20.0.2:7881
+Connecting to gossip endpoint: 172.20.0.13:7881
+Message sent asynchronously to: 172.20.0.13:7881
+Spreading pong from source: 172.20.0.2:7881
+Connecting to gossip endpoint: 172.20.0.6:7881
+Message sent asynchronously to: 172.20.0.6:7881
+Spreading pong from source: 172.20.0.2:7881
+Connecting to gossip endpoint: 172.20.0.11:7881
+Accepted new connection from 172.20.0.2:37960
+Received Gossip from: 172.20.0.2:37960
+Waiting for incoming connections on port 7881...
+Successfully connected to 172.20.0.13:7881
+Successfully connected to 172.20.0.6:7881
+Successfully wrote 80 bytes to 172.20.0.13:7881
+Successfully wrote 80 bytes to 172.20.0.6:7881
+Successfully connected to 172.20.0.11:7881
+Successfully wrote 80 bytes to 172.20.0.11:7881
+Message sent asynchronously to: 172.20.0.11:7881
+Spreading pong from source: 172.20.0.6:7881
+Connecting to gossip endpoint: 172.20.0.11:7881
+Message sent asynchronously to: 172.20.0.11:7881
+Spreading pong from source: 172.20.0.6:7881
+Connecting to gossip endpoint: 172.20.0.14:7881
+Message sent asynchronously to: 172.20.0.14:7881
+Spreading pong from source: 172.20.0.6:7881
+Connecting to gossip endpoint: 172.20.0.15:7881
+Message sent asynchronously to: 172.20.0.15:7881
+Spreading pong from source: 172.20.0.5:7881
+Connecting to gossip endpoint: 172.20.0.15:7881
+Message sent asynchronously to: 172.20.0.15:7881
+Spreading pong from source: 172.20.0.5:7881
+Connecting to gossip endpoint: 172.20.0.11:7881
+Message sent asynchronously to: 172.20.0.11:7881
+Spreading pong from source: 172.20.0.5:7881
+Connecting to gossip endpoint: 172.20.0.4:7881
+Message sent asynchronously to: 172.20.0.4:7881
+Successfully connected to 172.20.0.11:7881
+Successfully connected to 172.20.0.14:7881
+Successfully connected to 172.20.0.15:7881
+Successfully connected to 172.20.0.15:7881
+Successfully connected to 172.20.0.11:7881
+Successfully connected to 172.20.0.4:7881
+Successfully wrote 80 bytes to 172.20.0.11:7881
+Successfully wrote 80 bytes to 172.20.0.14:7881
+Successfully wrote 80 bytes to 172.20.0.15:7881
+Successfully wrote 80 bytes to 172.20.0.15:7881
+Successfully wrote 80 bytes to 172.20.0.11:7881
+Successfully wrote 80 bytes to 172.20.0.4:7881
+Accepted new connection from 172.20.0.15:39688
+Received Gossip from: 172.20.0.15:39688
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.15:39692
+Received Gossip from: 172.20.0.15:39692
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.12:55496
+Received Gossip from: 172.20.0.12:55496
+Waiting for incoming connections on port 7881...
+There are 0 in the message queue
+Received pong from source: 7881:172.20.0.6[Bootstrap] Received heartbeat response from: 172.20.0.6:7881
+received heartbeat from: 172.20.0.6:7881
+Received pong from source: 7881:172.20.0.5[Bootstrap] Received heartbeat response from: 172.20.0.5:7881
+received heartbeat from: 172.20.0.5:7881
+Accepted new connection from 172.20.0.4:60888
+Received Gossip from: 172.20.0.4:60888
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.13:60126
+Received Gossip from: 172.20.0.13:60126
+Waiting for incoming connections on port 7881...
+spreading message
+selected random peers
+peer: 172.20.0.14:7881
+peer: 172.20.0.12:7881
+peer: 172.20.0.15:7881
+messages pushed to queue
+Received and forwarded message from 172.20.0.13:60126
+Accepted new connection from 172.20.0.13:60134
+Received Gossip from: 172.20.0.13:60134
+Waiting for incoming connections on port 7881...
+Outgoing Queue Size: 3
+Spreading pong from source: 172.20.0.3:7881
+Connecting to gossip endpoint: 172.20.0.14:7881
+Accepted new connection from 172.20.0.6:54480
+Received Gossip from: 172.20.0.6:54480
+Waiting for incoming connections on port 7881...
+Successfully connected to 172.20.0.14:7881
+Message sent asynchronously to: 172.20.0.14:7881
+Spreading pong from source: 172.20.0.3:7881
+Connecting to gossip endpoint: 172.20.0.12:7881
+Successfully wrote 80 bytes to 172.20.0.14:7881
+Message sent asynchronously to: 172.20.0.12:7881
+Spreading pong from source: 172.20.0.3:7881
+Connecting to gossip endpoint: 172.20.0.15:7881
+Message sent asynchronously to: 172.20.0.15:7881
+
+[Bootstrap] DHT nodes in routing table: 9
+[Bootstrap] Routing table details:
+  Bucket 0: 9 nodes
+Successfully connected to 172.20.0.12:7881
+Successfully connected to 172.20.0.15:7881
+There are 0 in the message queue
+Received pong from source: 7881:172.20.0.3[Bootstrap] Received heartbeat response from: 172.20.0.3:7881
+received heartbeat from: 172.20.0.3:7881
+Successfully wrote 80 bytes to 172.20.0.12:7881
+Successfully wrote 80 bytes to 172.20.0.15:7881
+Accepted new connection from 172.20.0.13:60136
+Received Gossip from: 172.20.0.13:60136
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.11:53298
+Received Gossip from: 172.20.0.11:53298
+Waiting for incoming connections on port 7881...
+spreading message
+selected random peers
+peer: 172.20.0.2:7881
+peer: 172.20.0.11:7881
+peer: 172.20.0.14:7881
+messages pushed to queue
+Received and forwarded message from 172.20.0.11:53298
+Accepted new connection from 172.20.0.5:36122
+Received Gossip from: Outgoing Queue Size: 3
+Spreading ping from source: 172.20.0.2:7881
+Connecting to gossip endpoint: 172.20.0.2:7881
+Message sent asynchronously to: 172.20.0.2:7881
+Spreading ping from source: 172.20.0.2:7881
+Connecting to gossip endpoint: 172.20.0.11:7881
+Message sent asynchronously to: 172.20.0.11:7881
+Spreading ping from source: 172.20.0.2:7881
+Connecting to gossip endpoint: 172.20.0.14:7881
+Message sent asynchronously to: 172.20.0.14:7881
+There are 0 in the message queue
+Received ping from source: 7881:172.20.0.2making a pong
+spreading message
+selected random peers
+peer: 172.20.0.4:7881
+peer: 172.20.0.6:7881
+peer: 172.20.0.13:7881
+messages pushed to queue
+172.20.0.5:36122
+Waiting for incoming connections on port 7881...
+Successfully connected to 172.20.0.2:7881
+Successfully connected to 172.20.0.11:7881
+Successfully connected to 172.20.0.14:7881
+spreading message
+selected random peers
+peer: 172.20.0.2:7881
+peer: 172.20.0.11:7881
+peer: 172.20.0.15:7881
+messages pushed to queue
+Received and forwarded message from 172.20.0.5:36122
+Successfully wrote 78 bytes to 172.20.0.2:7881
+Successfully wrote 78 bytes to 172.20.0.11:7881
+Successfully wrote 78 bytes to 172.20.0.14:7881
+Accepted new connection from 172.20.0.2:37972
+Received Gossip from: 172.20.0.2:37972
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.4:60902
+Received Gossip from: 172.20.0.4:60902
+Waiting for incoming connections on port 7881...
+Outgoing Queue Size: 6
+Accepted new connection from Spreading pong from source: 172.20.0.3:7881
+172.20.0.6:54496
+Received Gossip from: 172.20.0.6:54496
+Connecting to gossip endpoint: 172.20.0.4:7881
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.15:39698
+Received Gossip from: 172.20.0.15:39698
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.15:39706
+Received Gossip from: 172.20.0.15:39706
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.12:55508
+Received Gossip from: 172.20.0.12:55508
+Waiting for incoming connections on port 7881...
+Message sent asynchronously to: 172.20.0.4:7881
+Spreading pong from source: 172.20.0.3:7881
+Connecting to gossip endpoint: 172.20.0.6:7881
+Message sent asynchronously to: 172.20.0.6:7881
+Spreading pong from source: 172.20.0.3:7881
+Connecting to gossip endpoint: 172.20.0.13:7881
+Message sent asynchronously to: 172.20.0.13:7881
+Spreading ping from source: 172.20.0.5:7881
+Connecting to gossip endpoint: 172.20.0.2:7881
+Message sent asynchronously to: 172.20.0.2:7881
+Spreading ping from source: 172.20.0.5:7881
+Connecting to gossip endpoint: 172.20.0.11:7881
+Message sent asynchronously to: 172.20.0.11:7881
+Spreading ping from source: 172.20.0.5:7881
+Connecting to gossip endpoint: 172.20.0.15:7881
+Message sent asynchronously to: 172.20.0.15:7881
+Successfully connected to 172.20.0.4:7881
+Successfully connected to 172.20.0.6:7881
+Successfully connected to 172.20.0.13:7881
+Successfully connected to 172.20.0.2:7881
+Successfully connected to 172.20.0.11:7881
+Successfully connected to 172.20.0.15:7881
+Successfully wrote 80 bytes to 172.20.0.4:7881
+Successfully wrote 80 bytes to 172.20.0.6:7881
+Successfully wrote 80 bytes to 172.20.0.13:7881
+Successfully wrote 78 bytes to 172.20.0.2:7881
+Successfully wrote 78 bytes to 172.20.0.11:7881
+Successfully wrote 78 bytes to 172.20.0.15:7881
+There are 0 in the message queue
+Received ping from source: 7881:172.20.0.5making a pong
+spreading message
+selected random peers
+peer: 172.20.0.6:7881
+peer: 172.20.0.15:7881
+peer: 172.20.0.2:7881
+messages pushed to queue
+spreading message
+selected random peers
+peer: 172.20.0.11:7881
+peer: 172.20.0.13:7881
+peer: 172.20.0.14:7881
+messages pushed to queue
+Received and forwarded message from 172.20.0.15:39698
+Accepted new connection from 172.20.0.2:37986
+Received Gossip from: 172.20.0.2:37986
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.5:36132
+Received Gossip from: 172.20.0.5:36132
+Waiting for incoming connections on port 7881...
+Outgoing Queue Size: 6
+Spreading pong from source: 172.20.0.3:7881
+Connecting to gossip endpoint: 172.20.0.6:7881
+Message sent asynchronously to: 172.20.0.6:7881
+Spreading pong from source: 172.20.0.3:7881
+Connecting to gossip endpoint: 172.20.0.15:7881
+There are 0 in the message queue
+Received ping from source: 7881:172.20.0.4making a pong
+spreading message
+selected random peers
+Successfully connected to 172.20.0.6:7881
+Successfully wrote 80 bytes to 172.20.0.6:7881
+Successfully connected to 172.20.0.15:7881
+Successfully wrote 80 bytes to 172.20.0.15:7881
+Message sent asynchronously to: 172.20.0.15:7881
+Spreading pong from source: 172.20.0.3:7881
+Connecting to gossip endpoint: 172.20.0.2:7881
+Successfully connected to 172.20.0.2:7881
+Successfully wrote 80 bytes to 172.20.0.2:7881
+Message sent asynchronously to: 172.20.0.2:7881
+Spreading ping from source: 172.20.0.4:7881
+Connecting to gossip endpoint: 172.20.0.11:7881
+Message sent asynchronously to: 172.20.0.11:7881
+Successfully connected to 172.20.0.11:7881
+Successfully wrote 78 bytes to 172.20.0.11:7881
+Spreading ping from source: 172.20.0.4:7881
+Connecting to gossip endpoint: 172.20.0.13:7881
+Message sent asynchronously to: 172.20.0.13:7881
+Successfully connected to 172.20.0.13:7881
+Successfully wrote 78 bytes to 172.20.0.13:7881
+Spreading ping from source: 172.20.0.4:7881
+Connecting to gossip endpoint: 172.20.0.14:7881
+Message sent asynchronously to: 172.20.0.14:7881
+Successfully connected to 172.20.0.14:7881
+Successfully wrote 78 bytes to 172.20.0.14:7881
+peer: 172.20.0.11:7881
+peer: 172.20.0.5:7881
+peer: 172.20.0.2:7881
+messages pushed to queue
+Outgoing Queue Size: 3
+There are 0 in the message queue
+Spreading pong from source: 172.20.0.3:7881
+Connecting to gossip endpoint: 172.20.0.11:7881
+Message sent asynchronously to: 172.20.0.11:7881
+Spreading pong from source: 172.20.0.3:7881
+Connecting to gossip endpoint: 172.20.0.5:7881
+Successfully connected to 172.20.0.11:7881
+Successfully wrote 80 bytes to 172.20.0.11:7881
+Successfully connected to 172.20.0.5:7881
+Successfully wrote 80 bytes to 172.20.0.5:7881
+Message sent asynchronously to: 172.20.0.5:7881
+Spreading pong from source: 172.20.0.3:7881
+Connecting to gossip endpoint: 172.20.0.2:7881
+Successfully connected to 172.20.0.2:7881
+Successfully wrote 80 bytes to 172.20.0.2:7881
+Message sent asynchronously to: 172.20.0.2:7881
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are Outgoing Queue Size: 0 in the message queue0
+
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Accepted new connection from 172.20.0.13:60140
+Received Gossip from: 172.20.0.13:60140
+Waiting for incoming connections on port 7881...
+spreading message
+selected random peers
+peer: 172.20.0.5:7881
+peer: 172.20.0.6:7881
+peer: 172.20.0.11:7881
+messages pushed to queue
+Received and forwarded message from 172.20.0.13:60140
+Accepted new connection from 172.20.0.4:60910
+Received Gossip from: 172.20.0.4:60910
+Waiting for incoming connections on port 7881...
+Outgoing Queue Size: 3
+Connecting to gossip endpoint: 172.20.0.5:7881
+Message sent asynchronously to: 172.20.0.5:7881
+Connecting to gossip endpoint: 172.20.0.6:7881
+Message sent asynchronously to: Successfully connected to 172.20.0.6:7881
+Connecting to gossip endpoint: 172.20.0.11:7881
+172.20.0.5:7881
+Message sent asynchronously to: 172.20.0.11:7881
+There are 0 in the message queue
+Successfully wrote 66 bytes to 172.20.0.5:7881
+Successfully connected to 172.20.0.6:7881
+Successfully connected to 172.20.0.11:7881
+Successfully wrote 66 bytes to 172.20.0.6:7881
+Successfully wrote 66 bytes to 172.20.0.11:7881
+Accepted new connection from 172.20.0.2:38000
+Received Gossip from: 172.20.0.2:38000
+Waiting for incoming connections on port 7881...
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Accepted new connection from 172.20.0.6:54512
+Received Gossip from: 172.20.0.6:54512
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.6:54520
+Received Gossip from: 172.20.0.6:54520
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.14:54234
+Received Gossip from: 172.20.0.14:54234
+Waiting for incoming connections on port 7881...
+spreading message
+selected random peers
+peer: 172.20.0.15:7881
+peer: 172.20.0.4:7881
+peer: 172.20.0.6:7881
+messages pushed to queue
+Received and forwarded message from 172.20.0.6:54512
+spreading message
+selected random peers
+peer: 172.20.0.6:7881
+peer: 172.20.0.11:7881
+peer: 172.20.0.14:7881
+messages pushed to queue
+Received and forwarded message from 172.20.0.6:54520
+Accepted new connection from 172.20.0.11:53310
+Received Gossip from: 172.20.0.11:53310
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.11:53316
+Received Gossip from: 172.20.0.11:53316
+Waiting for incoming connections on port 7881...
+There are 0 in the message queue
+Outgoing Queue Size: 6
+Connecting to gossip endpoint: 172.20.0.15:7881
+Message sent asynchronously to: 172.20.0.15:7881
+Successfully connected to Connecting to gossip endpoint: 172.20.0.4172.20.0.15:7881
+:7881
+Successfully wrote 89 bytes to 172.20.0.15:7881
+Message sent asynchronously to: 172.20.0.4:7881
+Connecting to gossip endpoint: 172.20.0.6:7881
+Successfully connected to 172.20.0.4:7881
+Message sent asynchronously to: Successfully wrote 89 bytes to 172.20.0.4:7881
+Successfully connected to 172.20.0.6:7881
+Successfully wrote 89 bytes to 172.20.0.6:7881
+Accepted new connection from 172.20.0.6:54536
+Received Gossip from: 172.20.0.6:54536
+Waiting for incoming connections on port 7881...
+172.20.0.6:7881
+Connecting to gossip endpoint: 172.20.0.6:7881
+spreading message
+Message sent asynchronously to: selected random peers
+172.20.0.6:7881
+Connecting to gossip endpoint: 172.20.0.11:7881
+Message sent asynchronously to: 172.20.0.11:7881
+Connecting to gossip endpoint: 172.20.0.14:7881
+Message sent asynchronously to: 172.20.0.14:7881
+peer: 172.20.0.5:7881
+peer: 172.20.0.14:7881
+peer: 172.20.0.15:7881
+messages pushed to queue
+Received and forwarded message from 172.20.0.6:54536
+Successfully connected to 172.20.0.6:7881
+Successfully connected to 172.20.0.11:7881
+Accepted new connection from 172.20.0.14:54236
+Received Gossip from: 172.20.0.14:54236
+Waiting for incoming connections on port 7881...
+Successfully connected to 172.20.0.14:7881
+Successfully wrote 89 bytes to 172.20.0.6:7881
+Successfully wrote 89 bytes to 172.20.0.11:7881
+Accepted new connection from 172.20.0.13:60150
+Received Gossip from: 172.20.0.13:60150
+Waiting for incoming connections on port 7881...
+Successfully wrote 89 bytes to 172.20.0.14:7881
+Accepted new connection from 172.20.0.15:39708
+Received Gossip from: 172.20.0.15:39708
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.5:36136
+Received Gossip from: 172.20.0.5:36136
+Waiting for incoming connections on port 7881...
+spreading message
+selected random peers
+peer: 172.20.0.12:7881
+peer: 172.20.0.5:7881
+peer: 172.20.0.6:7881
+messages pushed to queue
+Received and forwarded message from 172.20.0.5:36136
+Accepted new connection from 172.20.0.5:36148
+Received Gossip from: 172.20.0.5:36148
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.12:55524
+Received Gossip from: 172.20.0.12:55524
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.11:53330
+Received Gossip from: 172.20.0.11:53330
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.11:53342
+Received Gossip from: 172.20.0.11:53342
+Waiting for incoming connections on port 7881...
+There are 0 in the message queue
+Outgoing Queue Size: 6
+Connecting to gossip endpoint: 172.20.0.5:7881
+Message sent asynchronously to: 172.20.0.5:7881
+Connecting to gossip endpoint: 172.20.0.14:7881
+Message sent asynchronously to: 172.20.0.14:7881
+Connecting to gossip endpoint: 172.20.0.15:7881
+Successfully connected to 172.20.0.5:Message sent asynchronously to: 7881
+172.20.0.15:7881
+Connecting to gossip endpoint: 172.20.0.12:7881
+Successfully connected to 172.20.0.14:7881
+Successfully wrote 89 bytes to 172.20.0.5:7881
+Successfully wrote 89 bytes to 172.20.0.14:7881
+Message sent asynchronously to: 172.20.0.12:7881
+Successfully connected to 172.20.0.15:7881
+Connecting to gossip endpoint: 172.20.0.5:7881
+Successfully wrote 89 bytes to 172.20.0.15:7881
+Message sent asynchronously to: 172.20.0.5:7881
+Connecting to gossip endpoint: 172.20.0.6:7881
+Successfully connected to 172.20.0.12:7881
+Accepted new connection from 172.20.0.13:60162
+Received Gossip from: 172.20.0.13:60162
+Message sent asynchronously to: Waiting for incoming connections on port 7881...
+172.20.0.6:7881
+Successfully wrote 89 bytes to 172.20.0.12:7881
+Successfully connected to 172.20.0.5:7881
+Successfully connected to 172.20.0.6:7881
+Successfully wrote 89 bytes to 172.20.0.5:7881
+Successfully wrote 89 bytes to 172.20.0.6:7881
+Accepted new connection from 172.20.0.15:39716
+Received Gossip from: 172.20.0.15:39716
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.4:60918
+Received Gossip from: 172.20.0.4:60918
+Waiting for incoming connections on port 7881...
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Accepted new connection from 172.20.0.14:54244
+Received Gossip from: 172.20.0.14:54244
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.11:53356
+Received Gossip from: 172.20.0.11:53356
+Waiting for incoming connections on port 7881...
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Accepted new connection from 172.20.0.14:54250
+Received Gossip from: 172.20.0.14:54250
+Waiting for incoming connections on port 7881...
+There are 0 in the message queue
+Accepted new connection from 172.20.0.12:55536
+Received Gossip from: 172.20.0.12:55536
+Waiting for incoming connections on port 7881...
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are Outgoing Queue Size: 0 in the message queue
+0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are Outgoing Queue Size: 0 in the message queue
+0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: There are 0
+0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: There are 0 in the message queue0
+
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: There are 0
+0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0There are 
+0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are Outgoing Queue Size: 0 in the message queue
+0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0There are 
+0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: There are 00
+ in the message queue
+Outgoing Queue Size: There are 00 in the message queue
+
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: There are 0
+0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: There are 0
+0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: There are 0
+0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: There are 00 in the message queue
+
+Outgoing Queue Size: There are 0 in the message queue
+0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+=== DHT Stats ===
+DHT stats requested
+=================
+Outgoing Queue Size: 0
+Accepted new connection from 172.20.0.11:53372
+Received Gossip from: 172.20.0.11:53372
+Waiting for incoming connections on port 7881...
+----Sending Heartbeat----spreading message
+
+spreading message
+selected random peers
+peer: 172.20.0.5:7881
+peer: 172.20.0.2:7881
+peer: 172.20.0.6:7881
+messages pushed to queue
+Received and forwarded message from 172.20.0.11:53372
+selected random peers
+peer: 172.20.0.5:7881
+peer: 172.20.0.4:7881
+peer: 172.20.0.12:7881
+messages pushed to queue
+===== Current heartbeat status =====
+Node: 172.20.0.5:7881 | Last seen: 4 seconds ago
+Node: 172.20.0.4:7881 | Last seen: 4 seconds ago
+Node: 172.20.0.6:7881 | Last seen: 4 seconds ago
+Node: 172.20.0.3:7881 | Last seen: 4 seconds ago
+Node: 172.20.0.2:7881 | Last seen: 4 seconds ago
+==================================
+[Bootstrap] Requesting DHT stats...
+Accepted new connection from 172.20.0.5:36160
+Received Gossip from: 172.20.0.5:36160
+Waiting for incoming connections on port 7881...
+[Bootstrap] Announcing hash: 9e4124c5eb40c56dc47ccd5aaaa563300592cc80 on port 6881
+Accepted new connection from 172.20.0.6:54538
+Received Gossip from: 172.20.0.6:54538
+Waiting for incoming connections on port 7881...
+spreading message
+selected random peers
+peer: 172.20.0.6:7881
+peer: 172.20.0.14:7881
+peer: 172.20.0.4:7881
+messages pushed to queue
+Received and forwarded message from 172.20.0.5:36160
+There are 0 in the message queue
+Accepted new connection from 172.20.0.6:54542
+Received Gossip from: Received pong from source: 7881:172.20.0.5172.20.0.6:54542
+[Bootstrap] Received heartbeat response from: 172.20.0.5:7881
+Waiting for incoming connections on port 7881...
+received heartbeat from: 172.20.0.5:7881
+Received ping from source: 7881:172.20.0.6making a pong
+spreading message
+selected random peers
+peer: 172.20.0.6:7881
+peer: 172.20.0.12:7881
+peer: 172.20.0.5:7881
+messages pushed to queue
+
+[Bootstrap] DHT nodes in routing table: 9
+[Bootstrap] Routing table details:
+  Bucket 0: 9 nodes
+
+[Bootstrap] DHT nodes in routing table: 9
+[Bootstrap] Routing table details:
+  Bucket 0: 9 nodes
+spreading message
+selected random peers
+peer: 172.20.0.4:7881
+peer: 172.20.0.11:7881
+peer: 172.20.0.14:7881
+messages pushed to queue
+Received and forwarded message from 172.20.0.6:54542
+[Bootstrap] DHT routing table has 9 nodes
+[Bootstrap] DHT node: 172.20.0.6:6881
+[Bootstrap] DHT node: 172.20.0.2:6881
+[Bootstrap] DHT node: 172.20.0.5:6881
+[Bootstrap] DHT node: 172.20.0.4:6881
+[Bootstrap] DHT node: 172.20.0.15:6881
+[Bootstrap] DHT node: 172.20.0.13:6881
+[Bootstrap] DHT node: 172.20.0.11:6881
+[Bootstrap] DHT node: 172.20.0.14:6881
+[Bootstrap] DHT node: 172.20.0.12:6881
+Accepted new connection from 172.20.0.12:55538
+Received Gossip from: 172.20.0.12:55538
+Waiting for incoming connections on port 7881...
+Outgoing Queue Size: 15
+Spreading ping from source: 172.20.0.6:7881
+Connecting to gossip endpoint: 172.20.0.5:7881
+Message sent asynchronously to: 172.20.0.5:7881
+Spreading ping from source: 172.20.0.6:7881
+Connecting to gossip endpoint: 172.20.0.2:7881
+Message sent asynchronously to: 172.20.0.2:7881
+Spreading ping from source: 172.20.0.6:7881
+Connecting to gossip endpoint: 172.20.0.6:7881
+Message sent asynchronously to: 172.20.0.6:7881
+Spreading ping from source: 172.20.0.3:7881
+Connecting to gossip endpoint: 172.20.0.5:7881
+Successfully connected to 172.20.0.5:7881
+Message sent asynchronously to: 172.20.0.5:7881
+Accepted new connection from Spreading ping from source: 172.20.0.3:7881
+Connecting to gossip endpoint: 172.20.0.13172.20.0.4::7881
+60174
+Received Gossip from: 172.20.0.13:60174
+Waiting for incoming connections on port 7881...
+Successfully connected to 172.20.0.2:7881
+Message sent asynchronously to: 172.20.0.4:7881
+Spreading ping from source: 172.20.0.3:7881
+Successfully connected to 172.20.0.6:7881
+Connecting to gossip endpoint: 172.20.0.12:7881
+Successfully wrote 79 bytes to 172.20.0.5:7881
+Accepted new connection from 172.20.0.13:60178
+Received Gossip from: 172.20.0.13:60178
+Message sent asynchronously to: Waiting for incoming connections on port 7881...
+Successfully wrote 79 bytes to 172.20.0.2:7881
+Successfully wrote 79 bytes to 172.20.0.6:7881
+Successfully connected to 172.20.0.5:7881
+Successfully connected to 172.20.0.4:7881
+Successfully wrote 79 bytes to 172.20.0.5:7881
+Successfully wrote 79 bytes to 172.20.0.4:7881
+Successfully connected to 172.20.0.12:7881
+Successfully wrote 79 bytes to 172.20.0.12:7881
+172.20.0.12:7881
+Spreading pong from source: 172.20.0.5:7881
+Connecting to gossip endpoint: 172.20.0.6:7881
+Message sent asynchronously to: 172.20.0.6:7881
+Spreading pong from source: 172.20.0.5:7881
+Connecting to gossip endpoint: 172.20.0.14:7881
+Message sent asynchronously to: 172.20.0.14:7881
+Spreading pong from source: 172.20.0.5:7881
+Connecting to gossip endpoint: 172.20.0.4:7881
+Message sent asynchronously to: 172.20.0.4:7881
+Spreading pong from source: 172.20.0.3:7881
+Connecting to gossip endpoint: 172.20.0.6:7881
+Message sent asynchronously to: 172.20.0.6:7881
+Successfully connected to 172.20.0.6:7881
+Successfully connected to 172.20.0.14:7881
+Successfully connected to 172.20.0.4:7881
+Accepted new connection from 172.20.0.5:36168
+Received Gossip from: 172.20.0.5:36168
+Waiting for incoming connections on port 7881...
+Successfully connected to 172.20.0.6:7881
+Successfully wrote 81 bytes to 172.20.0.6:7881
+Successfully wrote 81 bytes to 172.20.0.14:7881
+Successfully wrote 81 bytes to 172.20.0.4:7881
+Successfully wrote 81 bytes to 172.20.0.6:7881
+spreading message
+selected random peers
+peer: 172.20.0.13:7881
+peer: 172.20.0.11:7881
+peer: 172.20.0.2:7881
+messages pushed to queue
+Received and forwarded message from 172.20.0.5:36168
+Accepted new connection from 172.20.0.13:60192
+Received Gossip from: 172.20.0.13:60192
+Waiting for incoming connections on port 7881...
+There are 0 in the message queue
+Received pong from source: 7881:172.20.0.6[Bootstrap] Received heartbeat response from: 172.20.0.6:7881
+received heartbeat from: 172.20.0.6:7881
+Received ping from source: 7881:172.20.0.3making a pong
+spreading message
+selected random peers
+peer: 172.20.0.15:7881
+peer: 172.20.0.2:7881
+peer: 172.20.0.11:7881
+messages pushed to queue
+Accepted new connection from 172.20.0.2:38006
+Received Gossip from: 172.20.0.2:38006
+Waiting for incoming connections on port 7881...
+spreading message
+selected random peers
+peer: 172.20.0.2:7881
+peer: 172.20.0.14:7881
+peer: 172.20.0.4:7881
+messages pushed to queue
+Received and forwarded message from 172.20.0.2:38006
+Accepted new connection from 172.20.0.2:38016
+Received Gossip from: 172.20.0.2:38016
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.11:53382
+Received Gossip from: 172.20.0.11:53382
+Waiting for incoming connections on port 7881...
+Outgoing Queue Size: 14
+Spreading pong from source: 172.20.0.3:7881
+Connecting to gossip endpoint: 172.20.0.12:7881
+Message sent asynchronously to: 172.20.0.12:7881
+Spreading pong from source: 172.20.0.3:7881
+Connecting to gossip endpoint: 172.20.0.5:7881
+Message sent asynchronously to: 172.20.0.5:7881
+Spreading pong from source: 172.20.0.6:7881
+Connecting to gossip endpoint: 172.20.0.4:7881
+Message sent asynchronously to: 172.20.0.4:7881
+Spreading pong from source: 172.20.0.6:7881
+Connecting to gossip endpoint: 172.20.0.11:7881
+Message sent asynchronously to: 172.20.0.11:7881
+Spreading pong from source: 172.20.0.6:7881
+Connecting to gossip endpoint: 172.20.0.14:7881
+Message sent asynchronously to: 172.20.0.14:7881
+Spreading ping from source: 172.20.0.3:7881
+Connecting to gossip endpoint: 172.20.0.13:7881
+Message sent asynchronously to: 172.20.0.13:7881
+Spreading ping from source: 172.20.0.3:7881
+Connecting to gossip endpoint: 172.20.0.11:7881
+Message sent asynchronously to: 172.20.0.11:7881
+Spreading ping from source: 172.20.0.3:7881
+Connecting to gossip endpoint: 172.20.0.2:7881
+Message sent asynchronously to: 172.20.0.2:7881
+Spreading pong from source: 172.20.0.3:7881
+Connecting to gossip endpoint: 172.20.0.15:7881
+Message sent asynchronously to: 172.20.0.15:7881
+Spreading pong from source: 172.20.0.3:7881
+Connecting to gossip endpoint: 172.20.0.2:7881
+Successfully connected to Message sent asynchronously to: 172.20.0.2:7881
+172.20.0.12:7881
+Accepted new connection from 172.20.0.4:60926
+Received Gossip from: 172.20.0.4:60926
+Waiting for incoming connections on port 7881...
+Successfully connected to 172.20.0.5:7881
+There are 0 in the message queue
+Received pong from source: 7881:172.20.0.2[Bootstrap] Received heartbeat response from: 172.20.0.2:7881
+received heartbeat from: 172.20.0.2:7881
+Successfully connected to 172.20.0.4:7881
+Successfully connected to 172.20.0.11:7881
+Successfully connected to 172.20.0.14:7881
+Successfully connected to 172.20.0.13:7881
+Successfully connected to 172.20.0.11:7881
+Successfully connected to 172.20.0.2:7881
+Successfully connected to 172.20.0.15:7881
+Successfully wrote 81 bytes to 172.20.0.12:7881
+Accepted new connection from 172.20.0.4:60930
+Received Gossip from: 172.20.0.4:60930
+Waiting for incoming connections on port 7881...
+Successfully wrote 81 bytes to 172.20.0.5:7881
+Successfully wrote 81 bytes to 172.20.0.4:7881
+Successfully wrote 81 bytes to 172.20.0.11:7881
+Successfully wrote 81 bytes to 172.20.0.14:7881
+Successfully wrote 79 bytes to 172.20.0.13:7881
+Successfully wrote 79 bytes to 172.20.0.11:7881
+Successfully wrote 79 bytes to 172.20.0.2:7881
+Successfully wrote 81 bytes to 172.20.0.15:7881
+Successfully connected to 172.20.0.2:7881
+Accepted new connection from 172.20.0.4:60946
+Received Gossip from: 172.20.0.4:60946
+Waiting for incoming connections on port 7881...
+Successfully wrote 81 bytes to 172.20.0.2:7881
+spreading message
+selected random peers
+peer: 172.20.0.12:7881
+peer: 172.20.0.11:7881
+peer: 172.20.0.14:7881
+messages pushed to queue
+Received and forwarded message from 172.20.0.4:60930
+Accepted new connection from 172.20.0.5:36182
+Received Gossip from: 172.20.0.5:36182
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.13:60204
+Received Gossip from: 172.20.0.13:60204
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.6:54548
+Received Gossip from: 172.20.0.6:54548
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.14:54254
+Received Gossip from: 172.20.0.14:54254
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.15:39720
+Received Gossip from: 172.20.0.15:39720
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.14:54266
+Received Gossip from: 172.20.0.14:54266
+Waiting for incoming connections on port 7881...
+spreading message
+selected random peers
+peer: 172.20.0.12:7881
+peer: 172.20.0.2:7881
+peer: 172.20.0.5:7881
+messages pushed to queue
+Received and forwarded message from 172.20.0.14:54266
+Accepted new connection from 172.20.0.15:39728
+Received Gossip from: 172.20.0.15:39728
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.12:55540
+Received Gossip from: 172.20.0.12:55540
+Waiting for incoming connections on port 7881...
+There are 0 in the message queue
+Received pong from source: 7881:172.20.0.4[Bootstrap] Received heartbeat response from: 172.20.0.4:7881
+received heartbeat from: 172.20.0.4:7881
+Received pong from source: 7881:172.20.0.3[Bootstrap] Received heartbeat response from: 172.20.0.3:7881
+received heartbeat from: 172.20.0.3:7881
+Outgoing Queue Size: 10
+Spreading pong from source: 172.20.0.3:7881
+Connecting to gossip endpoint: 172.20.0.11:7881
+Message sent asynchronously to: 172.20.0.11:7881
+Spreading pong from source: 172.20.0.2:7881
+Connecting to gossip endpoint: 172.20.0.2:7881
+Message sent asynchronously to: 172.20.0.2:7881
+Spreading pong from source: 172.20.0.2:7881
+Connecting to gossip endpoint: 172.20.0.14:7881
+Successfully connected to 172.20.0.11:7881
+Accepted new connection from 172.20.0.5:36188
+Received Gossip from: Message sent asynchronously to: 172.20.0.5:36188
+172.20.0.14:7881
+Spreading pong from source: 172.20.0.2:7881
+Waiting for incoming connections on port 7881...
+Connecting to gossip endpoint: 172.20.0.4:7881
+Successfully connected to 172.20.0.2:7881
+Message sent asynchronously to: 172.20.0.4:7881
+Spreading pong from source: 172.20.0.4:7881
+Successfully wrote 81 bytes to Connecting to gossip endpoint: 172.20.0.11172.20.0.12:7881
+:Successfully wrote 81 bytes to 172.20.0.2:7881
+Successfully connected to 172.20.0.14:7881
+Successfully connected to 172.20.0.4:7881
+Successfully wrote 81 bytes to 172.20.0.14:7881
+Successfully wrote 81 bytes to 172.20.0.4:7881
+7881
+Message sent asynchronously to: 172.20.0.12:7881
+Spreading pong from source: 172.20.0.4:7881
+Connecting to gossip endpoint: 172.20.0.11:7881
+Message sent asynchronously to: 172.20.0.11:7881
+Spreading pong from source: 172.20.0.4:7881
+Connecting to gossip endpoint: 172.20.0.14:7881
+Message sent asynchronously to: 172.20.0.14:7881
+Spreading pong from source: 172.20.0.3:7881
+Connecting to gossip endpoint: 172.20.0.12:7881
+Message sent asynchronously to: 172.20.0.12:7881
+Spreading pong from source: 172.20.0.3:7881
+Connecting to gossip endpoint: 172.20.0.2:7881
+Message sent asynchronously to: 172.20.0.2:7881
+Spreading pong from source: 172.20.0.3:7881
+Connecting to gossip endpoint: 172.20.0.5:7881
+Message sent asynchronously to: 172.20.0.5:7881
+Successfully connected to 172.20.0.12:7881
+Accepted new connection from 172.20.0.13:60206
+Received Gossip from: 172.20.0.13:60206
+Waiting for incoming connections on port 7881...
+Successfully connected to 172.20.0.11:7881
+Successfully connected to 172.20.0.14:7881
+Successfully connected to 172.20.0.12:7881
+Successfully connected to 172.20.0.2:7881
+Successfully connected to 172.20.0.5:7881
+Successfully wrote 81 bytes to 172.20.0.12:7881
+Accepted new connection from 172.20.0.13:60216
+Received Gossip from: 172.20.0.13:60216
+Waiting for incoming connections on port 7881...
+Successfully wrote 81 bytes to 172.20.0.11:7881
+Successfully wrote 81 bytes to 172.20.0.14:7881
+Successfully wrote 81 bytes to 172.20.0.12:7881
+Successfully wrote 81 bytes to 172.20.0.2:7881
+Successfully wrote 81 bytes to 172.20.0.5:7881
+Accepted new connection from 172.20.0.13:60232
+Received Gossip from: 172.20.0.13:60232
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.6:54550
+Received Gossip from: 172.20.0.6:54550
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.2:38032
+Received Gossip from: 172.20.0.2:38032
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.2:38048
+Received Gossip from: 172.20.0.2:38048
+Waiting for incoming connections on port 7881...
+There are 0 in the message queue
+Accepted new connection from 172.20.0.11:53384
+Received Gossip from: 172.20.0.11:53384
+Waiting for incoming connections on port 7881...
+spreading message
+selected random peers
+peer: 172.20.0.13:7881
+peer: 172.20.0.15:7881
+peer: 172.20.0.12:7881
+messages pushed to queue
+Received and forwarded message from 172.20.0.2:38048
+Outgoing Queue Size: 3
+Spreading ping from source: 172.20.0.2:7881
+Connecting to gossip endpoint: 172.20.0.13:7881
+Message sent asynchronously to: 172.20.0.13:7881
+Spreading ping from source: 172.20.0.2:7881
+Connecting to gossip endpoint: 172.20.0.15:7881
+Message sent asynchronously to: 172.20.0.15:7881
+Spreading ping from source: 172.20.0.2:7881
+Connecting to gossip endpoint: 172.20.0.12:7881
+Message sent asynchronously to: 172.20.0.12:7881
+Successfully connected to 172.20.0.13:7881
+Successfully connected to 172.20.0.15:7881
+Successfully connected to 172.20.0.12:7881
+Successfully wrote 79 bytes to 172.20.0.13:7881
+Successfully wrote 79 bytes to 172.20.0.15:7881
+Successfully wrote 79 bytes to 172.20.0.12:7881
+Accepted new connection from 172.20.0.6:54558
+Received Gossip from: 172.20.0.6:54558
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.12:55554
+Received Gossip from: 172.20.0.12:55554
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.15:39738
+Received Gossip from: 172.20.0.15:39738
+Waiting for incoming connections on port 7881...
+There are 0 in the message queue
+Received ping from source: 7881:172.20.0.2making a pong
+spreading message
+selected random peers
+peer: 172.20.0.4:7881
+peer: 172.20.0.12:7881
+peer: 172.20.0.14:7881
+messages pushed to queue
+Accepted new connection from 172.20.0.11:53398
+Received Gossip from: 172.20.0.11:53398
+Waiting for incoming connections on port 7881...
+Outgoing Queue Size: 3
+Spreading pong from source: 172.20.0.3:7881
+Connecting to gossip endpoint: 172.20.0.4:7881
+Message sent asynchronously to: 172.20.0.4:7881
+Spreading pong from source: 172.20.0.3:7881
+Connecting to gossip endpoint: 172.20.0.12:7881
+Message sent asynchronously to: 172.20.0.12:7881
+Spreading pong from source: 172.20.0.3:7881
+Connecting to gossip endpoint: 172.20.0.14:7881
+Message sent asynchronously to: 172.20.0.14:7881
+Successfully connected to 172.20.0.4:7881
+Successfully connected to 172.20.0.12:7881
+Successfully connected to 172.20.0.14:7881
+Successfully wrote 81 bytes to 172.20.0.4:7881
+Successfully wrote 81 bytes to 172.20.0.12:7881
+Successfully wrote 81 bytes to 172.20.0.14:7881
+Accepted new connection from 172.20.0.5:36192
+Received Gossip from: 172.20.0.5:36192
+Waiting for incoming connections on port 7881...
+spreading message
+selected random peers
+peer: 172.20.0.6:7881
+peer: 172.20.0.14:7881
+peer: 172.20.0.2:7881
+messages pushed to queue
+Received and forwarded message from 172.20.0.5:36192
+Accepted new connection from 172.20.0.13:60242
+Received Gossip from: 172.20.0.13:60242
+Waiting for incoming connections on port 7881...
+spreading message
+selected random peers
+peer: 172.20.0.11:7881
+peer: 172.20.0.4:7881
+peer: 172.20.0.5:7881
+messages pushed to queue
+Received and forwarded message from 172.20.0.13:60242
+Accepted new connection from 172.20.0.12:55558
+Received Gossip from: 172.20.0.12:55558
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.2:38050
+Received Gossip from: 172.20.0.2:38050
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.2:38054
+Received Gossip from: 172.20.0.2:38054
+Waiting for incoming connections on port 7881...
+There are 0 in the message queue
+Received ping from source: 7881:172.20.0.5making a pong
+spreading message
+selected random peers
+peer: 172.20.0.15:7881
+peer: 172.20.0.11:7881
+peer: 172.20.0.14:7881
+messages pushed to queue
+Received ping from source: 7881:172.20.0.4making a pong
+spreading message
+selected random peers
+peer: 172.20.0.4:7881
+peer: 172.20.0.2:7881
+peer: 172.20.0.13:7881
+messages pushed to queue
+Accepted new connection from 172.20.0.11:53414
+Received Gossip from: 172.20.0.11:53414
+Waiting for incoming connections on port 7881...
+Outgoing Queue Size: 12
+Spreading ping from source: 172.20.0.5:7881
+Connecting to gossip endpoint: 172.20.0.6:7881
+Message sent asynchronously to: 172.20.0.6:7881
+Spreading ping from source: 172.20.0.5:7881
+Connecting to gossip endpoint: 172.20.0.14:7881
+Successfully connected to 172.20.0.6:7881
+Message sent asynchronously to: 172.20.0.14:7881
+Spreading ping from source: 172.20.0.5:7881
+Connecting to gossip endpoint: 172.20.0.2:7881
+Successfully wrote 79 bytes to 172.20.0.6:7881
+Successfully connected to 172.20.0.14:7881
+Message sent asynchronously to: 172.20.0.2:7881
+Spreading ping from source: 172.20.0.4:7881
+Connecting to gossip endpoint: 172.20.0.11:7881
+Message sent asynchronously to: Successfully wrote 172.20.0.11:7881
+79 bytes to Spreading ping from source: 172.20.0.4:7881
+172.20.0.14:7881
+Connecting to gossip endpoint: 172.20.0.4:7881
+Successfully connected to 172.20.0.2:7881
+Message sent asynchronously to: 172.20.0.4:7881
+Spreading ping from source: 172.20.0.4:7881
+Connecting to gossip endpoint: 172.20.0.5:7881
+Successfully wrote 79 bytes to 172.20.0.2:7881
+Message sent asynchronously to: 172.20.0.5:7881
+Spreading pong from source: 172.20.0.3:7881
+Connecting to gossip endpoint: 172.20.0.15:7881
+Successfully connected to 172.20.0.11:7881
+Successfully connected to 172.20.0.4:7881
+Message sent asynchronously to: 172.20.0.15:7881
+Spreading pong from source: 172.20.0.3:7881
+Connecting to gossip endpoint: 172.20.0.11:7881
+Successfully wrote 79 bytes to 172.20.0.11:7881
+Successfully wrote 79 bytes to 172.20.0.4:7881
+Message sent asynchronously to: 172.20.0.11:7881
+Spreading pong from source: 172.20.0.3:7881
+Connecting to gossip endpoint: 172.20.0.14:7881
+Successfully connected to 172.20.0.5:7881
+Accepted new connection from 172.20.0.4:60952
+Received Gossip from: 172.20.0.4:60952
+Waiting for incoming connections on port 7881...
+Message sent asynchronously to: 172.20.0.14:7881
+Spreading pong from source: 172.20.0.3:7881
+Successfully connected to 172.20.0.15:7881
+Connecting to gossip endpoint: 172.20.0.4:7881
+Successfully wrote 79 bytes to 172.20.0.5:7881
+Successfully wrote 81 bytes to 172.20.0.15:7881
+Message sent asynchronously to: 172.20.0.4:7881
+Successfully connected to 172.20.0.11:7881
+Successfully connected to 172.20.0.14:7881
+Successfully wrote 81 bytes to 172.20.0.11:7881
+Successfully wrote 81 bytes to 172.20.0.14:7881
+Successfully connected to 172.20.0.4:7881
+Accepted new connection from 172.20.0.5:36206
+Received Gossip from: 172.20.0.5:36206
+Waiting for incoming connections on port 7881...
+Successfully wrote 81 bytes to 172.20.0.4:7881
+Accepted new connection from 172.20.0.6:54564
+Received Gossip from: 172.20.0.6:54564
+Waiting for incoming connections on port 7881...
+There are 0 in the message queue
+Accepted new connection from 172.20.0.11:53416
+Received Gossip from: 172.20.0.11:53416
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.2:38070
+Received Gossip from: 172.20.0.2:38070
+Waiting for incoming connections on port 7881...
+Outgoing Queue Size: 2
+Spreading pong from source: 172.20.0.3:7881
+Connecting to gossip endpoint: 172.20.0.2:7881
+Message sent asynchronously to: 172.20.0.2:7881
+Spreading pong from source: 172.20.0.3:7881
+Successfully connected to 172.20.0.2:7881
+Connecting to gossip endpoint: 172.20.0.13:7881
+Successfully wrote 81 bytes to 172.20.0.2:7881
+Message sent asynchronously to: 172.20.0.13:7881
+Successfully connected to 172.20.0.13:7881
+Successfully wrote 81 bytes to 172.20.0.13:7881
+Accepted new connection from 172.20.0.4:60956
+Received Gossip from: 172.20.0.4:60956
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.4:60962
+Received Gossip from: 172.20.0.4:60962
+Waiting for incoming connections on port 7881...
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Accepted new connection from 172.20.0.6:54566
+Received Gossip from: 172.20.0.6:54566
+Waiting for incoming connections on port 7881...
+There are 0 in the message queue
+spreading message
+selected random peers
+peer: 172.20.0.11:7881
+peer: 172.20.0.13:7881
+peer: 172.20.0.15:7881
+messages pushed to queue
+Received and forwarded message from 172.20.0.6:54566
+Accepted new connection from 172.20.0.14:54272
+Received Gossip from: 172.20.0.14:54272
+Waiting for incoming connections on port 7881...
+Outgoing Queue Size: 3
+Connecting to gossip endpoint: 172.20.0.11:7881
+Message sent asynchronously to: 172.20.0.11:7881
+Connecting to gossip endpoint: 172.20.0.13:7881
+Message sent asynchronously to: 172.20.0.13:7881
+Connecting to gossip endpoint: 172.20.0.15:7881
+Successfully connected to 172.20.0.11:7881
+Message sent asynchronously to: Successfully connected to 172.20.0.13:172.20.0.15:78817881
+
+Accepted new connection from 172.20.0.11:53432
+Received Gossip from: 172.20.0.11:53432
+Waiting for incoming connections on port 7881...
+Successfully wrote 67 bytes to 172.20.0.11:7881
+Successfully wrote 67 bytes to 172.20.0.13:7881
+Accepted new connection from 172.20.0.15:39754
+Received Gossip from: 172.20.0.15:39754
+Waiting for incoming connections on port 7881...
+Successfully connected to 172.20.0.15:7881
+Accepted new connection from 172.20.0.11:53436
+Received Gossip from: 172.20.0.11:53436
+Waiting for incoming connections on port 7881...
+Successfully wrote 67 bytes to 172.20.0.15:7881
+spreading message
+selected random peers
+peer: 172.20.0.14:7881
+peer: 172.20.0.5:7881
+peer: 172.20.0.15:7881
+messages pushed to queue
+Received and forwarded message from 172.20.0.11:53436
+spreading message
+selected random peers
+peer: 172.20.0.6:7881
+peer: 172.20.0.11:7881
+peer: 172.20.0.13:7881
+messages pushed to queue
+Received and forwarded message from 172.20.0.15:39754
+Accepted new connection from 172.20.0.13:There are 0 in the message queue
+60258
+Received Gossip from: 172.20.0.13:60258
+Waiting for incoming connections on port 7881...
+Outgoing Queue Size: 6
+Connecting to gossip endpoint: 172.20.0.14:7881
+Message sent asynchronously to: 172.20.0.14:7881
+Successfully connected to 172.20.0.14:7881Connecting to gossip endpoint: 
+Successfully wrote 89 bytes to 172.20.0.14:7881
+172.20.0.5:7881
+Message sent asynchronously to: 172.20.0.5:7881
+Connecting to gossip endpoint: 172.20.0.15:7881
+Successfully connected to 172.20.0.5:7881
+Accepted new connection from 172.20.0.5:36208
+Received Gossip from: 172.20.0.5:36208
+Waiting for incoming connections on port 7881...
+Successfully wrote 89 bytes to 172.20.0.5:7881
+There are 0 in the message queue
+Message sent asynchronously to: 172.20.0.15:7881
+Connecting to gossip endpoint: 172.20.0.6:7881
+Accepted new connection from 172.20.0.13:60268
+Received Gossip from: 172.20.0.13:60268
+Waiting for incoming connections on port 7881...
+Successfully connected to 172.20.0.15:7881
+Successfully wrote 89 bytes to 172.20.0.15:7881
+Message sent asynchronously to: 172.20.0.6:7881
+Connecting to gossip endpoint: 172.20.0.11:7881
+Successfully connected to 172.20.0.6:7881
+Message sent asynchronously to: Successfully wrote 89172.20.0.11:7881 bytes to 
+172.20.0.6:7881
+Connecting to gossip endpoint: 172.20.0.13:7881
+Successfully connected to 172.20.0.11:7881
+spreading message
+Message sent asynchronously to: 172.20.0.13:7881
+selected random peers
+peer: 172.20.0.6:7881
+peer: 172.20.0.4:7881
+peer: 172.20.0.15:7881
+messages pushed to queue
+Received and forwarded message from 172.20.0.13:60268
+Successfully wrote 89 bytes to 172.20.0.11:7881
+Successfully connected to 172.20.0.13:7881
+Successfully wrote 89 bytes to 172.20.0.13:7881
+Accepted new connection from 172.20.0.14:54282
+Received Gossip from: 172.20.0.14:54282
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.15:39768
+Received Gossip from: 172.20.0.15:39768
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.12:55572
+Received Gossip from: 172.20.0.12:55572
+Waiting for incoming connections on port 7881...
+spreading message
+selected random peers
+peer: 172.20.0.13:7881
+peer: 172.20.0.15:7881
+peer: 172.20.0.12:7881
+messages pushed to queue
+Received and forwarded message from 172.20.0.12:55572
+Accepted new connection from 172.20.0.15:39778
+Received Gossip from: 172.20.0.15:39778
+Waiting for incoming connections on port 7881...
+There are 0 in the message queue
+spreading message
+selected random peers
+peer: 172.20.0.5:7881
+peer: 172.20.0.12:7881
+peer: 172.20.0.11:7881
+messages pushed to queue
+Received and forwarded message from 172.20.0.15:39778
+Accepted new connection from 172.20.0.13:60270
+Received Gossip from: 172.20.0.13:60270
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.13:60286
+Received Gossip from: 172.20.0.13:60286
+Waiting for incoming connections on port 7881...
+Outgoing Queue Size: 9
+Connecting to gossip endpoint: 172.20.0.6:7881
+Message sent asynchronously to: 172.20.0.6:7881
+Connecting to gossip endpoint: 172.20.0.4:7881
+Message sent asynchronously to: 172.20.0.4:7881
+Connecting to gossip endpoint: 172.20.0.15:7881
+Message sent asynchronously to: 172.20.0.15:7881
+Connecting to gossip endpoint: 172.20.0.13:7881
+Message sent asynchronously to: 172.20.0.13:7881
+Connecting to gossip endpoint: Accepted new connection from 172.20.0.15:7881
+172.20.0.4:60970
+Received Gossip from: 172.20.0.4:60970
+Waiting for incoming connections on port 7881...
+Successfully connected to 172.20.0.6:7881
+Message sent asynchronously to: 172.20.0.15:7881
+Connecting to gossip endpoint: 172.20.0.12:7881
+Successfully connected to 172.20.0.4:7881
+Successfully connected to 172.20.0.15:7881
+Accepted new connection from Message sent asynchronously to: 172.20.0.2:38072
+172.20.0.12:7881
+Connecting to gossip endpoint: 172.20.0.5:7881
+Received Gossip from: 172.20.0.2:38072
+Waiting for incoming connections on port 7881...
+Message sent asynchronously to: 172.20.0.5:7881
+Connecting to gossip endpoint: 172.20.0.12:7881
+Successfully wrote 89 bytes to 172.20.0.6:7881
+Successfully wrote 89 bytes to 172.20.0.4:7881
+Successfully wrote 89 bytes to 172.20.0.15:7881
+Successfully connected to 172.20.0.13:7881
+Successfully connected to 172.20.0.15:7881
+Successfully wrote 89 bytes to 172.20.0.13:7881
+Successfully wrote 89 bytes to 172.20.0.15:7881
+Successfully connected to 172.20.0.12:7881
+Successfully connected to 172.20.0.5:7881
+Successfully wrote 89 bytes to 172.20.0.12:7881
+Successfully wrote 89 bytes to 172.20.0.5:7881
+Message sent asynchronously to: 172.20.0.12:7881
+Connecting to gossip endpoint: 172.20.0.11:7881
+Message sent asynchronously to: 172.20.0.11:7881
+Successfully connected to 172.20.0.12:7881
+Successfully connected to 172.20.0.11:7881
+Successfully wrote 89 bytes to 172.20.0.12:7881
+Successfully wrote 89 bytes to 172.20.0.11:7881
+Accepted new connection from 172.20.0.14:54292
+Received Gossip from: 172.20.0.14:54292
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.14:54294
+Received Gossip from: 172.20.0.14:54294
+Waiting for incoming connections on port 7881...
+There are 0 in the message queue
+Accepted new connection from 172.20.0.15:39792
+Received Gossip from: 172.20.0.15:39792
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.2:38078
+Received Gossip from: 172.20.0.2:38078
+Waiting for incoming connections on port 7881...
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Accepted new connection from 172.20.0.11:53450
+Received Gossip from: 172.20.0.11:53450
+Waiting for incoming connections on port 7881...
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: There are 00
+ in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: There are 0
+0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: There are 00
+ in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are Outgoing Queue Size: 00
+ in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queueOutgoing Queue Size: 
+0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+----Sending Heartbeat----
+spreading message
+selected random peers
+peer: 172.20.0.4:7881
+peer: 172.20.0.14:7881
+peer: 172.20.0.15:7881
+messages pushed to queue
+===== Current heartbeat status =====
+Node: 172.20.0.5:7881 | Last seen: 4 seconds ago
+Node: 172.20.0.4:7881 | Last seen: 4 seconds ago
+Node: 172.20.0.6:7881 | Last seen: 4 seconds ago
+Node: 172.20.0.3:7881 | Last seen: 4 seconds ago
+Node: 172.20.0.2:7881 | Last seen: 4 seconds ago
+==================================
+[Bootstrap] Requesting DHT stats...
+[Bootstrap] Announcing hash: 81442a8d32a7a32e58b8460cd86652bced2f8aff on port 6881
+[Bootstrap] DHT routing table has 9 nodes
+[Bootstrap] DHT node: 172.20.0.6:6881
+[Bootstrap] DHT node: 172.20.0.2:6881
+[Bootstrap] DHT node: 172.20.0.5:6881
+[Bootstrap] DHT node: 172.20.0.4:6881
+[Bootstrap] DHT node: 172.20.0.15:6881
+[Bootstrap] DHT node: 172.20.0.13:6881
+[Bootstrap] DHT node: 172.20.0.11:6881
+[Bootstrap] DHT node: 172.20.0.14:6881
+[Bootstrap] DHT node: 172.20.0.12:6881
+Outgoing Queue Size: 3
+Spreading ping from source: 172.20.0.3:7881
+Connecting to gossip endpoint: 172.20.0.4:7881
+Message sent asynchronously to: 172.20.0.4:7881
+Spreading ping from source: 172.20.0.3:7881
+Connecting to gossip endpoint: 172.20.0.14:7881
+There are 0 in the message queue
+Message sent asynchronously to: 172.20.0.14:7881
+Spreading ping from source: 172.20.0.3:7881
+Connecting to gossip endpoint: 172.20.0.15:7881
+Successfully connected to 172.20.0.4:7881
+Message sent asynchronously to: 172.20.0.15:7881
+Successfully wrote 79 bytes to 172.20.0.4:7881
+Successfully connected to 172.20.0.14:7881
+Successfully connected to 172.20.0.15:7881
+Successfully wrote 79 bytes to 172.20.0.14:7881
+Successfully wrote 79 bytes to 172.20.0.15:7881
+Accepted new connection from 172.20.0.11:37622
+Received Gossip from: 172.20.0.11:37622
+Waiting for incoming connections on port 7881...
+spreading message
+selected random peers
+peer: 172.20.0.5:7881
+peer: 172.20.0.12:7881
+peer: 172.20.0.14:7881
+messages pushed to queue
+Received and forwarded message from 172.20.0.11:37622
+Outgoing Queue Size: 3
+Spreading ping from source: 172.20.0.6:7881
+Connecting to gossip endpoint: 172.20.0.5:7881
+Message sent asynchronously to: 172.20.0.5:7881
+Spreading ping from source: 172.20.0.6:7881
+Connecting to gossip endpoint: 172.20.0.12:7881
+Successfully connected to 172.20.0.5:7881
+Message sent asynchronously to: 172.20.0.12:7881
+Spreading ping from source: 172.20.0.6:7881
+Successfully connected to 172.20.0.12:7881
+Connecting to gossip endpoint: 172.20.0.14:7881
+Successfully wrote 79 bytes to 172.20.0.5:7881
+Successfully wrote 79 bytes to 172.20.0.12:7881
+Message sent asynchronously to: 172.20.0.14:7881
+There are 0 in the message queue
+Received ping from source: 7881:172.20.0.6making a pong
+spreading message
+selected random peers
+peer: 172.20.0.14:7881
+peer: 172.20.0.11:7881
+peer: 172.20.0.6:7881
+messages pushed to queue
+Successfully connected to 172.20.0.14:7881
+Accepted new connection from 172.20.0.12:46642
+Received Gossip from: 172.20.0.12:46642
+Waiting for incoming connections on port 7881...
+Successfully wrote 79 bytes to 172.20.0.14:7881
+Accepted new connection from 172.20.0.2:51792
+Received Gossip from: 172.20.0.2:51792
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.15:58062
+Received Gossip from: 172.20.0.15:58062
+Waiting for incoming connections on port 7881...
+spreading message
+selected random peers
+peer: 172.20.0.11:7881
+peer: 172.20.0.5:7881
+peer: 172.20.0.14:7881
+messages pushed to queue
+Received and forwarded message from 172.20.0.15:58062
+Accepted new connection from 172.20.0.2:51798
+Received Gossip from: 172.20.0.2:51798
+Waiting for incoming connections on port 7881...
+Outgoing Queue Size: 6
+Spreading pong from source: 172.20.0.3:7881
+Connecting to gossip endpoint: 172.20.0.14:7881
+There are 0 in the message queue
+Received ping from source: 7881:172.20.0.3making a pong
+spreading message
+selected random peers
+Message sent asynchronously to: 172.20.0.14:7881
+Spreading pong from source: 172.20.0.3:7881
+Connecting to gossip endpoint: 172.20.0.11:7881
+Message sent asynchronously to: 172.20.0.11:7881
+Spreading pong from source: 172.20.0.3:7881
+Connecting to gossip endpoint: 172.20.0.6:7881
+Message sent asynchronously to: 172.20.0.6:7881
+Spreading ping from source: 172.20.0.3:7881
+Connecting to gossip endpoint: 172.20.0.11:7881
+Message sent asynchronously to: 172.20.0.11:7881
+Spreading ping from source: 172.20.0.3:7881
+Connecting to gossip endpoint: 172.20.0.5:7881
+Message sent asynchronously to: 172.20.0.5:7881
+Spreading ping from source: 172.20.0.3:7881
+Connecting to gossip endpoint: 172.20.0.14:7881
+Successfully connected to 172.20.0.14:7881
+Successfully connected to 172.20.0.11:7881
+Successfully connected to 172.20.0.6:7881
+Successfully connected to 172.20.0.11:7881
+Successfully connected to 172.20.0.5:7881
+Successfully wrote 81 bytes to 172.20.0.14:7881
+Successfully wrote 81 bytes to 172.20.0.11:7881
+Successfully wrote 81 bytes to 172.20.0.6:7881
+Successfully wrote 79 bytes to 172.20.0.11:7881
+Successfully wrote 79 bytes to 172.20.0.5:7881
+Message sent asynchronously to: 172.20.0.14:7881
+peer: 172.20.0.12:7881
+peer: 172.20.0.4:7881
+peer: 172.20.0.6:7881
+messages pushed to queue
+Accepted new connection from 172.20.0.13:42642
+Received Gossip from: 172.20.0.13:42642
+Waiting for incoming connections on port 7881...
+Successfully connected to 172.20.0.14:7881
+Successfully wrote 79 bytes to 172.20.0.14:7881
+Accepted new connection from 172.20.0.12:46650
+Received Gossip from: 172.20.0.12:46650
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.15:58066
+Received Gossip from: 172.20.0.15:58066
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.14:36698
+Received Gossip from: 172.20.0.14:36698
+Waiting for incoming connections on port 7881...
+spreading message
+selected random peers
+peer: 172.20.0.14:7881
+peer: 172.20.0.6:7881
+peer: 172.20.0.5:7881
+messages pushed to queue
+Received and forwarded message from 172.20.0.13:42642
+Accepted new connection from 172.20.0.11:37624
+Received Gossip from: 172.20.0.11:37624
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.13:42646
+Received Gossip from: 172.20.0.13:42646
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.14:36710
+Received Gossip from: 172.20.0.14:36710
+Waiting for incoming connections on port 7881...
+spreading message
+selected random peers
+peer: 172.20.0.15:7881
+peer: 172.20.0.14:7881
+peer: 172.20.0.4:7881
+messages pushed to queue
+Received and forwarded message from 172.20.0.11:37624
+Accepted new connection from 172.20.0.6:51950
+Received Gossip from: 172.20.0.6:51950
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.2:51804
+Received Gossip from: 172.20.0.2:51804
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.6:51960
+Received Gossip from: 172.20.0.6:51960
+Waiting for incoming connections on port 7881...
+spreading message
+selected random peers
+peer: 172.20.0.4:7881
+peer: 172.20.0.15:7881
+peer: 172.20.0.6:7881
+messages pushed to queue
+Received and forwarded message from 172.20.0.2:51804
+There are 0 in the message queue
+Received pong from source: 7881:172.20.0.5[Bootstrap] Received heartbeat response from: 172.20.0.5:7881
+received heartbeat from: 172.20.0.5:7881
+Received pong from source: 7881:172.20.0.2[Bootstrap] Received heartbeat response from: 172.20.0.2:7881
+received heartbeat from: Outgoing Queue Size: 172.20.0.2:7881
+12
+Received pong from source: 7881:172.20.0.3[Bootstrap] Received heartbeat response from: 172.20.0.3:7881
+received heartbeat from: 172.20.0.3:7881
+Spreading pong from source: 172.20.0.3:7881
+Connecting to gossip endpoint: 172.20.0.12:7881
+Message sent asynchronously to: 172.20.0.12:7881
+Spreading pong from source: 172.20.0.3:7881
+Connecting to gossip endpoint: 172.20.0.4:7881
+Message sent asynchronously to: 172.20.0.4:7881
+Spreading pong from source: 172.20.0.3:7881
+Connecting to gossip endpoint: 172.20.0.6:7881
+Message sent asynchronously to: 172.20.0.6:7881
+Spreading pong from source: 172.20.0.2:7881
+Connecting to gossip endpoint: 172.20.0.14:7881
+Message sent asynchronously to: 172.20.0.14:7881
+Spreading pong from source: 172.20.0.2:7881
+Connecting to gossip endpoint: 172.20.0.6:7881
+Message sent asynchronously to: 172.20.0.6:7881
+Spreading pong from source: 172.20.0.2:7881
+Connecting to gossip endpoint: 172.20.0.5:7881
+Message sent asynchronously to: 172.20.0.5:7881
+Spreading pong from source: 172.20.0.3:7881
+Connecting to gossip endpoint: 172.20.0.15:7881
+Message sent asynchronously to: 172.20.0.15:7881
+Spreading pong from source: 172.20.0.3:7881
+Connecting to gossip endpoint: 172.20.0.14:7881
+Successfully connected to 172.20.0.12:7881
+Message sent asynchronously to: 172.20.0.14:7881
+Spreading pong from source: 172.20.0.3:7881
+Connecting to gossip endpoint: 172.20.0.4:7881
+Successfully connected to 172.20.0.4:7881
+Successfully connected to 172.20.0.6:7881
+Message sent asynchronously to: 172.20.0.4:7881
+Spreading pong from source: 172.20.0.5:7881
+Connecting to gossip endpoint: 172.20.0.4:7881
+Successfully connected to 172.20.0.14:7881
+Successfully connected to 172.20.0.6:7881
+Successfully connected to Message sent asynchronously to: 172.20.0.5:7881
+172.20.0.4:7881
+Successfully connected to 172.20.0.15:7881
+Successfully wrote 81 bytes to 172.20.0.12:7881
+Successfully wrote 81 bytes to 172.20.0.4:7881
+Successfully wrote 81 bytes to 172.20.0.6:7881
+Successfully wrote 81 bytes to 172.20.0.14:7881
+Successfully wrote 81 bytes to 172.20.0.6:7881
+Successfully wrote 81 bytes to 172.20.0.5:7881
+Successfully wrote 81 bytes to 172.20.0.15:7881
+Successfully connected to 172.20.0.14:7881
+Successfully connected to 172.20.0.4:7881
+Successfully connected to 172.20.0.4:7881
+Successfully wrote 81 bytes to 172.20.0.14:7881
+Successfully wrote 81 bytes to 172.20.0.4:7881
+Successfully wrote 81 bytes to 172.20.0.4:7881
+Accepted new connection from 172.20.0.4:33608
+Received Gossip from: 172.20.0.4:33608
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.15:58076
+Received Gossip from: 172.20.0.15:58076
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.11:37634
+Received Gossip from: 172.20.0.11:37634
+Waiting for incoming connections on port 7881...
+spreading message
+selected random peers
+peer: 172.20.0.5:7881
+peer: 172.20.0.2:7881
+peer: 172.20.0.4:7881
+messages pushed to queue
+Received and forwarded message from 172.20.0.15:58076
+Accepted new connection from 172.20.0.13:42652
+Received Gossip from: 172.20.0.13:42652
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.12:46652
+Received Gossip from: 172.20.0.12:46652
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.12:46662
+Received Gossip from: 172.20.0.12:46662
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.15:58082
+Received Gossip from: 172.20.0.15:58082
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.6:51976
+Received Gossip from: 172.20.0.6:51976
+Waiting for incoming connections on port 7881...
+Outgoing Queue Size: 5
+Spreading pong from source: 172.20.0.5:7881
+Connecting to gossip endpoint: 172.20.0.15:7881
+There are 0 in the message queue
+Received pong from source: 7881:172.20.0.4[Bootstrap] Received heartbeat response from: 172.20.0.4:7881
+received heartbeat from: 172.20.0.4:7881
+Message sent asynchronously to: 172.20.0.15:7881
+Spreading pong from source: 172.20.0.5:7881
+Connecting to gossip endpoint: 172.20.0.6:7881
+Message sent asynchronously to: 172.20.0.6:7881
+Spreading pong from source: 172.20.0.4:7881
+Connecting to gossip endpoint: 172.20.0.5:7881
+Message sent asynchronously to: 172.20.0.5:7881
+Spreading pong from source: 172.20.0.4:7881
+Connecting to gossip endpoint: 172.20.0.2:7881
+Message sent asynchronously to: 172.20.0.2:7881
+Spreading pong from source: 172.20.0.4:7881
+Connecting to gossip endpoint: 172.20.0.4:7881
+Message sent asynchronously to: 172.20.0.4:7881
+Successfully connected to 172.20.0.15:7881
+Successfully connected to 172.20.0.6:7881
+Successfully connected to 172.20.0.5:7881
+Successfully connected to 172.20.0.2:7881
+Accepted new connection from 172.20.0.5:51058
+Received Gossip from: 172.20.0.5:51058
+Waiting for incoming connections on port 7881...
+Successfully connected to 172.20.0.4:7881
+Successfully wrote 81 bytes to 172.20.0.15:7881
+Successfully wrote 81 bytes to 172.20.0.6:7881
+Successfully wrote 81 bytes to 172.20.0.5:7881
+Successfully wrote 81 bytes to 172.20.0.2:7881
+Successfully wrote 81 bytes to 172.20.0.4:7881
+Accepted new connection from 172.20.0.11:37642
+Received Gossip from: 172.20.0.11:37642
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.11:37648
+Received Gossip from: 172.20.0.11:37648
+Waiting for incoming connections on port 7881...
+spreading message
+selected random peers
+peer: 172.20.0.6:7881
+peer: 172.20.0.12:7881
+peer: 172.20.0.2:7881
+messages pushed to queue
+Received and forwarded message from 172.20.0.11:37642
+spreading message
+selected random peers
+peer: 172.20.0.12:7881
+peer: 172.20.0.5:7881
+peer: 172.20.0.13:7881
+messages pushed to queue
+Received and forwarded message from 172.20.0.11:37648
+Accepted new connection from 172.20.0.13:42666
+Received Gossip from: 172.20.0.13:42666
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.13:42680
+Received Gossip from: 172.20.0.13:42680
+Waiting for incoming connections on port 7881...
+spreading message
+selected random peers
+peer: 172.20.0.4:7881
+peer: 172.20.0.12:7881
+peer: 172.20.0.15:7881
+messages pushed to queue
+Received and forwarded message from 172.20.0.13:42666
+Accepted new connection from 172.20.0.15:58098
+Received Gossip from: 172.20.0.15:58098
+Waiting for incoming connections on port 7881...
+There are 0 in the message queue
+Outgoing Queue Size: 9
+Received pong from source: 7881:172.20.0.6[Bootstrap] Received heartbeat response from: 172.20.0.6:7881
+received heartbeat from: 172.20.0.6:7881
+Received ping from source: 7881:172.20.0.2making a pong
+spreading message
+Spreading ping from source: 172.20.0.2:7881
+Connecting to gossip endpoint: 172.20.0.6:7881
+selected random peers
+Message sent asynchronously to: 172.20.0.6:7881
+Spreading ping from source: 172.20.0.2:7881
+Connecting to gossip endpoint: 172.20.0.12:7881
+Successfully connected to 172.20.0.6:7881
+Message sent asynchronously to: 172.20.0.12:7881
+Spreading ping from source: 172.20.0.2:7881
+Connecting to gossip endpoint: 172.20.0.2:7881
+Accepted new connection from 172.20.0.5:51074
+Received Gossip from: 172.20.0.5:51074
+Waiting for incoming connections on port 7881...
+Successfully wrote 79 bytes to 172.20.0.6:7881
+Successfully connected to 172.20.0.12:7881
+Message sent asynchronously to: 172.20.0.2:7881
+Spreading ping from source: 172.20.0.5:7881
+Connecting to gossip endpoint: 172.20.0.12:7881
+Successfully wrote 79 bytes to 172.20.0.12:7881
+Message sent asynchronously to: Successfully connected to 172.20.0.12:7881172.20.0.2
+Spreading ping from source: 172.20.0.5:7881
+Connecting to gossip endpoint: 172.20.0.5:7881
+:7881
+Successfully wrote 79 bytes to 172.20.0.2:7881
+Successfully connected to 172.20.0.12:7881
+Successfully wrote 79 bytes to 172.20.0.12:7881
+Accepted new connection from 172.20.0.5:51080
+Received Gossip from: 172.20.0.5:51080
+Waiting for incoming connections on port 7881...
+Message sent asynchronously to: 172.20.0.5:7881
+Spreading ping from source: 172.20.0.5:7881
+Successfully connected to 172.20.0.5:7881
+Connecting to gossip endpoint: 172.20.0.13:7881
+Successfully wrote 79 bytes to 172.20.0.5:7881
+Message sent asynchronously to: 172.20.0.13:7881
+Spreading pong from source: 172.20.0.6:7881
+Successfully connected to 172.20.0.13:7881
+Connecting to gossip endpoint: 172.20.0.4:7881
+Successfully wrote 79 bytes to 172.20.0.13:7881
+Message sent asynchronously to: 172.20.0.4:7881
+Spreading pong from source: 172.20.0.6:7881
+Connecting to gossip endpoint: 172.20.0.12:7881
+Successfully connected to 172.20.0.4:7881
+Successfully wrote 81 bytes to 172.20.0.4:7881
+Message sent asynchronously to: 172.20.0.12:7881
+Spreading pong from source: 172.20.0.6:7881
+Connecting to gossip endpoint: 172.20.0.15:7881
+Successfully connected to 172.20.0.12:7881
+Successfully wrote 81 bytes to 172.20.0.12:7881
+Message sent asynchronously to: Successfully connected to 172.20.0.15:7881
+172.20.0.15:7881
+peer: Successfully wrote 81 bytes to 172.20.0.15:7881
+172.20.0.13:7881
+peer: 172.20.0.2:7881
+peer: 172.20.0.4:7881
+messages pushed to queue
+Received ping from source: 7881:172.20.0.5making a pong
+spreading message
+selected random peers
+peer: 172.20.0.14:7881
+peer: 172.20.0.4:7881
+peer: 172.20.0.15:7881
+messages pushed to queue
+Accepted new connection from 172.20.0.14:36720
+Received Gossip from: 172.20.0.14:36720
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.12:46672
+Received Gossip from: 172.20.0.12:46672
+Waiting for incoming connections on port 7881...
+
+[Bootstrap] DHT nodes in routing table: 9
+[Bootstrap] Routing table details:
+  Bucket 0: 9 nodes
+Accepted new connection from 172.20.0.15:58104
+Received Gossip from: 172.20.0.15:58104
+Waiting for incoming connections on port 7881...
+Outgoing Queue Size: 6
+Spreading pong from source: 172.20.0.3:7881
+Connecting to gossip endpoint: 172.20.0.13:7881
+Message sent asynchronously to: 172.20.0.13:7881
+Spreading pong from source: 172.20.0.3:7881
+Connecting to gossip endpoint: 172.20.0.2:7881
+Message sent asynchronously to: 172.20.0.2:7881
+Spreading pong from source: 172.20.0.3:7881
+Connecting to gossip endpoint: 172.20.0.4:7881
+Message sent asynchronously to: 172.20.0.4:7881
+Spreading pong from source: 172.20.0.3:7881
+Connecting to gossip endpoint: 172.20.0.14:7881
+Message sent asynchronously to: 172.20.0.14:7881
+Spreading pong from source: 172.20.0.3:7881
+Connecting to gossip endpoint: 172.20.0.4:7881
+Message sent asynchronously to: 172.20.0.4:7881
+Spreading pong from source: 172.20.0.3:7881
+Connecting to gossip endpoint: 172.20.0.15:7881
+Message sent asynchronously to: 172.20.0.15:7881
+There are 0 in the message queue
+Successfully connected to 172.20.0.13:7881
+Successfully connected to 172.20.0.2:7881
+Successfully connected to 172.20.0.4:7881
+Successfully connected to 172.20.0.14:7881
+Successfully connected to 172.20.0.4:7881
+Successfully connected to 172.20.0.15:7881
+Successfully wrote 81 bytes to 172.20.0.13:7881
+Successfully wrote 81 bytes to 172.20.0.2:7881
+Successfully wrote 81 bytes to 172.20.0.4:7881
+Successfully wrote 81 bytes to 172.20.0.14:7881
+Successfully wrote 81 bytes to 172.20.0.4:7881
+Successfully wrote 81 bytes to 172.20.0.15:7881
+Accepted new connection from 172.20.0.14:36730
+Received Gossip from: 172.20.0.14:36730
+Waiting for incoming connections on port 7881...
+spreading message
+selected random peers
+peer: 172.20.0.14:7881
+peer: 172.20.0.6:7881
+peer: 172.20.0.15:7881
+messages pushed to queue
+Received and forwarded message from 172.20.0.14:36730
+Accepted new connection from 172.20.0.15:58116
+Received Gossip from: 172.20.0.15:58116
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.2:51814
+Received Gossip from: 172.20.0.2:51814
+Waiting for incoming connections on port 7881...
+Outgoing Queue Size: 3
+There are 0 in the message queue
+Received ping from source: 7881:172.20.0.4making a pong
+Spreading ping from source: 172.20.0.4:7881
+spreading message
+Connecting to gossip endpoint: 172.20.0.14:7881
+selected random peers
+Message sent asynchronously to: 172.20.0.14:7881
+Successfully connected to 172.20.0.14:7881
+Successfully wrote 79 bytes to 172.20.0.14:7881
+Spreading ping from source: 172.20.0.4:7881
+Connecting to gossip endpoint: 172.20.0.6:7881
+Message sent asynchronously to: 172.20.0.6:7881
+Spreading ping from source: 172.20.0.4:7881
+Connecting to gossip endpoint: 172.20.0.15:7881
+Message sent asynchronously to: 172.20.0.15:7881
+Accepted new connection from 172.20.0.5:51092
+Received Gossip from: 172.20.0.5:51092
+peer: Waiting for incoming connections on port 7881...
+172.20.0.11:7881
+Successfully connected to peer: 172.20.0.6:7881
+172.20.0.4:7881
+peer: 172.20.0.14:7881
+messages pushed to queue
+Successfully connected to 172.20.0.15:7881
+Accepted new connection from 172.20.0.5:51094
+Received Gossip from: 172.20.0.5:51094
+Waiting for incoming connections on port 7881...
+Successfully wrote 79 bytes to 172.20.0.6:7881
+Successfully wrote 79 bytes to 172.20.0.15:7881
+Accepted new connection from 172.20.0.4:33616
+Received Gossip from: 172.20.0.4:33616
+Waiting for incoming connections on port 7881...
+Outgoing Queue Size: 3
+Spreading pong from source: 172.20.0.3:7881
+There are 0 in the message queue
+Connecting to gossip endpoint: 172.20.0.11:7881
+Message sent asynchronously to: 172.20.0.11:7881
+Spreading pong from source: 172.20.0.3:7881
+Connecting to gossip endpoint: 172.20.0.4:7881
+Successfully connected to 172.20.0.11:7881
+Successfully wrote 81 bytes to 172.20.0.11:7881
+Message sent asynchronously to: 172.20.0.4:7881
+Spreading pong from source: 172.20.0.3:7881
+Connecting to gossip endpoint: 172.20.0.14:7881
+Successfully connected to 172.20.0.4:7881
+Successfully wrote 81 bytes to 172.20.0.4:7881
+Message sent asynchronously to: 172.20.0.14:7881
+Successfully connected to 172.20.0.14:7881
+Successfully wrote 81 bytes to 172.20.0.14:7881
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are Outgoing Queue Size: 0 in the message queue0
+
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Accepted new connection from 172.20.0.2:51816
+Received Gossip from: 172.20.0.2:51816
+Waiting for incoming connections on port 7881...
+spreading message
+selected random peers
+peer: 172.20.0.2:7881
+peer: 172.20.0.12:7881
+peer: 172.20.0.15:7881
+messages pushed to queue
+Received and forwarded message from 172.20.0.2:51816
+There are 0 in the message queue
+Outgoing Queue Size: 3
+Connecting to gossip endpoint: 172.20.0.2:7881
+Message sent asynchronously to: 172.20.0.2:7881
+Connecting to gossip endpoint: 172.20.0.12:7881
+Message sent asynchronously to: 172.20.0.12:7881
+Successfully connected to 172.20.0.2:7881
+Connecting to gossip endpoint: 172.20.0.15:7881
+Successfully connected to 172.20.0.12:7881
+Message sent asynchronously to: 172.20.0.15:7881
+Successfully wrote 67 bytes to 172.20.0.2:7881
+Successfully wrote 67 bytes to 172.20.0.12:7881
+Accepted new connection from 172.20.0.5:51110
+Received Gossip from: 172.20.0.5:51110
+Waiting for incoming connections on port 7881...
+Successfully connected to 172.20.0.15:7881
+Successfully wrote 67 bytes to 172.20.0.15:7881
+Accepted new connection from 172.20.0.12:46676
+Received Gossip from: 172.20.0.12:46676
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.15:58130
+Received Gossip from: 172.20.0.15:58130
+Waiting for incoming connections on port 7881...
+spreading message
+selected random peers
+peer: 172.20.0.11:7881
+peer: 172.20.0.2:7881
+peer: 172.20.0.12:7881
+messages pushed to queue
+Received and forwarded message from 172.20.0.15:58130
+Accepted new connection from 172.20.0.6:51982
+Received Gossip from: 172.20.0.6:51982
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.6:51998
+Received Gossip from: 172.20.0.6:51998
+Waiting for incoming connections on port 7881...
+There are 0 in the message queue
+Accepted new connection from 172.20.0.5:51116
+Received Gossip from: 172.20.0.5:51116
+Waiting for incoming connections on port 7881...
+spreading message
+selected random peers
+peer: 172.20.0.6:7881
+peer: 172.20.0.12:7881
+peer: 172.20.0.2:7881
+messages pushed to queue
+Received and forwarded message from 172.20.0.5:51116
+Outgoing Queue Size: 6
+Connecting to gossip endpoint: 172.20.0.11:7881
+Message sent asynchronously to: 172.20.0.11:7881
+Connecting to gossip endpoint: 172.20.0.2:7881
+Message sent asynchronously to: 172.20.0.2:7881
+Connecting to gossip endpoint: 172.20.0.12:7881
+Message sent asynchronously to: 172.20.0.12:7881
+Connecting to gossip endpoint: 172.20.0.6:7881
+Successfully connected to 172.20.0.11:7881
+Message sent asynchronously to: 172.20.0.6:7881
+Connecting to gossip endpoint: 172.20.0.12:7881
+Successfully connected to 172.20.0.2:7881
+Successfully connected to 172.20.0.12:7881
+Message sent asynchronously to: 172.20.0.12:7881
+Successfully wrote 89 bytes to 172.20.0.11:7881
+Connecting to gossip endpoint: 172.20.0.2:7881
+Successfully wrote 89 bytes to 172.20.0.2:7881
+Successfully wrote 89 bytes to 172.20.0.12:7881
+Message sent asynchronously to: 172.20.0.2:7881
+Successfully connected to 172.20.0.6:7881
+Successfully connected to 172.20.0.12:7881
+Successfully wrote 89 bytes to 172.20.0.6:7881
+Successfully wrote 89 bytes to 172.20.0.12:7881
+Successfully connected to 172.20.0.2:7881
+Successfully wrote 89 bytes to 172.20.0.2:7881
+Accepted new connection from 172.20.0.12:46678
+Received Gossip from: 172.20.0.12:46678
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.15:58132
+Received Gossip from: 172.20.0.15:58132
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.15:58138
+Received Gossip from: 172.20.0.15:58138
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.15:58148
+Received Gossip from: 172.20.0.15:58148
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.2:51828
+Received Gossip from: 172.20.0.2:51828
+Waiting for incoming connections on port 7881...
+spreading message
+selected random peers
+peer: 172.20.0.5:7881
+peer: 172.20.0.11:7881
+peer: 172.20.0.13:7881
+messages pushed to queue
+Received and forwarded message from 172.20.0.15:58148
+Accepted new connection from 172.20.0.2:51844
+Received Gossip from: 172.20.0.2:51844
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.6:52008
+Received Gossip from: 172.20.0.6:52008
+Waiting for incoming connections on port 7881...
+spreading message
+selected random peers
+peer: 172.20.0.14:7881
+peer: 172.20.0.13:7881
+peer: 172.20.0.6:7881
+messages pushed to queue
+Received and forwarded message from 172.20.0.6:52008
+There are 0 in the message queue
+Accepted new connection from 172.20.0.14:36732
+Received Gossip from: 172.20.0.14:36732
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.5:51128
+Received Gossip from: 172.20.0.5:51128
+Waiting for incoming connections on port 7881...
+Outgoing Queue Size: 6
+Connecting to gossip endpoint: 172.20.0.5:7881
+Message sent asynchronously to: 172.20.0.5:7881
+Connecting to gossip endpoint: 172.20.0.11:7881
+Message sent asynchronously to: 172.20.0.11:7881
+Connecting to gossip endpoint: 172.20.0.13:7881
+Message sent asynchronously to: 172.20.0.13:7881
+Connecting to gossip endpoint: 172.20.0.14:7881
+Message sent asynchronously to: 172.20.0.14:7881
+Connecting to gossip endpoint: 172.20.0.13:7881
+Successfully connected to 172.20.0.5:7881
+Message sent asynchronously to: 172.20.0.13:7881
+Connecting to gossip endpoint: 172.20.0.6:7881
+Successfully connected to 172.20.0.11:7881
+Successfully connected to 172.20.0.13:7881
+Successfully connected to 172.20.0.14:7881
+Message sent asynchronously to: 172.20.0.6:7881
+Successfully wrote 89 bytes to 172.20.0.5:7881
+Successfully wrote 89 bytes to 172.20.0.11:7881
+Successfully wrote 89 bytes to 172.20.0.13:7881
+Successfully wrote 89 bytes to 172.20.0.14:7881
+Successfully connected to 172.20.0.13:7881
+Successfully connected to 172.20.0.6:7881
+Successfully wrote 89 bytes to 172.20.0.13:7881
+Successfully wrote 89 bytes to 172.20.0.6:7881
+Accepted new connection from 172.20.0.13:42686
+Received Gossip from: 172.20.0.13:42686
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.13:42698
+Received Gossip from: 172.20.0.13:42698
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.12:46680
+Received Gossip from: 172.20.0.12:46680
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.13:42704
+Received Gossip from: 172.20.0.13:42704
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.2:51856
+Received Gossip from: 172.20.0.2:51856
+Waiting for incoming connections on port 7881...
+There are 0 in the message queue
+Accepted new connection from 172.20.0.14:36742
+Received Gossip from: 172.20.0.14:36742
+Waiting for incoming connections on port 7881...
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+Outgoing Queue Size: 0
+Outgoing Queue Size: There are 00
+ in the message queue
+Outgoing Queue Size: 0
+There are 0 in the message queue
+There are 0 in the message queue
+Outgoing Queue Size: 0

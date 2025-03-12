@@ -27,7 +27,7 @@ namespace fs = std::filesystem;
 void displayHelp() {
     std::cout << "\n===== P2P Torrenting Client - Command Reference =====\n";
     std::cout << "  add <torrent_file>                - Add a torrent file to download\n";
-    std::cout << "  magnet <info_hash> <save_path>    - Add a torrent via magnet link\n";
+    std::cout << "  magnet <magnet_link>              - Add a torrent via magnet link\n";
     std::cout << "  generate <file_path>              - Generate a torrent file from a file/directory\n";
     std::cout << "  status                            - Display status of all torrents\n";
     std::cout << "  search <info_hash>                - Search DHT network for peers with specific info hash\n";
@@ -179,12 +179,11 @@ int main(int argc, char* argv[]) {
                     std::cout << "Usage: add <torrent_file>\n";
                 }
             } else if (command == "magnet") {
-                std::string info_hash, save_path;
-                if (iss >> info_hash >> save_path) {
+                std::string info_hash;
+                if (iss >> info_hash) {
                     try {
                         std::cout << "Adding magnet link with info hash: " << info_hash << "\n";
-                        std::cout << "Save path: " << save_path << "\n";
-                        client->addMagnet(info_hash, save_path);
+                        client->addMagnet(info_hash);
                     } catch (const std::exception& e) {
                         std::cerr << "Error adding magnet link: " << e.what() << "\n";
                     }

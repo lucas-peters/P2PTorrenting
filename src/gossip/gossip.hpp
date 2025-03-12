@@ -30,7 +30,7 @@ public:
     // Constructor takes a reference to the libtorrent session
     Gossip(lt::session& session, int port = 6789);
     // Constructor with explicit host IP
-    Gossip(lt::session& session, int port, const std::string& host_ip);
+    Gossip(lt::session& session, int port, const std::string& ip);
     ~Gossip();
 
     void start();
@@ -50,24 +50,27 @@ public:
     
     // Setting handlers for reputation messages
     using ReputationHandler = std::function<void(const ReputationMessage&, const lt::tcp::endpoint&)>;
-    //using IndexHandler = std::function<void(const IndexMessage&, const lt::tcp::endpoint&)>;
+    using HeartbeatHandler = std::function<void(const lt::tcp::endpoint&)>;
+    using IndexHeartbeatHandler = std::function<void(const lt::tcp::endpoint&)>;
+    using IndexSyncHandler = std::function<void(const IndexSyncMessage&, const lt::tcp::endpoint&)>;
+    
     void setReputationHandler(ReputationHandler handler) { reputation_handler_ = handler; };
-    //void setIndexHandler(IndexHandler handler) {index_handler_ = handler};
+    void setHeartbeatHandler(HeartbeatHandler handler) { heartbeat_handler_ = handler; }
+    void setIndexHeartbeatHandler(IndexHeartbeatHandler handler) { index_heartbeat_handler_ = handler; }
+    void setIndexSyncHandler(IndexSyncHandler handler) { index_sync_handler_ = handler; }
 
-    std::function<void(const lt::tcp::endpoint&)> heartbeat_handler_;
-
-    void setHeartbeatHandler(std::function<void(const lt::tcp::endpoint&)> handler) {heartbeat_handler_ = handler;}
-
-    void sendMessage(const lt::tcp::endpoint& target, const GossipMessage& message) {
-        std::lock_guard<std::mutex> lock(outgoing_queue_mutex_);
-        outgoing_messages_.push({target, message});
-    }
+    // Send a message to a specific peer
+    // void sendMessage(const lt::tcp::endpoint& target, const GossipMessage& message) {
+    //     std::lock_guard<std::mutex> lock(outgoing_queue_mutex_);
+    //     outgoing_messages_.push({target, message});
+    // }
 
 private:
     bool running_ = false;
     int port_;
     lt::session& session_;
-    std::string host_ip_ = "127.0.0.1"; // Default to localhost if not specified
+    std::string ip_ = "127.0.0.1"; // Default to localhost if not specified
+    lt::tcp::endpoint self_endpoint_;
 
     // threads
     boost::asio::io_context io_context_;
@@ -82,8 +85,9 @@ private:
     
     // Message handlers - can add more to support multiple types of messages
     ReputationHandler reputation_handler_;
-    // This handler is used for index Nodes to gossip to each other about added torrents
-    //IndexHandler index_handler_;
+    HeartbeatHandler heartbeat_handler_;
+    IndexSyncHandler index_sync_handler_;
+    IndexHeartbeatHandler index_heartbeat_handler_;
     
     // struct to help incoming message queue order messages by lamport timestamp
     struct IncomingMessage {
@@ -116,8 +120,8 @@ private:
     void processOutgoingMessages();
     void sendMessageAsync(const lt::tcp::endpoint& target, const GossipMessage& message);
     void handleConnect(const boost::system::error_code& error, 
-                      boost::asio::ip::tcp::socket* socket, 
-                      std::shared_ptr<std::string> serialized_message);
+                       boost::asio::ip::tcp::socket* socket, 
+                       std::shared_ptr<std::string> serialized_message);
     void handleWrite(const boost::system::error_code& error, 
                     size_t bytes_transferred, 
                     boost::asio::ip::tcp::socket* socket, 

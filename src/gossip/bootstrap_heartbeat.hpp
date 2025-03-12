@@ -27,18 +27,23 @@ namespace torrent_p2p {
 
 class BootstrapHeartbeat {
 public:
-    BootstrapHeartbeat(Gossip& gossip, const std::vector<lt::tcp::endpoint>& bootstrap_nodes);
-    ~BootstrapHeartbeat();
+    BootstrapHeartbeat(Gossip& gossip, const std::vector<lt::tcp::endpoint>& nodes, 
+                      const std::string& ip, const int port);
+    virtual ~BootstrapHeartbeat();
 
     void start();
     void stop();
-    void addBootstrapNode(const lt::tcp::endpoint& node);
-    void removeBootstrapNode(const lt::tcp::endpoint& node);
-    bool isBootstrapNodeAlive(const lt::tcp::endpoint& node) const;
+    void addNode(const lt::tcp::endpoint& node);
+    void removeNode(const lt::tcp::endpoint& node);
+    bool isNodeAlive(const lt::tcp::endpoint& node) const;
+    virtual void processHeartbeatResponse(const lt::tcp::endpoint& sender);
 
-private:
+protected:
+    const std::string ip_;
+    const int port_;
+    lt::tcp::endpoint self_endpoint_;
     Gossip& gossip_;
-    std::vector<lt::tcp::endpoint> bootstrap_nodes_;
+    std::vector<lt::tcp::endpoint> nodes_;
     std::unordered_map<lt::tcp::endpoint, std::chrono::steady_clock::time_point> last_heartbeat_;
     std::unique_ptr<std::thread> heartbeat_thread_;
     std::atomic<bool> running_;
@@ -46,12 +51,14 @@ private:
     const std::chrono::seconds HEARTBEAT_INTERVAL{5};
     const std::chrono::seconds NODE_TIMEOUT{15};
 
-    void heartbeatLoop();
-    void sendHeartbeats();
-    void processHeartbeatResponse(const lt::tcp::endpoint& sender);
-    void checkNodeHealth();
+    virtual void heartbeatLoop();
+    virtual void sendHeartbeats();
+    virtual void checkNodeHealth();
+    
+    // Helper method to create a heartbeat message with the appropriate type
+    //virtual GossipMessage createHeartbeatMessage(HeartbeatMessage::Type type) const;
 };
 
 } // namespace torrent_p2p
 
-#endif // BOOTSTRAP_HEARTBEAT_HPP
+#endif

@@ -22,14 +22,13 @@
 namespace torrent_p2p {
 
 // Node is an abstract class that defines the interface for other nodes to inherit from
-// It implements common functions for nodes, to improve code reusability
 
 class Node {
 public:
-    Node(int port = 6881, const std::string& env = "aws", const std::string& ip = "None");
+    Node(const int port = 6881, const std::string& env = "aws", const std::string& ip = "None");
 
     // Constructor to load from save state file
-    Node(int port, const std::string& env, const std::string& ip, const std::string& state_file);
+    Node(const int port, const std::string& env, const std::string& ip, const std::string& state_file);
     ~Node();
     // Get the node's DHT state
     std::string getDHTStats() const;
@@ -50,24 +49,25 @@ protected:
     std::unique_ptr<lt::session> session_;
     std::unique_ptr<Gossip> gossip_;
     std::unique_ptr<Messenger> messenger_;
-    
+
     int port_;
     std::string ip_;
-    bool running_;
+    std::atomic<bool> running_;
     std::string state_file_;
+
     // Predefined list of static endpoints set in config.json, loaded on start up based on --env flag
     std::vector<std::pair<std::string, int>> bootstrap_nodes_;
     std::vector<std::pair<std::string, int>> index_nodes_;
-
+    
     // All Node subtypes should be started using these
     virtual void start();
-        // Stop the node
     virtual void stop();
     void connectToDHT();
     void initializeSession();
 
+    // Used to set our own ip, so that other nodes know how to respond to us
+    // In docker on EC2 this needs to be set as an environment variable
     void setIP(const std::string& env);
-
 };
 
 } // namespace torrent_p2p

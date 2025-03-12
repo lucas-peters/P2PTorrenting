@@ -94,6 +94,7 @@ int main(int argc, char* argv[]) {
     
     try {
         BootstrapNode node(port, env, ip);
+        // node.start();
         std::atomic<bool> running{true};
         // Keep the program running until signal is received
         while (running) {

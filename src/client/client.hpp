@@ -144,7 +144,7 @@ public:
     std::string createMagnetURI(const std::string& torrentFilePath) const;
 
     // Add a magnet link to the client
-    void addMagnet(const std::string& infoHash, const std::string& savePath);
+    void addMagnet(const std::string& magnet);
 
     // by default a torrent starts seeding when added, these can be used to turn those flags on/off
     void startSeeding(const std::string& torrentFilePath);
@@ -192,9 +192,10 @@ private:
     std::unique_ptr<std::thread> peer_cache_thread_;
 
     // this is where we store torrents and downloads on docker images
-    //std::string torrent_path_ = "/app/torrents/";
+    // std::string torrent_path_ = "/app/torrents/";
+    // std::string download_path_ = "/app/downloads/";
     std::string torrent_path_ = "/Users/lucaspeters/Documents/GitHub/P2PTorrenting/6882/";
-    std::string download_path_ = "/app/downloads/";
+    std::string download_path_ = "/Users/lucaspeters/Documents/GitHub/P2PTorrenting/6882/";
     
     // Ban a node from the DHT network
     void banNode(const lt::tcp::endpoint& endpoint);

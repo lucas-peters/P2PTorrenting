@@ -3,8 +3,9 @@
 
 namespace torrent_p2p {
 
-BootstrapHeartbeat::BootstrapHeartbeat(Gossip& gossip, const std::vector<lt::tcp::endpoint>& bootstrap_nodes)
-    : gossip_(gossip), bootstrap_nodes_(bootstrap_nodes), running_(false) {
+BootstrapHeartbeat::BootstrapHeartbeat(Gossip& gossip, const std::vector<lt::tcp::endpoint>& nodes,
+     const std::string& ip, const int port): gossip_(gossip), nodes_(nodes), running_(false), ip_(ip), port_(port) {
+    std::cout << "CREATED HEARTBEAT OBJECT" << std::endl;
 }
 
 BootstrapHeartbeat::~BootstrapHeartbeat() {
@@ -13,7 +14,9 @@ BootstrapHeartbeat::~BootstrapHeartbeat() {
 
 void BootstrapHeartbeat::start() {
     running_ = true;
+    self_endpoint_ = lt::tcp::endpoint(lt::make_address_v4(ip_), port_);
     heartbeat_thread_ = std::make_unique<std::thread>(&BootstrapHeartbeat::heartbeatLoop, this);
+    std::cout << "HEARTBEAT THREAD STARTED" << std::endl;
 }
 
 void BootstrapHeartbeat::stop() {
@@ -23,29 +26,29 @@ void BootstrapHeartbeat::stop() {
     }
 }
 
-void BootstrapHeartbeat::addBootstrapNode(const lt::tcp::endpoint& node) {
+void BootstrapHeartbeat::addNode(const lt::tcp::endpoint& node) {
     std::lock_guard<std::mutex> lock(nodes_mutex_);
     
     // Check if node already exists
-    auto it = std::find(bootstrap_nodes_.begin(), bootstrap_nodes_.end(), node);
-    if (it == bootstrap_nodes_.end()) {
-        bootstrap_nodes_.push_back(node);
+    auto it = std::find(nodes_.begin(), nodes_.end(), node);
+    if (it == nodes_.end()) {
+        nodes_.push_back(node);
     }
 }
 
-void BootstrapHeartbeat::removeBootstrapNode(const lt::tcp::endpoint& node) {
+void BootstrapHeartbeat::removeNode(const lt::tcp::endpoint& node) {
     std::lock_guard<std::mutex> lock(nodes_mutex_);
     
-    auto it = std::find(bootstrap_nodes_.begin(), bootstrap_nodes_.end(), node);
-    if (it != bootstrap_nodes_.end()) {
-        bootstrap_nodes_.erase(it);
+    auto it = std::find(nodes_.begin(), nodes_.end(), node);
+    if (it != nodes_.end()) {
+        nodes_.erase(it);
     }
     
     // Remove from last heartbeat tracking
     last_heartbeat_.erase(node);
 }
 
-bool BootstrapHeartbeat::isBootstrapNodeAlive(const lt::tcp::endpoint& node) const {
+bool BootstrapHeartbeat::isNodeAlive(const lt::tcp::endpoint& node) const {
     std::lock_guard<std::mutex> lock(nodes_mutex_);
     
     auto heartbeat_it = last_heartbeat_.find(node);
@@ -59,6 +62,7 @@ bool BootstrapHeartbeat::isBootstrapNodeAlive(const lt::tcp::endpoint& node) con
 }
 
 void BootstrapHeartbeat::heartbeatLoop() {
+    std::cout << "Inside heartbeat loop" << std::endl;
     while (running_) {
         try {
             // Send heartbeats to all bootstrap nodes
@@ -77,25 +81,27 @@ void BootstrapHeartbeat::heartbeatLoop() {
 
 void BootstrapHeartbeat::sendHeartbeats() {
     std::lock_guard<std::mutex> lock(nodes_mutex_);
+    std::cout << "----Sending Heartbeat----" << std::endl;
+    // Create a heartbeat message
+    GossipMessage heartbeat_msg;
+    heartbeat_msg.set_timestamp(std::time(nullptr));
+    heartbeat_msg.set_message_id("heartbeat_ping_" + ip_ + "_" + std::to_string(port_) + "_" + std::to_string(std::time(nullptr)));
+    heartbeat_msg.set_source_ip(ip_);
+    heartbeat_msg.set_source_port(port_);
     
-    for (const auto& node : bootstrap_nodes_) {
-        // Create a heartbeat message
-        GossipMessage heartbeat_msg;
-        heartbeat_msg.set_timestamp(std::time(nullptr));
-        heartbeat_msg.set_message_id("heartbeat_" + std::to_string(std::time(nullptr)));
-        
-        // Add a heartbeat-specific field to the message
-        HeartbeatMessage* heartbeat = heartbeat_msg.mutable_heartbeat();
-        heartbeat->set_type(HeartbeatMessage::PING);
-        heartbeat->set_timestamp(std::time(nullptr));
-        
-        // Send the heartbeat message using the new public method
-        gossip_.sendMessage(node, heartbeat_msg);
-    }
+    // Add a heartbeat-specific field to the message
+    HeartbeatMessage* heartbeat = heartbeat_msg.mutable_heartbeat();
+    heartbeat->set_type(HeartbeatMessage::PING);
+    heartbeat->set_timestamp(std::time(nullptr));
+    
+    // Send the heartbeat message using the new public method
+    gossip_.spreadMessage(heartbeat_msg, lt::tcp::endpoint());
 }
 
 void BootstrapHeartbeat::processHeartbeatResponse(const lt::tcp::endpoint& sender) {
     std::lock_guard<std::mutex> lock(nodes_mutex_);
+
+    std::cout << "received heartbeat from: " << sender.address() << ":" << sender.port() << std::endl;
     
     // Update the last heartbeat time for the sender
     last_heartbeat_[sender] = std::chrono::steady_clock::now();
@@ -106,25 +112,35 @@ void BootstrapHeartbeat::checkNodeHealth() {
     
     auto now = std::chrono::steady_clock::now();
     std::vector<lt::tcp::endpoint> failed_nodes;
+
+    std::cout << "===== Current heartbeat status =====" << std::endl;
+    for (const auto& entry : last_heartbeat_) {
+        auto time_since_last_heartbeat = std::chrono::duration_cast<std::chrono::seconds>(now - entry.second).count();
+        std::cout << "Node: " << entry.first.address().to_string() << ":" << entry.first.port() 
+                  << " | Last seen: " << time_since_last_heartbeat << " seconds ago" << std::endl;
+    }
+    std::cout << "==================================" << std::endl;
     
     // Check each tracked node's last heartbeat
-    for (const auto& node : bootstrap_nodes_) {
+    for (const auto& node : nodes_) {
+
         auto heartbeat_it = last_heartbeat_.find(node);
         if (heartbeat_it == last_heartbeat_.end()) {
             // Node hasn't been heard from, mark as potentially failed
-            failed_nodes.push_back(node);
+            // failed_nodes.push_back(node);
+            continue;
         } else if ((now - heartbeat_it->second) >= NODE_TIMEOUT) {
             // Node hasn't responded within timeout period
             failed_nodes.push_back(node);
-            std::cerr << "Bootstrap node failed: " << node.address() << ":" << node.port() << std::endl;
+            std::cout << "*** Bootstrap node failed: " << node.address() << ":" << node.port() << " ***" << std::endl;
         }
     }
     
     // Remove failed nodes from the bootstrap nodes list
     for (const auto& failed_node : failed_nodes) {
-        auto it = std::find(bootstrap_nodes_.begin(), bootstrap_nodes_.end(), failed_node);
-        if (it != bootstrap_nodes_.end()) {
-            bootstrap_nodes_.erase(it);
+        auto it = std::find(nodes_.begin(), nodes_.end(), failed_node);
+        if (it != nodes_.end()) {
+            nodes_.erase(it);
         }
     }
 }
