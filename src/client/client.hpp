@@ -144,7 +144,7 @@ public:
     std::string createMagnetURI(const std::string& torrentFilePath) const;
 
     // Add a magnet link to the client
-    void addMagnet(const std::string& infoHash, const std::string& savePath);
+    void addMagnet(const std::string& magnet);
 
     // by default a torrent starts seeding when added, these can be used to turn those flags on/off
     void startSeeding(const std::string& torrentFilePath);

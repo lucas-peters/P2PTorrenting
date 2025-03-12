@@ -3,11 +3,11 @@
 
 namespace torrent_p2p {
 
-BootstrapNode::BootstrapNode(int port, const std::string& env, const std::string& ip) : Node(port, env) {
+BootstrapNode::BootstrapNode(int port, const std::string& env, const std::string& ip) : Node(port, env, ip) {
     start();
 }
 
-BootstrapNode::BootstrapNode(int port, const std::string& env, const std::string& ip, const std::string& state_file) : Node(port, env, state_file) {
+BootstrapNode::BootstrapNode(int port, const std::string& env, const std::string& ip, const std::string& state_file) : Node(port, env, state_file, ip) {
     start();
     // The base class constructor already loads the DHT state, so we don't need to call loadDHTState again
 }
@@ -22,50 +22,6 @@ BootstrapNode::~BootstrapNode() {
 
 void BootstrapNode::start() {
     Node::start();
-    // if (!session_) {
-    //     lt::settings_pack pack;
-    //     pack.set_int(lt::settings_pack::alert_mask, 
-    //         lt::alert::dht_notification + 
-    //         lt::alert::status_notification +
-    //         lt::alert::error_notification +
-    //         lt::alert::dht_log_notification);
-        
-    //     // Force Highest Level Encryption, ChaCha20 instead of RC4
-    //     pack.set_int(lt::settings_pack::in_enc_policy, lt::settings_pack::pe_forced);
-    //     pack.set_int(lt::settings_pack::out_enc_policy, lt::settings_pack::pe_forced);
-            
-    //     // Enable DHT with local-only settings
-    //     pack.set_bool(lt::settings_pack::enable_dht, true);
-    //     pack.set_str(lt::settings_pack::dht_bootstrap_nodes, "");  // Disable external bootstrap nodes
-    //     pack.set_int(lt::settings_pack::dht_announce_interval, 5);
-    //     pack.set_bool(lt::settings_pack::enable_outgoing_utp, true);
-    //     pack.set_bool(lt::settings_pack::enable_incoming_utp, true);
-    //     pack.set_bool(lt::settings_pack::enable_outgoing_tcp, true);
-    //     pack.set_bool(lt::settings_pack::enable_incoming_tcp, true);
-        
-    //     // Disable IP restrictions for local testing, by default it blocks having 2 nodes in the routing table from the same ip
-    //     pack.set_bool(lt::settings_pack::dht_restrict_routing_ips, false);
-    //     pack.set_bool(lt::settings_pack::dht_restrict_search_ips, false);
-    //     pack.set_int(lt::settings_pack::dht_max_peers_reply, 100);
-    //     pack.set_bool(lt::settings_pack::dht_ignore_dark_internet, false);
-    //     pack.set_int(lt::settings_pack::dht_max_fail_count, 100);  // More forgiving of failures
-        
-    //     // Listen on all interfaces to accept connections from any IP
-    //     pack.set_str(lt::settings_pack::listen_interfaces, "0.0.0.0:" + std::to_string(port_));        
-    //     std::cout << "[Bootstrap] Starting on port " << port_ << " listening on all interfaces" << std::endl;
-        
-    //     // Set up the session
-    //     session_ = std::make_unique<lt::session>(pack);
-        
-    //     // Verify that we're actually listening
-    //     // auto endpoints = session_->get_listen_status();
-    //     // if (endpoints.empty()) {
-    //     //     std::cerr << "[Bootstrap] WARNING: Not listening on any interfaces!" << std::endl;
-    //     // } else {
-    //     //     for (const auto& ep : endpoints) {
-    //     //         std::cout << "[Bootstrap] Listening on: " << ep.address() << ":" << ep.port() << std::endl;
-    //     //     }
-    //     // }
         
     // Start periodic DHT announcements
     announceTimer_ = std::make_unique<std::thread>([this]() {
@@ -106,17 +62,12 @@ void BootstrapNode::start() {
     
     running_ = true;
     
-    // try {
-    //     std::cout << "[Bootstrap] Creating Gossip object..." << std::endl;
-    //     gossip_ = std::make_unique<torrent_p2p::Gossip>(*session_, port_ + 1000);
-    //     std::cout << "[Bootstrap] Gossip object created successfully" << std::endl;
-    //     // Initialize heartbeat after gossip is created
-    //     initializeHeartbeat();
-    // } catch (const std::exception& e) {
-    //     std::cerr << "[Bootstrap] Exception during Gossip initialization: " << e.what() << std::endl;
-    // } catch (...) {
-    //     std::cerr << "[Bootstrap] Unknown exception during Gossip initialization" << std::endl;
-    // }
+    try {
+        // Initialize heartbeat after gossip is created
+        initializeHeartbeat();
+    } catch (const std::exception& e) {
+        std::cerr << "[Bootstrap] Exception during Heartbeat initialization: " << e.what() << std::endl;
+    }
     
     // Start handling alerts in a separate thread
     std::thread([this]() {
@@ -175,9 +126,9 @@ void BootstrapNode::handleAlerts() {
                         }
                     }
                 }
-            } else if (auto* dht_log = lt::alert_cast<lt::dht_log_alert>(a)) {
-                // Log all DHT activity for debugging
-                std::cout << "[Bootstrap] DHT: " << dht_log->message() << std::endl;
+            // } else if (auto* dht_log = lt::alert_cast<lt::dht_log_alert>(a)) {
+            //     // Log all DHT activity for debugging
+            //     //std::cout << "[Bootstrap] DHT: " << dht_log->message() << std::endl;
             } else if (auto* node_alert = lt::alert_cast<lt::dht_bootstrap_alert>(a)) {
                 std::cout << "[Bootstrap] DHT bootstrap complete" << std::endl;
             } else if (auto* listen_failed = lt::alert_cast<lt::listen_failed_alert>(a)) {
@@ -185,23 +136,10 @@ void BootstrapNode::handleAlerts() {
                           << ": " << listen_failed->error.message() << std::endl;
             } else if (auto* listen_succeeded = lt::alert_cast<lt::listen_succeeded_alert>(a)) {
                 std::cout << "[Bootstrap] Successfully listening on port " << listen_succeeded->port << std::endl;
-            // } else if (auto* pa = lt::alert_cast<lt::peer_connect_alert>(a)) {
-            // // We are ensuring that all peers are using ChaCha20 encryption
-            //     std::vector<lt::peer_info> peers;
-            //     pa->handle.get_peer_info(peers);
-            //     for (const auto& p : peers) {
-            //         if (p.ip == pa->ip) { // Find the peer that just connected
-            //             if (p.flags & lt::peer_info::rc4) {
-            //                 std::cout << "Peer " << p.ip << " is using RC4 encryption." << std::endl; // Should NEVER happen
-            //             } else {
-            //                 std::cout << "Peer " << p.ip << " is using ChaCha20 encryption." << std::endl; // Expected output
-            //             }
-            //         }
-            //     }
-            // 
-            } else {
-                // Log all alert messages for debugging
-                std::cout << a->message() << std::endl;
+            // } else {
+            //     // Log all alert messages for debugging
+            //     //std::cout << a->message() << std::endl;
+            // }
             }
         } catch (const std::exception& e) {
             std::cerr << "[Bootstrap] Error processing alert: " << e.what() << std::endl;
@@ -210,17 +148,50 @@ void BootstrapNode::handleAlerts() {
 }
 
 void BootstrapNode::initializeHeartbeat() {
-    std::cout << "[Bootstrap] Initiallizing Heartbeat" << std::endl;
-    if (gossip_ && !bootstrap_nodes_.empty()) {
-        gossip_->setHeartbeatHandler([this](const lt::tcp::endpoint& sender) {
-            // Optional: Add additional logic for handling heartbeat responses here
-            std::cout << "Received heartbeat response from: " 
-                      << sender.address() << ":" << sender.port() << std::endl;
-        });
+    std::cout << "[Bootstrap] Initializing Heartbeat" << std::endl;
+    if (!gossip_) {
+        std::cerr << "[Bootstrap] Error: Cannot initialize heartbeat, gossip_ is null" << std::endl;
+        return;
+    }
+    
+    // First set the heartbeat handler with a safe implementation
+    gossip_->setHeartbeatHandler([this](const lt::tcp::endpoint& sender) {
+        std::cout << "[Bootstrap] Received heartbeat response from: " 
+                  << sender.address() << ":" << sender.port() << std::endl;
+        
+        // Check if heartbeat manager exists before forwarding
+        if (heartbeat_manager_) {
+            heartbeat_manager_->processHeartbeatResponse(sender);
+        }
+    });
+    
+    if (!bootstrap_nodes_.empty()) {
+        // Convert bootstrap_nodes_ from std::vector<std::pair<std::string, int>> to std::vector<lt::tcp::endpoint>
+        std::vector<lt::tcp::endpoint> endpoint_nodes;
+        for (const auto& node : bootstrap_nodes_) {
+            try {
+                lt::tcp::endpoint endpoint(lt::make_address_v4(node.first), node.second + 1000);
+                endpoint_nodes.push_back(endpoint);
+                std::cout << "[Bootstrap] Added endpoint: " << node.first << ":" << node.second << std::endl;
+            } catch (const std::exception& e) {
+                std::cerr << "[Bootstrap] Error creating endpoint for " << node.first << ":" << node.second 
+                          << " - " << e.what() << std::endl;
+            }
+        }
         
         // Create heartbeat manager
-        heartbeat_manager_ = std::make_unique<BootstrapHeartbeat>(*gossip_, bootstrap_nodes_);
-        heartbeat_manager_->start();
+        try {
+            heartbeat_manager_ = std::make_unique<BootstrapHeartbeat>(*gossip_, endpoint_nodes, ip_, port_ + 1000);
+            std::cout << "[Bootstrap] Heartbeat manager created successfully" << std::endl;
+            
+            // Start the heartbeat process
+            heartbeat_manager_->start();
+            std::cout << "[Bootstrap] Heartbeat started successfully" << std::endl;
+        } catch (const std::exception& e) {
+            std::cerr << "[Bootstrap] Error creating heartbeat manager: " << e.what() << std::endl;
+        }
+    } else {
+        std::cerr << "[Bootstrap] Cannot initialize heartbeat - no bootstrap nodes" << std::endl;
     }
 }
 

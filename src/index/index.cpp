@@ -59,7 +59,7 @@ void Index::start() {
     // Find our node ID in the index_nodes_ list
     int count = 0;
     for (auto& node : index_nodes_) {
-        if (ip_ == node.address().to_string()) {
+        if (ip_ == node.first) {
             id_ = count;
             std::cout << "This index node has ID: " << id_ << std::endl;
             break;
@@ -74,6 +74,13 @@ void Index::start() {
     
     total_nodes_ = index_nodes_.size();
     std::cout << "Total index nodes: " << total_nodes_ << std::endl;
+
+    try {
+        // Initialize heartbeat after gossip is created
+        initializeHeartbeat();
+    } catch (const std::exception& e) {
+        std::cerr << "[Index] Exception during Heartbeat initialization: " << e.what() << std::endl;
+    }
 }
 
 std::vector<std::string> Index::generateKeywords(const std::string& title) {
@@ -166,7 +173,10 @@ void Index::addTorrent(const std::string& title, const std::string& magnet) {
             } 
             // Otherwise, send to the responsible node
             else {
-                sendKeywordAddMessage(index_nodes_[target_node_id], keyword, title, magnet);
+                // converting {string, int} to lt::tcp::endpoint
+                lt::tcp::endpoint target(lt::make_address_v4(index_nodes_[target_node_id].first), 
+                    index_nodes_[target_node_id].second);
+                sendKeywordAddMessage(target, keyword, title, magnet);
             }
         }
     }
@@ -246,14 +256,15 @@ std::vector<std::pair<std::string, std::string>> Index::searchTorrent(const std:
     } 
     // Otherwise, forward the search to the responsible node
     else {
-        // Create a WantMessage and send it to the responsible node
         IndexMessage message;
         WantMessage* wantMsg = message.mutable_wanttorrent();
         wantMsg->set_keyword(keyword);
         wantMsg->set_request_identifier(generateRequestId());
         
         // Send to the primary node responsible for this keyword
-        messenger_->queueMessage(index_nodes_[keyword_node_id], message);
+        lt::tcp::endpoint target(lt::make_address_v4(index_nodes_[keyword_node_id].first), 
+                    index_nodes_[keyword_node_id].second);
+        messenger_->queueMessage(target, message);
         std::cout << "Forwarded search for keyword '" << keyword << "' to responsible node" << std::endl;
         
         // Note: In a real implementation, we would wait for the response
@@ -329,20 +340,55 @@ void Index::handleIndexMessage(const lt::tcp::endpoint& sender, const IndexMessa
     }
 }
 
-size_t Node::getResponsibleNodeIndex(const std::string& keyword, size_t nodeCount) {
+size_t Index::getResponsibleNodeIndex(const std::string& keyword, size_t nodeCount) {
     std::hash<std::string> hasher;
     size_t hash = hasher(keyword);
     
     return hash % nodeCount;
 }
 
-bool Node::isResponsibleForTorrent(const std::string& keyword, size_t nodeCount) {
+bool Index::isResponsibleForTorrent(const std::string& keyword, size_t nodeCount) {
     size_t responsibleId = getResponsibleNodeIndex(keyword, nodeCount);
     for (int i = 0; i <= NUM_REPLICATIONS; i++) {
         if (id_ == (responsibleId + i) % nodeCount)
             return true;
     }
     return false;
+}
+
+void Index::initializeHeartbeat() {
+    std::cout << "[Index] Initializing Heartbeat" << std::endl;
+    if (gossip_ && !index_nodes_.empty()) {
+        gossip_->setIndexHeartbeatHandler([this](const lt::tcp::endpoint& sender) {
+            std::cout << "Received index heartbeat response from: " << sender.address() << ":" << sender.port() << std::endl;
+            heartbeat_manager_->processHeartbeatResponse(sender);
+        });
+        
+        // Convert index_nodes_ from std::vector<std::pair<std::string, int>> to std::vector<lt::tcp::endpoint>
+        std::vector<lt::tcp::endpoint> endpoint_nodes;
+        for (const auto& node : index_nodes_) {
+            try {
+                lt::tcp::endpoint endpoint(lt::make_address_v4(node.first), node.second + 1000);
+                endpoint_nodes.push_back(endpoint);
+                std::cout << "[Index] Added endpoint: " << node.first << ":" << node.second << std::endl;
+            } catch (const std::exception& e) {
+                std::cerr << "[Index] Error creating endpoint for " << node.first << ":" << node.second 
+                          << " - " << e.what() << std::endl;
+            }
+        }
+        
+        // Create heartbeat manager
+        try {
+            heartbeat_manager_ = std::make_unique<IndexHeartbeat>(*gossip_, endpoint_nodes, ip_, port_ + 1000);
+            std::cout << "[Index] Heartbeat manager created successfully" << std::endl;
+            heartbeat_manager_->start();
+            std::cout << "[Index] Heartbeat started successfully" << std::endl;
+        } catch (const std::exception& e) {
+            std::cerr << "[Index] Error creating heartbeat manager: " << e.what() << std::endl;
+        }
+    } else {
+        std::cerr << "[Index] Cannot initialize heartbeat - gossip not initialized or no index nodes" << std::endl;
+    }
 }
 
 } // namespace

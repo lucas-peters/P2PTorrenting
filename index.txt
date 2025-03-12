@@ -1,0 +1,584 @@
+Starting index node on port 6881 in environment docker
+Press Ctrl+C to exit
+Using public IP from environment variable: 172.20.0.12
+Using IP: 172.20.0.12
+Using Docker/AWS config path: /app/config.json
+Loaded configuration for environment: docker
+Bootstrap nodes:
+  172.20.0.2:6881
+  172.20.0.3:6881
+  172.20.0.4:6881
+  172.20.0.5:6881
+  172.20.0.6:6881
+Index nodes:
+  172.20.0.11:6881
+  172.20.0.13:6881
+  172.20.0.14:6881
+  172.20.0.15:6881
+Connecting to DHT bootstrap nodes...
+[Node:6881] Adding bootstrap node: 172.20.0.2:6881
+[Node:6881] Checking if bootstrap node is reachable...
+[Node:6881] Sending direct DHT request to 172.20.0.2:6881
+[Node:6881] Announcing to DHT with hash: df28aefc4eab2f0969e50455beb13d6b436f409c
+[Node:6881] Getting peers for hash: df28aefc4eab2f0969e50455beb13d6b436f409c
+[Node:6881] Adding bootstrap node: 172.20.0.3:6881
+[Node:6881] Checking if bootstrap node is reachable...
+[Node:6881] Sending direct DHT request to 172.20.0.3:6881
+[Node:6881] Announcing to DHT with hash: d31abe962a042ae3b1b6a7ec21d87ad3ccb29a82
+[Node:6881] Getting peers for hash: d31abe962a042ae3b1b6a7ec21d87ad3ccb29a82
+[Node:6881] Adding bootstrap node: 172.20.0.4:6881
+[Node:6881] Checking if bootstrap node is reachable...
+[Node:6881] Sending direct DHT request to 172.20.0.4:6881
+[Node:6881] Announcing to DHT with hash: 5694301d1dfab7a008d295cc44e64d4f2280853f
+[Node:6881] Getting peers for hash: 5694301d1dfab7a008d295cc44e64d4f2280853f
+[Node:6881] Adding bootstrap node: 172.20.0.5:6881
+[Node:6881] Checking if bootstrap node is reachable...
+[Node:6881] Sending direct DHT request to 172.20.0.5:6881
+[Node:6881] Announcing to DHT with hash: fe3833f8a36aba0d9cfa04f69aa2424ddef8de6a
+[Node:6881] Getting peers for hash: fe3833f8a36aba0d9cfa04f69aa2424ddef8de6a
+[Node:6881] Adding bootstrap node: 172.20.0.6:6881
+[Node:6881] Checking if bootstrap node is reachable...
+[Node:6881] Sending direct DHT request to 172.20.0.6:6881
+[Node:6881] Announcing to DHT with hash: 7f9ae4ce34134d9977ba3ee88088d712631b5b0c
+[Node:6881] Getting peers for hash: 7f9ae4ce34134d9977ba3ee88088d712631b5b0c
+Waiting for DHT to initialize...
+Creating Gossip object...
+Starting gossip on port 7881
+Started io_context thread
+Starting TCP acceptor on port 7881
+Creating new TCP acceptor on port 7881
+IO context thread starting
+TCP acceptor created and listening on port 7881
+Waiting for incoming connections on port 7881...
+TCP acceptor started successfully
+Started peer thread
+Started send thread
+Started message processing thread
+Gossip object created successfully
+ Creating Messenger
+Started io_context thread
+Starting TCP acceptor on port 8881
+Creating new TCP acceptor on port 8881
+IO context thread starting
+TCP acceptor created and listening on port 8881
+Waiting for incoming connections on port 8881...
+TCP acceptor started successfully
+Started send thread
+Started message processing thread
+Messenger object created successfully
+Index Handler set successfully
+Total index nodes: 4
+Accepted new connection from 172.20.0.2:33252
+Received Gossip from: 172.20.0.2:33252
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.6:54688
+Received Gossip from: 172.20.0.6:54688
+Waiting for incoming connections on port 7881...
+Received and forwarded message from 172.20.0.2:33252
+Spreading ping from source: 172.20.0.2:7881
+Connecting to gossip endpoint: 172.20.0.6:7881
+Message sent asynchronously to: 172.20.0.6:7881
+Spreading ping from source: 172.20.0.2:7881
+Connecting to gossip endpoint: 172.20.0.5:7881
+Message sent asynchronously to: 172.20.0.5:7881
+Spreading ping from source: 172.20.0.2:7881
+Connecting to gossip endpoint: 172.20.0.4:7881
+Message sent asynchronously to: 172.20.0.4:7881
+Successfully connected to 172.20.0.6:7881
+Successfully wrote 57 bytes to 172.20.0.6:7881
+Accepted new connection from 172.20.0.11:42576
+Received Gossip from: 172.20.0.11:42576
+Waiting for incoming connections on port 7881...
+Successfully connected to 172.20.0.5:7881
+Successfully connected to 172.20.0.4:7881
+Accepted new connection from 172.20.0.13:36220
+Received Gossip from: 172.20.0.13:36220
+Waiting for incoming connections on port 7881...
+Successfully wrote 57 bytes to 172.20.0.5:7881
+Successfully wrote 57 bytes to 172.20.0.4:7881
+Accepted new connection from 172.20.0.3:59126
+Received Gossip from: 172.20.0.3:59126
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.4:47034
+Received Gossip from: 172.20.0.4:47034
+Waiting for incoming connections on port 7881...
+Received and forwarded message from 172.20.0.4:47034
+Accepted new connection from 172.20.0.13:36230
+Received Gossip from: 172.20.0.13:36230
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.2:33268
+Received Gossip from: 172.20.0.2:33268
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.5:56950
+Received Gossip from: 172.20.0.5:56950
+Waiting for incoming connections on port 7881...
+Spreading pong from source: 172.20.0.4:7881
+Connecting to gossip endpoint: 172.20.0.4:7881
+Message sent asynchronously to: 172.20.0.4:7881
+Spreading pong from source: 172.20.0.4:7881
+Accepted new connection from Connecting to gossip endpoint: 172.20.0.4:172.20.0.3:7881
+47046
+Received Gossip from: 172.20.0.4:47046
+Waiting for incoming connections on port 7881...
+Successfully connected to 172.20.0.4:7881
+Message sent asynchronously to: 172.20.0.3:7881
+Spreading pong from source: 172.20.0.4:7881
+Connecting to gossip endpoint: Accepted new connection from 172.20.0.6:7881
+172.20.0.11:42584
+Received Gossip from: 172.20.0.11:42584
+Waiting for incoming connections on port 7881...
+Successfully wrote 64 bytes to 172.20.0.4:7881
+Successfully connected to 172.20.0.3:7881
+Message sent asynchronously to: 172.20.0.6:7881
+Successfully wrote 64 bytes to 172.20.0.3:7881
+Successfully connected to 172.20.0.6:7881
+Successfully wrote 64 bytes to 172.20.0.6:7881
+Accepted new connection from 172.20.0.6:54698
+Received Gossip from: 172.20.0.6:54698
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.4:47050
+Received Gossip from: 172.20.0.4:47050
+Waiting for incoming connections on port 7881...
+Received and forwarded message from 172.20.0.4:47050
+Spreading ping from source: 172.20.0.4:7881
+Connecting to gossip endpoint: 172.20.0.3:7881
+Message sent asynchronously to: 172.20.0.3:7881
+Spreading ping from source: 172.20.0.4:7881
+Connecting to gossip endpoint: 172.20.0.2:7881
+Message sent asynchronously to: 172.20.0.2:7881
+Spreading ping from source: 172.20.0.4:7881
+Connecting to gossip endpoint: 172.20.0.5:7881
+Message sent asynchronously to: 172.20.0.5:7881
+Successfully connected to 172.20.0.3:7881
+Successfully connected to 172.20.0.2:7881
+Accepted new connection from 172.20.0.13:36244
+Received Gossip from: 172.20.0.13:36244
+Waiting for incoming connections on port 7881...
+Successfully connected to 172.20.0.5:7881
+Successfully wrote 57 bytes to 172.20.0.3:7881
+Successfully wrote 57 bytes to 172.20.0.2:7881
+Accepted new connection from 172.20.0.5:56960
+Received Gossip from: 172.20.0.5:56960
+Waiting for incoming connections on port 7881...
+Successfully wrote 57 bytes to 172.20.0.5:7881
+Accepted new connection from 172.20.0.3:59138
+Received Gossip from: 172.20.0.3:59138
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.2:33270
+Received Gossip from: 172.20.0.2:33270
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.2:33272
+Received Gossip from: 172.20.0.2:33272
+Waiting for incoming connections on port 7881...
+Received and forwarded message from 172.20.0.2:33272
+Spreading pong from source: 172.20.0.2:7881
+Connecting to gossip endpoint: 172.20.0.5:7881
+Message sent asynchronously to: 172.20.0.5:7881
+Spreading pong from source: 172.20.0.2:7881
+Connecting to gossip endpoint: 172.20.0.2:7881
+Message sent asynchronously to: 172.20.0.2:7881
+Spreading pong from source: 172.20.0.2:7881
+Connecting to gossip endpoint: 172.20.0.3:7881
+Message sent asynchronously to: 172.20.0.3:7881
+Successfully connected to 172.20.0.5:7881
+Successfully connected to 172.20.0.2:7881
+Successfully connected to 172.20.0.3:7881
+Successfully wrote 64 bytes to 172.20.0.5:7881
+Successfully wrote 64 bytes to 172.20.0.2:7881
+Successfully wrote 64 bytes to 172.20.0.3:7881
+Accepted new connection from 172.20.0.5:56966
+Received Gossip from: 172.20.0.5:56966
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.3:59140
+Received Gossip from: 172.20.0.3:59140
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.14:47210
+Received Gossip from: 172.20.0.14:47210
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.2:52320
+Received Gossip from: 172.20.0.2:52320
+Waiting for incoming connections on port 7881...
+Received and forwarded message from 172.20.0.2:52320
+Spreading ping from source: 172.20.0.2:7881
+Connecting to gossip endpoint: 172.20.0.4:7881
+Message sent asynchronously to: 172.20.0.4:7881
+Spreading ping from source: 172.20.0.2:7881
+Connecting to gossip endpoint: 172.20.0.2:7881
+Successfully connected to 172.20.0.4:7881
+Message sent asynchronously to: 172.20.0.2:7881
+Spreading ping from source: 172.20.0.2:7881
+Connecting to gossip endpoint: 172.20.0.3:7881
+Accepted new connection from 172.20.0.11:41356
+Received Gossip from: 172.20.0.11:41356
+Waiting for incoming connections on port 7881...
+Message sent asynchronously to: 172.20.0.3:7881
+Successfully wrote 57 bytes to 172.20.0.4:7881
+Successfully connected to 172.20.0.2:7881
+Successfully connected to 172.20.0.3:7881
+Accepted new connection from 172.20.0.4:48558
+Received Gossip from: 172.20.0.4:48558
+Waiting for incoming connections on port 7881...
+Successfully wrote 57 bytes to 172.20.0.2:7881
+Successfully wrote 57 bytes to 172.20.0.3:7881
+Accepted new connection from 172.20.0.2:52326
+Received Gossip from: 172.20.0.2:52326
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.2:52334
+Received Gossip from: 172.20.0.2:52334
+Waiting for incoming connections on port 7881...
+Received and forwarded message from 172.20.0.2:52334
+Accepted new connection from 172.20.0.3:45718
+Received Gossip from: 172.20.0.3:45718
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.14:42054
+Received Gossip from: 172.20.0.14:42054
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.6:48394
+Received Gossip from: 172.20.0.6:48394
+Waiting for incoming connections on port 7881...
+Spreading pong from source: 172.20.0.2:7881
+Connecting to gossip endpoint: 172.20.0.4:7881
+Accepted new connection from 172.20.0.15:34658
+Received Gossip from: 172.20.0.15:34658
+Waiting for incoming connections on port 7881...
+Message sent asynchronously to: 172.20.0.4:7881
+Spreading pong from source: 172.20.0.2:7881
+Connecting to gossip endpoint: 172.20.0.5:7881
+Message sent asynchronously to: 172.20.0.5:7881
+Spreading pong from source: 172.20.0.2:7881
+Connecting to gossip endpoint: 172.20.0.3:7881
+Successfully connected to 172.20.0.4:7881
+Successfully connected to 172.20.0.5:7881
+Message sent asynchronously to: 172.20.0.3:7881
+Accepted new connection from 172.20.0.4:48564
+Received Gossip from: 172.20.0.4:48564
+Waiting for incoming connections on port 7881...
+Successfully wrote 64 bytes to 172.20.0.4:7881
+Successfully wrote 64 bytes to 172.20.0.5:7881
+Successfully connected to 172.20.0.3:7881
+Successfully wrote 64 bytes to 172.20.0.3:7881
+Accepted new connection from 172.20.0.15:34666
+Received Gossip from: 172.20.0.15:34666
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.2:52346
+Received Gossip from: 172.20.0.2:52346
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.3:45728
+Received Gossip from: 172.20.0.3:45728
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.11:41358
+Received Gossip from: 172.20.0.11:41358
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.4:48570
+Received Gossip from: 172.20.0.4:48570
+Waiting for incoming connections on port 7881...
+Received and forwarded message from 172.20.0.4:48570
+Spreading ping from source: 172.20.0.4:7881
+Connecting to gossip endpoint: 172.20.0.5:7881
+Message sent asynchronously to: 172.20.0.5:7881
+Spreading ping from source: 172.20.0.4:7881
+Connecting to gossip endpoint: 172.20.0.6:7881
+Accepted new connection from 172.20.0.6:48402
+Received Gossip from: Message sent asynchronously to: 172.20.0.6:7881
+Spreading ping from source: 172.20.0.4:7881
+Connecting to gossip endpoint: 172.20.0.3:7881
+172.20.0.6:48402
+Waiting for incoming connections on port 7881...
+Successfully connected to 172.20.0.5:7881
+Accepted new connection from 172.20.0.15:34674
+Received Gossip from: 172.20.0.15:34674
+Waiting for incoming connections on port 7881...
+Successfully wrote 57 bytes to 172.20.0.5:7881
+Successfully connected to 172.20.0.6:7881
+Accepted new connection from 172.20.0.13:56880
+Received Gossip from: 172.20.0.13:56880
+Waiting for incoming connections on port 7881...
+Successfully wrote 57 bytes to 172.20.0.6:7881
+Accepted new connection from 172.20.0.5:42714
+Received Gossip from: 172.20.0.5:42714
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.2:52348
+Received Gossip from: 172.20.0.2:52348
+Waiting for incoming connections on port 7881...
+Message sent asynchronously to: 172.20.0.3:7881
+Successfully connected to 172.20.0.3:7881
+Successfully wrote 57 bytes to 172.20.0.3:7881
+Received and forwarded message from 172.20.0.5:42714
+Accepted new connection from 172.20.0.11:41374
+Received Gossip from: 172.20.0.11:41374
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.15:34680
+Received Gossip from: 172.20.0.15:34680
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.6:48416
+Received Gossip from: 172.20.0.6:48416
+Waiting for incoming connections on port 7881...
+Spreading pong from source: 172.20.0.5:7881
+Connecting to gossip endpoint: 172.20.0.4:7881
+Message sent asynchronously to: 172.20.0.4:7881
+Spreading pong from source: 172.20.0.5:7881
+Connecting to gossip endpoint: 172.20.0.5:7881
+Message sent asynchronously to: 172.20.0.5:7881
+Spreading pong from source: 172.20.0.5:7881
+Connecting to gossip endpoint: 172.20.0.3:7881
+Message sent asynchronously to: 172.20.0.3:7881
+Accepted new connection from 172.20.0.5:42718
+Received Gossip from: 172.20.0.5:42718
+Waiting for incoming connections on port 7881...
+Successfully connected to 172.20.0.4:7881
+Successfully connected to 172.20.0.5:7881
+Successfully connected to 172.20.0.3:7881
+Successfully wrote 64 bytes to 172.20.0.4:7881
+Successfully wrote 64 bytes to 172.20.0.5:7881
+Successfully wrote 64 bytes to 172.20.0.3:7881
+Accepted new connection from 172.20.0.5:59544
+Received Gossip from: 172.20.0.5:59544
+Waiting for incoming connections on port 7881...
+Received and forwarded message from 172.20.0.5:59544
+Spreading ping from source: 172.20.0.5:7881
+Connecting to gossip endpoint: 172.20.0.4:7881
+Accepted new connection from 172.20.0.3:43166
+Received Gossip from: 172.20.0.3:43166
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.2:40692
+Received Gossip from: 172.20.0.2:40692
+Waiting for incoming connections on port 7881...
+Message sent asynchronously to: 172.20.0.4:7881
+Spreading ping from source: 172.20.0.5:7881
+Connecting to gossip endpoint: 172.20.0.3:7881
+Message sent asynchronously to: 172.20.0.3:7881
+Spreading ping from source: 172.20.0.5:7881
+Connecting to gossip endpoint: 172.20.0.6:7881
+Message sent asynchronously to: 172.20.0.6:7881
+Accepted new connection from 172.20.0.14:41890
+Received Gossip from: 172.20.0.14:41890
+Waiting for incoming connections on port 7881...
+Successfully connected to 172.20.0.4:7881
+Successfully connected to 172.20.0.3:7881
+Successfully connected to 172.20.0.6:7881
+Accepted new connection from 172.20.0.2:40698
+Received Gossip from: 172.20.0.2:40698
+Waiting for incoming connections on port 7881...
+Successfully wrote 57 bytes to 172.20.0.4:7881
+Successfully wrote 57 bytes to 172.20.0.3:7881
+Successfully wrote 57 bytes to 172.20.0.6:7881
+Accepted new connection from 172.20.0.2:40702
+Received Gossip from: 172.20.0.2:40702
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.3:43170
+Received Gossip from: 172.20.0.3:43170
+Waiting for incoming connections on port 7881...
+Received and forwarded message from 172.20.0.2:40702
+Accepted new connection from 172.20.0.3:43174
+Received Gossip from: 172.20.0.3:43174
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.5:59546
+Received Gossip from: 172.20.0.5:59546
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.4:44894
+Received Gossip from: 172.20.0.4:44894
+Waiting for incoming connections on port 7881...
+Spreading pong from source: 172.20.0.2:7881
+Connecting to gossip endpoint: 172.20.0.6:7881
+Accepted new connection from 172.20.0.13:48368
+Received Gossip from: 172.20.0.13:48368
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.14:41900
+Received Gossip from: 172.20.0.14:41900
+Waiting for incoming connections on port 7881...
+Message sent asynchronously to: 172.20.0.6:7881
+Spreading pong from source: 172.20.0.2:7881
+Connecting to gossip endpoint: 172.20.0.2:7881
+Successfully connected to 172.20.0.6:7881
+Successfully wrote 64 bytes to 172.20.0.6:7881
+Message sent asynchronously to: 172.20.0.2:7881
+Spreading pong from source: 172.20.0.2:7881
+Connecting to gossip endpoint: 172.20.0.5:7881
+Successfully connected to 172.20.0.2:7881
+Message sent asynchronously to: 172.20.0.5:7881
+Successfully wrote 64 bytes to 172.20.0.2:7881
+Successfully connected to 172.20.0.5:7881
+Successfully wrote 64 bytes to 172.20.0.5:7881
+Accepted new connection from 172.20.0.15:47854
+Received Gossip from: 172.20.0.15:47854
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.11:57130
+Received Gossip from: 172.20.0.11:57130
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.4:44896
+Received Gossip from: 172.20.0.4:44896
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.3:43178
+Received Gossip from: 172.20.0.3:43178
+Waiting for incoming connections on port 7881...
+Received and forwarded message from 172.20.0.3:43178
+Received and forwarded message from 172.20.0.11:57130
+Spreading pong from source: 172.20.0.3:7881
+Connecting to gossip endpoint: 172.20.0.4:7881
+Message sent asynchronously to: 172.20.0.4:7881
+Spreading pong from source: 172.20.0.3:7881
+Connecting to gossip endpoint: 172.20.0.3:7881
+Message sent asynchronously to: 172.20.0.3:7881
+Spreading pong from source: 172.20.0.3:7881
+Connecting to gossip endpoint: 172.20.0.5:7881
+Successfully connected to 172.20.0.4:7881
+Successfully connected to 172.20.0.3:7881
+Successfully wrote 64 bytes to 172.20.0.4:7881
+Successfully wrote 64 bytes to 172.20.0.3:7881
+Message sent asynchronously to: 172.20.0.5:7881
+Spreading ping from source: 172.20.0.2:7881
+Connecting to gossip endpoint: 172.20.0.5:7881
+Successfully connected to 172.20.0.5:7881
+Accepted new connection from 172.20.0.13:48374
+Received Gossip from: 172.20.0.13:48374
+Waiting for incoming connections on port 7881...
+Successfully wrote 64 bytes to 172.20.0.5:7881
+Successfully connected to 172.20.0.5:7881
+Message sent asynchronously to: 172.20.0.5:7881
+Spreading ping from source: 172.20.0.2:7881
+Connecting to gossip endpoint: 172.20.0.4:7881
+Successfully wrote 57 bytes to 172.20.0.5:7881
+Message sent asynchronously to: 172.20.0.4:7881
+Spreading ping from source: 172.20.0.2:7881
+Connecting to gossip endpoint: 172.20.0.2:7881
+Successfully connected to 172.20.0.4:7881
+Successfully wrote 57 bytes to 172.20.0.4:7881
+Message sent asynchronously to: 172.20.0.2:7881
+Successfully connected to 172.20.0.2:7881
+Successfully wrote 57 bytes to 172.20.0.2:7881
+Accepted new connection from 172.20.0.3:43194
+Received Gossip from: 172.20.0.3:43194
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.15:47866
+Received Gossip from: 172.20.0.15:47866
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.2:34294
+Received Gossip from: 172.20.0.2:34294
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.5:60736
+Received Gossip from: 172.20.0.5:60736
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.3:54568
+Received Gossip from: 172.20.0.3:54568
+Waiting for incoming connections on port 7881...
+Received and forwarded message from 172.20.0.5:60736
+Spreading ping from source: 172.20.0.5:7881
+Connecting to gossip endpoint: 172.20.0.6:7881
+Message sent asynchronously to: 172.20.0.6:7881
+Spreading ping from source: 172.20.0.5:7881
+Connecting to gossip endpoint: 172.20.0.5:7881
+Message sent asynchronously to: 172.20.0.5:7881
+Spreading ping from source: 172.20.0.5:7881
+Connecting to gossip endpoint: 172.20.0.4:7881
+Message sent asynchronously to: 172.20.0.4:7881
+Successfully connected to 172.20.0.6:7881
+Accepted new connection from 172.20.0.11:54594
+Received Gossip from: 172.20.0.11:54594
+Waiting for incoming connections on port 7881...
+Successfully connected to 172.20.0.5:7881
+Successfully connected to 172.20.0.4:7881
+Successfully wrote 57 bytes to 172.20.0.6:7881
+Accepted new connection from 172.20.0.4:46010
+Received Gossip from: 172.20.0.4:46010
+Waiting for incoming connections on port 7881...
+Successfully wrote 57 bytes to 172.20.0.5:7881
+Successfully wrote 57 bytes to 172.20.0.4:7881
+Accepted new connection from 172.20.0.5:60750
+Received Gossip from: 172.20.0.5:60750
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.3:54582
+Received Gossip from: 172.20.0.3:54582
+Waiting for incoming connections on port 7881...
+Received and forwarded message from 172.20.0.3:54582
+Accepted new connection from 172.20.0.6:33838
+Received Gossip from: 172.20.0.6:33838
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.14:52402
+Received Gossip from: 172.20.0.14:52402
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.11:54608
+Received Gossip from: 172.20.0.11:54608
+Waiting for incoming connections on port 7881...
+Spreading pong from source: 172.20.0.3:7881
+Connecting to gossip endpoint: 172.20.0.5:7881
+Message sent asynchronously to: 172.20.0.5:7881
+Spreading pong from source: 172.20.0.3:7881
+Connecting to gossip endpoint: 172.20.0.4:7881
+Message sent asynchronously to: 172.20.0.4:7881
+Spreading pong from source: 172.20.0.3:7881
+Connecting to gossip endpoint: 172.20.0.6:7881
+Message sent asynchronously to: 172.20.0.6:7881
+Successfully connected to 172.20.0.5:7881
+Successfully connected to 172.20.0.4:7881
+Successfully connected to 172.20.0.6:7881
+Successfully wrote 64 bytes to 172.20.0.5:7881
+Successfully wrote 64 bytes to 172.20.0.4:7881
+Successfully wrote 64 bytes to 172.20.0.6:7881
+Accepted new connection from 172.20.0.6:33848
+Received Gossip from: 172.20.0.6:33848
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.15:45476
+Received Gossip from: 172.20.0.15:45476
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.13:56366
+Received Gossip from: 172.20.0.13:56366
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.2:34306
+Received Gossip from: 172.20.0.2:34306
+Waiting for incoming connections on port 7881...
+Received and forwarded message from 172.20.0.2:34306
+Spreading ping from source: 172.20.0.2:7881
+Connecting to gossip endpoint: 172.20.0.6:7881
+Accepted new connection from 172.20.0.13:56376
+Received Gossip from: 172.20.0.13:56376
+Waiting for incoming connections on port 7881...
+Message sent asynchronously to: 172.20.0.6:7881
+Spreading ping from source: 172.20.0.2:7881
+Connecting to gossip endpoint: 172.20.0.2:7881
+Successfully connected to 172.20.0.6:7881
+Successfully wrote 57 bytes to 172.20.0.6:7881
+Message sent asynchronously to: 172.20.0.2:7881
+Spreading ping from source: 172.20.0.2:7881
+Connecting to gossip endpoint: Successfully connected to 172.20.0.4:7881
+172.20.0.2:7881
+Successfully wrote 57 bytes to 172.20.0.2:7881
+Message sent asynchronously to: 172.20.0.4:7881
+Successfully connected to 172.20.0.4:7881
+Successfully wrote 57 bytes to 172.20.0.4:7881
+Accepted new connection from 172.20.0.2:34316
+Received Gossip from: 172.20.0.2:34316
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.6:33854
+Received Gossip from: 172.20.0.6:33854
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.2:34326
+Received Gossip from: 172.20.0.2:34326
+Waiting for incoming connections on port 7881...
+Received and forwarded message from 172.20.0.2:34326
+Accepted new connection from 172.20.0.5:60754
+Received Gossip from: 172.20.0.5:60754
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.5:60756
+Received Gossip from: 172.20.0.5:60756
+Waiting for incoming connections on port 7881...
+Spreading pong from source: 172.20.0.2:7881
+Connecting to gossip endpoint: 172.20.0.5:7881
+Message sent asynchronously to: 172.20.0.5:7881
+Spreading pong from source: 172.20.0.2:7881
+Connecting to gossip endpoint: 172.20.0.4:7881
+Message sent asynchronously to: 172.20.0.4:7881
+Spreading pong from source: 172.20.0.2:7881
+Connecting to gossip endpoint: 172.20.0.3:7881
+Message sent asynchronously to: 172.20.0.3:7881
+Successfully connected to 172.20.0.5:7881
+Successfully connected to 172.20.0.4:7881
+Successfully wrote 65 bytes to 172.20.0.5:7881
+Successfully wrote 65 bytes to 172.20.0.4:7881
+Successfully connected to 172.20.0.3:7881
+Successfully wrote 65 bytes to 172.20.0.3:7881
+Accepted new connection from 172.20.0.13:56386
+Received Gossip from: 172.20.0.13:56386
+Waiting for incoming connections on port 7881...
+Accepted new connection from 172.20.0.4:46016
+Received Gossip from: 172.20.0.4:46016
+Waiting for incoming connections on port 7881...

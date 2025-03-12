@@ -1,0 +1,249 @@
+services:
+  # Bootstrap nodes
+  bootstrap1:
+    build:
+      context: .
+      dockerfile: Dockerfile.bootstrap
+    container_name: bootstrap1
+    networks:
+      p2p-network:
+        ipv4_address: 172.20.0.2
+    ports:
+      - "6881:6881/tcp"
+      - "6881:6881/udp"
+      - "7881:7881/tcp"
+      - "7881:7881/udp"
+    restart: unless-stopped
+    volumes:
+      - ./bootstrap_data/bootstrap1:/app/data
+    environment:
+      - GOSSIP_HOST=172.20.0.2
+      - PUBLIC_IP=172.20.0.2
+    command: ["--port", "6881", "--env", "docker", "--ip", "172.20.0.2"]
+
+  bootstrap2:
+    build:
+      context: .
+      dockerfile: Dockerfile.bootstrap
+    container_name: bootstrap2
+    networks:
+      p2p-network:
+        ipv4_address: 172.20.0.3
+    ports:
+      - "6882:6881/tcp"
+      - "6882:6881/udp"
+      - "7882:7881/tcp"
+      - "7882:7881/udp"
+    restart: unless-stopped
+    volumes:
+      - ./bootstrap_data/bootstrap2:/app/data
+    environment:
+      - GOSSIP_HOST=172.20.0.3
+      - PUBLIC_IP=172.20.0.3
+    command: ["--port", "6881", "--env", "docker", "--ip", "172.20.0.3"]
+
+  bootstrap3:
+    build:
+      context: .
+      dockerfile: Dockerfile.bootstrap
+    container_name: bootstrap3
+    networks:
+      p2p-network:
+        ipv4_address: 172.20.0.4
+    ports:
+      - "6883:6881/tcp"
+      - "6883:6881/udp"
+      - "7883:7881/tcp"
+      - "7883:7881/udp"
+    restart: unless-stopped
+    volumes:
+      - ./bootstrap_data/bootstrap3:/app/data
+    environment:
+      - GOSSIP_HOST=172.20.0.4
+      - PUBLIC_IP=172.20.0.4
+    command: ["--port", "6881", "--env", "docker", "--ip", "172.20.0.4"]
+
+  bootstrap4:
+    build:
+      context: .
+      dockerfile: Dockerfile.bootstrap
+    container_name: bootstrap4
+    networks:
+      p2p-network:
+        ipv4_address: 172.20.0.5
+    ports:
+      - "6884:6881/tcp"
+      - "6884:6881/udp"
+      - "7884:7881/tcp"
+      - "7884:7881/udp"
+    restart: unless-stopped
+    volumes:
+      - ./bootstrap_data/bootstrap4:/app/data
+    environment:
+      - GOSSIP_HOST=172.20.0.5
+      - PUBLIC_IP=172.20.0.5
+    command: ["--port", "6881", "--env", "docker", "--ip", "172.20.0.5"]
+
+  bootstrap5:
+    build:
+      context: .
+      dockerfile: Dockerfile.bootstrap
+    container_name: bootstrap5
+    networks:
+      p2p-network:
+        ipv4_address: 172.20.0.6
+    ports:
+      - "6885:6881/tcp"
+      - "6885:6881/udp"
+      - "7885:7881/tcp"
+      - "7885:7881/udp"
+    restart: unless-stopped
+    volumes:
+      - ./bootstrap_data/bootstrap5:/app/data
+    environment:
+      - GOSSIP_HOST=172.20.0.6
+      - PUBLIC_IP=172.20.0.6
+    command: ["--port", "6881", "--env", "docker", "--ip", "172.20.0.6"]
+
+  # Index nodes
+  index1:
+    build:
+      context: .
+      dockerfile: Dockerfile.index
+    container_name: index1
+    networks:
+      p2p-network:
+        ipv4_address: 172.20.0.11
+    ports:
+      - "6891:6881/tcp"
+      - "6891:6881/udp"
+      - "7891:7881/tcp"
+      - "7891:7881/udp"
+    restart: unless-stopped
+    volumes:
+      - ./index_data/index1:/app/data
+    environment:
+      - GOSSIP_HOST=172.20.0.11
+      - PUBLIC_IP=172.20.0.11
+    command: ["--port", "6881", "--env", "docker", "--ip", "172.20.0.11"]
+    depends_on:
+      - bootstrap1
+      - bootstrap2
+      - bootstrap3
+      - bootstrap4
+      - bootstrap5
+
+  index2:
+    build:
+      context: .
+      dockerfile: Dockerfile.index
+    container_name: index2
+    networks:
+      p2p-network:
+        ipv4_address: 172.20.0.12
+    ports:
+      - "6892:6881/tcp"
+      - "6892:6881/udp"
+      - "7892:7881/tcp"
+      - "7892:7881/udp"
+    restart: unless-stopped
+    volumes:
+      - ./index_data/index2:/app/data
+    environment:
+      - GOSSIP_HOST=172.20.0.12
+      - PUBLIC_IP=172.20.0.12
+    command: ["--port", "6881", "--env", "docker", "--ip", "172.20.0.12"]
+    depends_on:
+      - bootstrap1
+      - bootstrap2
+      - bootstrap3
+      - bootstrap4
+      - bootstrap5
+
+  index3:
+    build:
+      context: .
+      dockerfile: Dockerfile.index
+    container_name: index3
+    networks:
+      p2p-network:
+        ipv4_address: 172.20.0.13
+    ports:
+      - "6893:6881/tcp"
+      - "6893:6881/udp"
+      - "7893:7881/tcp"
+      - "7893:7881/udp"
+    restart: unless-stopped
+    volumes:
+      - ./index_data/index3:/app/data
+    environment:
+      - GOSSIP_HOST=172.20.0.13
+      - PUBLIC_IP=172.20.0.13
+    command: ["--port", "6881", "--env", "docker", "--ip", "172.20.0.13"]
+    depends_on:
+      - bootstrap1
+      - bootstrap2
+      - bootstrap3
+      - bootstrap4
+      - bootstrap5
+
+  index4:
+    build:
+      context: .
+      dockerfile: Dockerfile.index
+    container_name: index4
+    networks:
+      p2p-network:
+        ipv4_address: 172.20.0.14
+    ports:
+      - "6894:6881/tcp"
+      - "6894:6881/udp"
+      - "7894:7881/tcp"
+      - "7894:7881/udp"
+    restart: unless-stopped
+    volumes:
+      - ./index_data/index4:/app/data
+    environment:
+      - GOSSIP_HOST=172.20.0.14
+      - PUBLIC_IP=172.20.0.14
+    command: ["--port", "6881", "--env", "docker", "--ip", "172.20.0.14"]
+    depends_on:
+      - bootstrap1
+      - bootstrap2
+      - bootstrap3
+      - bootstrap4
+      - bootstrap5
+
+  index5:
+    build:
+      context: .
+      dockerfile: Dockerfile.index
+    container_name: index5
+    networks:
+      p2p-network:
+        ipv4_address: 172.20.0.15
+    ports:
+      - "6895:6881/tcp"
+      - "6895:6881/udp"
+      - "7895:7881/tcp"
+      - "7895:7881/udp"
+    restart: unless-stopped
+    volumes:
+      - ./index_data/index5:/app/data
+    environment:
+      - GOSSIP_HOST=172.20.0.15
+      - PUBLIC_IP=172.20.0.15
+    command: ["--port", "6881", "--env", "docker", "--ip", "172.20.0.15"]
+    depends_on:
+      - bootstrap1
+      - bootstrap2
+      - bootstrap3
+      - bootstrap4
+      - bootstrap5
+
+networks:
+  p2p-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

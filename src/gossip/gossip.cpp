@@ -5,12 +5,13 @@ namespace bip = boost::asio::ip;
 
 namespace torrent_p2p {
 
-Gossip::Gossip(lt::session& session, int port): session_(session), port_(port), running_(false) {
+Gossip::Gossip(lt::session& session, int port, const std::string& ip): session_(session), port_(port), ip_(ip), running_(false) {
     start();
 }
 
 void Gossip::start() {
     running_ = true;
+    lt::tcp::endpoint self_endpoint_(lt::make_address_v4(ip_), port_);
     std::cout << "Starting gossip on port " << port_ << std::endl;
     
     // Create a work guard to keep io_context running
@@ -215,7 +216,7 @@ void Gossip::handleReceivedMessage(const lt::tcp::endpoint& sender, const std::v
         }
 
         if (inCache(message.message_id())) {
-            std::cout << "Ignoring duplicate gossip message" << std::endl;
+            //std::cout << "Ignoring duplicate gossip message" << std::endl;
             return;
         }
         addToCache(message.message_id());
@@ -311,25 +312,30 @@ void Gossip::sendMessageAsync(const lt::tcp::endpoint& target, const GossipMessa
 void Gossip::processOutgoingMessages() {
     std::vector<std::pair<lt::tcp::endpoint, GossipMessage>> messages_to_process;
 
-    {
-        std::lock_guard<std::mutex> lock(outgoing_queue_mutex_);
-        const size_t max_batch_size = 10;
-        size_t count = 0;
+    
+    std::lock_guard<std::mutex> lock(outgoing_queue_mutex_);
+    const size_t max_batch_size = 10;
+    size_t count = 0;
 
-        while (!outgoing_messages_.empty() && count < max_batch_size) {
-            messages_to_process.push_back(outgoing_messages_.front());
-            outgoing_messages_.pop();
-            count++;
-        }
-
-        for (auto& msg : messages_to_process) {
-            // attaching lamport clock timestamp to outgoing message
-            msg.second.set_lamport_timestamp(lamport_clock_.getClock());
-            lamport_clock_.incrementClock();
-            sendMessageAsync(msg.first, msg.second);
-        }
-
+    while (!outgoing_messages_.empty() && count < max_batch_size) {
+        messages_to_process.push_back(outgoing_messages_.front());
+        outgoing_messages_.pop();
+        count++;
     }
+
+    for (auto& msg : messages_to_process) {
+        if (msg.second.has_heartbeat() && msg.second.heartbeat().type() == HeartbeatMessage::PING) {
+            std::cout << "Spreading ping from source: " << msg.second.source_ip() << ":" << msg.second.source_port() << std::endl;
+        } else if (msg.second.has_heartbeat() && msg.second.heartbeat().type() == HeartbeatMessage::PONG) {
+            std::cout << "Spreading pong from source: " << msg.second.source_ip() << ":" << msg.second.source_port() << std::endl;
+        }
+        // attaching lamport clock timestamp to outgoing message
+        msg.second.set_lamport_timestamp(lamport_clock_.getClock());
+        lamport_clock_.incrementClock();
+        sendMessageAsync(msg.first, msg.second);
+    }
+
+    
 }
 
 // processes messages that have been accepted and added to incoming queue
@@ -378,21 +384,60 @@ void Gossip::processIncomingMessages() {
                 const auto& heartbeat = message.heartbeat();
                 
                 if (heartbeat.type() == HeartbeatMessage::PING) {
-                    // Respond with a PONG
-                    GossipMessage pong_msg;
-                    pong_msg.set_timestamp(std::time(nullptr));
-                    pong_msg.set_message_id("heartbeat_pong_" + std::to_string(std::time(nullptr)));
-                    
-                    HeartbeatMessage* pong = pong_msg.mutable_heartbeat();
-                    pong->set_type(HeartbeatMessage::PONG);
-                    pong->set_timestamp(heartbeat.timestamp());
-                    
-                    sendMessageAsync(sender, pong_msg);
+                    std::cout << "Received ping from source: " << message.source_port() << ":" << message.source_ip();
+                    // only send a response if we are connected to a bootstrap node
+                    if (heartbeat_handler_) {
+                        // Respond with a PONG
+                        std::cout << "making a pong" << std::endl;
+                        GossipMessage pong_msg;
+                        pong_msg.set_source_ip(ip_);
+                        pong_msg.set_source_port(port_);
+                        pong_msg.set_timestamp(std::time(nullptr));
+                        pong_msg.set_message_id("heartbeat_pong_" + ip_ + "_" + std::to_string(port_) + "_" + std::to_string(std::time(nullptr)));
+                        
+                        HeartbeatMessage* pong = pong_msg.mutable_heartbeat();
+                        pong->set_type(HeartbeatMessage::PONG);
+                        pong->set_timestamp(heartbeat.timestamp());
+                        
+                        spreadMessage(pong_msg, lt::tcp::endpoint());
+                    }
                 } else if (heartbeat.type() == HeartbeatMessage::PONG) {
+                    std::cout << "Received pong from source: " << message.source_port() << ":" << message.source_ip();
                     // Notify heartbeat handler if exists
                     if (heartbeat_handler_) {
-                        heartbeat_handler_(sender);
+                        lt::tcp::endpoint source(lt::make_address_v4(message.source_ip()), message.source_port());
+                        heartbeat_handler_(source);
                     }
+                
+                } else if (heartbeat.type() == HeartbeatMessage::INDEX_PING) {
+                    // Respond with an INDEX_PONG
+                    if (index_heartbeat_handler_) {
+                        GossipMessage pong_msg;
+                        pong_msg.set_source_ip(ip_);
+                        pong_msg.set_source_port(port_);
+                        pong_msg.set_timestamp(std::time(nullptr));
+                        pong_msg.set_message_id("index_heartbeat_pong_" + ip_ + "_" + std::to_string(port_) + 
+                            "_" + std::to_string(std::time(nullptr)));
+                        
+                        HeartbeatMessage* pong = pong_msg.mutable_heartbeat();
+                        pong->set_type(HeartbeatMessage::INDEX_PONG);
+                        pong->set_timestamp(heartbeat.timestamp());
+                        
+                        spreadMessage(pong_msg, lt::tcp::endpoint());
+                    }
+                } else if (heartbeat.type() == HeartbeatMessage::INDEX_PONG) {
+                    // Notify heartbeat handler if exists
+                    if (index_heartbeat_handler_) {
+                        lt::tcp::endpoint source(lt::make_address_v4(message.source_ip()), message.source_port());
+                        index_heartbeat_handler_(source);
+                    }
+                }
+            } else if (message.has_index_sync()) {
+                // Handle index sync message
+                if (index_sync_handler_) {
+                    index_sync_handler_(message.index_sync(), sender);
+                } else {
+                    std::cerr << "Gossip: Received index sync message but no handler is registered" << std::endl;
                 }
             }
             else {
@@ -495,15 +540,16 @@ std::vector<lt::tcp::endpoint> Gossip::selectRandomPeers(size_t count, const lt:
 }
 
 void Gossip::spreadMessage(const GossipMessage& message, const lt::tcp::endpoint& exclude) {
-    std::cout << "spreading message" << std::endl;
+    // std::cout << "spreading message" << std::endl;
     auto peers = selectRandomPeers(3, exclude);
-    std::cout << "selected random peers" << std::endl;
+    // std::cout << "selected random peers" << std::endl;
 
     std::lock_guard<std::mutex> lock(outgoing_queue_mutex_);
     for (const auto & peer: peers) {
-        std::cout << "peer: " << peer << std::endl;
+        // std::cout << "peer: " << peer << std::endl;
         outgoing_messages_.push({peer, message});
     }
+    // std::cout << "messages pushed to queue" << std::endl;
 }
 
 void Gossip::sendReputationMessage(const lt::tcp::endpoint& target, 

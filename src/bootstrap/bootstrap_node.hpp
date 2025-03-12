@@ -33,10 +33,9 @@ private:
     void stop() override;
     // Handle DHT alerts
     void handleAlerts() override;
-    std::unique_ptr<BootstrapHeartbeat> heartbeat_manager_;
-    std::vector<lt::tcp::endpoint> bootstrap_nodes_;
     
     void initializeHeartbeat();
+    std::unique_ptr<BootstrapHeartbeat> heartbeat_manager_;
 };
 
 } // namespace torrent_p2p

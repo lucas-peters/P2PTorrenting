@@ -14,6 +14,7 @@ message IndexMessage {
         RemoveMessage removeTorrent = 11;
         WantMessage wantTorrent = 12;
         GiveMessage giveTorrent = 13;
+        KeywordAddMessage keywordAdd = 14;
     }
 }
 
@@ -37,6 +38,12 @@ message GiveMessage {
     string request_identifier = 2;  // Renamed from request_id to avoid protobuf compatibility issues
     repeated TorrentResult results = 3;
     bool more_results = 4;  // Indicates if there are more results available
+}
+
+message KeywordAddMessage {
+    string keyword = 1;
+    string title = 2;
+    string magnet = 3;
 }
 
 message TorrentResult {

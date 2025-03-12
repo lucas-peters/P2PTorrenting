@@ -8,13 +8,13 @@ using json = nlohmann::json;
 
 namespace torrent_p2p {
 Node::Node(int port, const std::string& env, const std::string& ip) : port_(port), ip_(ip), running_(false) {
-    loadEnvConfig(env);
     setIP(env);
+    loadEnvConfig(env);
 }
 
 Node::Node(int port, const std::string& env, const std::string& ip, const std::string& state_file) : port_(port), ip_(ip), running_(false), state_file_(state_file) {
-    loadEnvConfig(env);
     setIP(env);
+    loadEnvConfig(env);
     loadDHTState(state_file);
 }
 
@@ -61,9 +61,19 @@ void Node::loadEnvConfig(const std::string& env) {
         bootstrap_nodes_.clear();
         if (env_data.contains("bootstrap_nodes") && env_data["bootstrap_nodes"].is_array()) {
             for (const auto& node : env_data["bootstrap_nodes"]) {
+                // don't add ourself
+                if (node[0] == ip_ && node[1] == port_) {
+                    continue;
+                }
                 if (node.is_array() && node.size() == 2 && 
                     node[0].is_string() && node[1].is_number()) {
-                    bootstrap_nodes_.emplace_back(node[0].get<std::string>(), node[1].get<int>());
+                    std::string ip = node[0].get<std::string>();
+                    int port = node[1].get<int>();
+                    // don't add ourself
+                    if (ip_ == ip && port_ == port) {
+                        continue;
+                    }
+                    bootstrap_nodes_.emplace_back(ip, port);
                 } else {
                     std::cerr << "Invalid bootstrap node format" << std::endl;
                 }
@@ -76,7 +86,13 @@ void Node::loadEnvConfig(const std::string& env) {
             for (const auto& node : env_data["index_nodes"]) {
                 if (node.is_array() && node.size() == 2 && 
                     node[0].is_string() && node[1].is_number()) {
-                    index_nodes_.emplace_back(node[0].get<std::string>(), node[1].get<int>());
+                    std::string ip = node[0].get<std::string>();
+                    int port = node[1].get<int>();
+                    // don't add ourself
+                    if (ip_ == ip && port_ == port) {
+                        continue;
+                    }
+                    index_nodes_.emplace_back(ip, port);
                 } else {
                     std::cerr << "Invalid index node format" << std::endl;
                 }
@@ -120,7 +136,7 @@ void Node::start() {
         std::this_thread::sleep_for(std::chrono::seconds(2)); // Give DHT time to initialize
         
         std::cout << "Creating Gossip object..." << std::endl;
-        gossip_ = std::make_unique<Gossip>(*session_, port_ + 1000);
+        gossip_ = std::make_unique<Gossip>(*session_, port_ + 1000, ip_);
         std::cout << "Gossip object created successfully" << std::endl;
 
         std::cout << " Creating Messenger" << std::endl;

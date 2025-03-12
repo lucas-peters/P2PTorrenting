@@ -1,118 +1,37 @@
-// File: /Users/lucaspeters/Documents/GitHub/P2PTorrenting/src/gossip/index_heartbeat.cpp
-
 #include "gossip/index_heartbeat.hpp"
 #include <iostream>
 
 namespace torrent_p2p {
 
-IndexHeartbeat::IndexHeartbeat(Gossip& gossip, const std::vector<lt::tcp::endpoint>& index_nodes)
-    : gossip_(gossip), index_nodes_(index_nodes), running_(false) {
+IndexHeartbeat::IndexHeartbeat(Gossip& gossip, const std::vector<lt::tcp::endpoint>& index_nodes, 
+                               const std::string& ip, const int port)
+    : BootstrapHeartbeat(gossip, index_nodes, ip, port) {
+    std::cout << "[IndexHeartbeat] Initializing with " << index_nodes.size() << " index nodes" << std::endl;
 }
 
 IndexHeartbeat::~IndexHeartbeat() {
-    stop();
-}
-
-void IndexHeartbeat::start() {
-    running_ = true;
-    heartbeat_thread_ = std::make_unique<std::thread>(&IndexHeartbeat::heartbeatLoop, this);
-}
-
-void IndexHeartbeat::stop() {
-    running_ = false;
-    if (heartbeat_thread_ && heartbeat_thread_->joinable()) {
-        heartbeat_thread_->join();
-    }
-}
-
-void IndexHeartbeat::addIndexNode(const lt::tcp::endpoint& node) {
-    std::lock_guard<std::mutex> lock(nodes_mutex_);
-    
-    // Check if node already exists
-    auto it = std::find(index_nodes_.begin(), index_nodes_.end(), node);
-    if (it == index_nodes_.end()) {
-        index_nodes_.push_back(node);
-        std::cout << "Added index node: " << node.address().to_string() << ":" << node.port() << std::endl;
-    }
-}
-
-void IndexHeartbeat::removeIndexNode(const lt::tcp::endpoint& node) {
-    std::lock_guard<std::mutex> lock(nodes_mutex_);
-    
-    auto it = std::find(index_nodes_.begin(), index_nodes_.end(), node);
-    if (it != index_nodes_.end()) {
-        index_nodes_.erase(it);
-        std::cout << "Removed index node: " << node.address().to_string() << ":" << node.port() << std::endl;
-    }
-    
-    // Remove from last heartbeat tracking
-    last_heartbeat_.erase(node);
-}
-
-bool IndexHeartbeat::isIndexNodeAlive(const lt::tcp::endpoint& node) const {
-    std::lock_guard<std::mutex> lock(nodes_mutex_);
-    
-    auto heartbeat_it = last_heartbeat_.find(node);
-    if (heartbeat_it == last_heartbeat_.end()) {
-        // Node not tracked yet, consider it potentially alive
-        return true;
-    }
-    
-    auto now = std::chrono::steady_clock::now();
-    return (now - heartbeat_it->second) < NODE_TIMEOUT;
-}
-
-std::vector<lt::tcp::endpoint> IndexHeartbeat::getAliveIndexNodes() const {
-    std::lock_guard<std::mutex> lock(nodes_mutex_);
-    
-    std::vector<lt::tcp::endpoint> alive_nodes;
-    auto now = std::chrono::steady_clock::now();
-    
-    for (const auto& node : index_nodes_) {
-        auto heartbeat_it = last_heartbeat_.find(node);
-        if (heartbeat_it == last_heartbeat_.end() || 
-            (now - heartbeat_it->second) < NODE_TIMEOUT) {
-            alive_nodes.push_back(node);
-        }
-    }
-    
-    return alive_nodes;
-}
-
-void IndexHeartbeat::heartbeatLoop() {
-    while (running_) {
-        try {
-            // Send heartbeats to all index nodes
-            sendHeartbeats();
-            
-            // Check health of nodes
-            checkNodeHealth();
-            
-            // Sleep for heartbeat interval
-            std::this_thread::sleep_for(HEARTBEAT_INTERVAL);
-        } catch (const std::exception& e) {
-            std::cerr << "Index heartbeat loop error: " << e.what() << std::endl;
-        }
-    }
+    // Base class destructor will handle stopping the heartbeat thread
 }
 
 void IndexHeartbeat::sendHeartbeats() {
     std::lock_guard<std::mutex> lock(nodes_mutex_);
     
-    for (const auto& node : index_nodes_) {
-        // Create a heartbeat message
-        GossipMessage heartbeat_msg;
-        heartbeat_msg.set_timestamp(std::time(nullptr));
-        heartbeat_msg.set_message_id("index_heartbeat_" + std::to_string(std::time(nullptr)));
-        
-        // Add a heartbeat-specific field to the message
-        HeartbeatMessage* heartbeat = heartbeat_msg.mutable_heartbeat();
-        heartbeat->set_type(HeartbeatMessage::INDEX_PING);
-        heartbeat->set_timestamp(std::time(nullptr));
-        
-        // Send the heartbeat message
-        gossip_.sendMessage(node, heartbeat_msg);
-    }
+    std::cout << "[IndexHeartbeat] Sending heartbeats to " << nodes_.size() << " nodes" << std::endl;
+    
+    // Create a heartbeat message
+    GossipMessage heartbeat_msg;
+    heartbeat_msg.set_timestamp(std::time(nullptr));
+    heartbeat_msg.set_message_id("index_heartbeat_" + std::to_string(std::time(nullptr)));
+    heartbeat_msg.set_source_ip(ip_);
+    heartbeat_msg.set_source_port(port_);
+    
+    // Add a heartbeat-specific field to the message
+    HeartbeatMessage* heartbeat = heartbeat_msg.mutable_heartbeat();
+    heartbeat->set_type(HeartbeatMessage::INDEX_PING);
+    heartbeat->set_timestamp(std::time(nullptr));
+    
+    // Send the heartbeat message, use null endpoint since we dont want to exclude any nodes
+    gossip_.spreadMessage(heartbeat_msg, lt::tcp::endpoint());
 }
 
 void IndexHeartbeat::processHeartbeatResponse(const lt::tcp::endpoint& sender) {
@@ -120,19 +39,21 @@ void IndexHeartbeat::processHeartbeatResponse(const lt::tcp::endpoint& sender) {
     
     // Update the last heartbeat time for the sender
     last_heartbeat_[sender] = std::chrono::steady_clock::now();
+    std::cout << "[IndexHeartbeat] Processed heartbeat response from: " 
+              << sender.address().to_string() << ":" << sender.port() << std::endl;
     
     // If this is a new index node, add it to our list
-    auto it = std::find(index_nodes_.begin(), index_nodes_.end(), sender);
-    if (it == index_nodes_.end()) {
-        index_nodes_.push_back(sender);
-        std::cout << "Discovered new index node: " << sender.address().to_string() << ":" << sender.port() << std::endl;
-        
-        // Request index sync with the new node
-        requestIndexSync(sender);
+    auto it = std::find(nodes_.begin(), nodes_.end(), sender);
+    if (it == nodes_.end()) {
+        nodes_.push_back(sender);
+        std::cout << "[IndexHeartbeat] Added new index node from heartbeat response: " 
+                  << sender.address().to_string() << ":" << sender.port() << std::endl;
     }
 }
 
 void IndexHeartbeat::requestIndexSync(const lt::tcp::endpoint& target) {
+    std::cout << "[IndexHeartbeat] Requesting index sync from: " 
+              << target.address().to_string() << ":" << target.port() << std::endl;
     // Create a sync request message
     GossipMessage sync_msg;
     sync_msg.set_timestamp(std::time(nullptr));
@@ -144,34 +65,68 @@ void IndexHeartbeat::requestIndexSync(const lt::tcp::endpoint& target) {
     sync->set_timestamp(std::time(nullptr));
     
     // Send the sync message
-    gossip_.sendMessage(target, sync_msg);
-    std::cout << "Requested index sync with: " << target.address().to_string() << ":" << target.port() << std::endl;
+    gossip_.spreadMessage(sync_msg, target);
+    std::cout << "[IndexHeartbeat] Requested index sync with: " << target.address().to_string() << ":" << target.port() << std::endl;
 }
 
-void IndexHeartbeat::checkNodeHealth() {
+std::vector<lt::tcp::endpoint> IndexHeartbeat::getAliveIndexNodes() const {
     std::lock_guard<std::mutex> lock(nodes_mutex_);
     
+    std::vector<lt::tcp::endpoint> alive_nodes;
     auto now = std::chrono::steady_clock::now();
-    std::vector<lt::tcp::endpoint> failed_nodes;
     
-    // Check each tracked node's last heartbeat
-    for (const auto& node : index_nodes_) {
+    for (const auto& node : nodes_) {
         auto heartbeat_it = last_heartbeat_.find(node);
-        if (heartbeat_it != last_heartbeat_.end() && 
-            (now - heartbeat_it->second) >= NODE_TIMEOUT) {
-            // Node hasn't responded within timeout period
-            failed_nodes.push_back(node);
-            std::cerr << "Index node failed: " << node.address().to_string() << ":" << node.port() << std::endl;
+        if (heartbeat_it == last_heartbeat_.end() || 
+            (now - heartbeat_it->second) < NODE_TIMEOUT) {
+            alive_nodes.push_back(node);
         }
     }
     
-    // Remove failed nodes from the index nodes list
-    for (const auto& failed_node : failed_nodes) {
-        auto it = std::find(index_nodes_.begin(), index_nodes_.end(), failed_node);
-        if (it != index_nodes_.end()) {
-            index_nodes_.erase(it);
-        }
-    }
+    std::cout << "[IndexHeartbeat] Found " << alive_nodes.size() << " alive nodes out of " 
+              << nodes_.size() << " total nodes" << std::endl;
+    
+    return alive_nodes;
 }
+
+// void IndexHeartbeat::checkNodeHealth() {
+//     std::lock_guard<std::mutex> lock(nodes_mutex_);
+    
+//     auto now = std::chrono::steady_clock::now();
+//     std::vector<lt::tcp::endpoint> failed_nodes;
+
+//     std::cout << "===== Current heartbeat status =====" << std::endl;
+//     for (const auto& entry : last_heartbeat_) {
+//         auto time_since_last_heartbeat = std::chrono::duration_cast<std::chrono::seconds>(now - entry.second).count();
+//         std::cout << "Node: " << entry.first.address().to_string() << ":" << entry.first.port() 
+//                   << " | Last seen: " << time_since_last_heartbeat << " seconds ago" << std::endl;
+//     }
+//     std::cout << "==================================" << std::endl;
+    
+//     // Check each tracked node's last heartbeat
+//     for (const auto& node : nodes_) {
+
+//         auto heartbeat_it = last_heartbeat_.find(node);
+//         // if (heartbeat_it == last_heartbeat_.end()) {
+//         //     // Node hasn't been heard from, mark as potentially failed
+//         //     // failed_nodes.push_back(node);
+//         //     continue;
+//         // } else 
+//         if ((now - heartbeat_it->second) >= NODE_TIMEOUT) {
+//             // Node hasn't responded within timeout period
+//             failed_nodes.push_back(node);
+//             std::cout << "*** Index node failed: " << node.address() << ":" << node.port() << " ***" << std::endl;
+//         }
+//     }
+    
+//     // Remove failed nodes from the bootstrap nodes list
+//     for (const auto& failed_node : failed_nodes) {
+//         auto it = std::find(nodes_.begin(), nodes_.end(), failed_node);
+//         if (it != nodes_.end()) {
+//             nodes_.erase(it);
+//             // need to rebalance sharding here
+//         }
+//     }
+// }
 
 } // namespace torrent_p2p
