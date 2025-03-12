@@ -36,6 +36,7 @@ void displayHelp() {
     std::cout << "  gossip                            - Send a test gossip message\n";
     std::cout << "  save <state_file>                 - Save DHT state to file\n";
     std::cout << "  load <state_file>                 - Load DHT state from file\n";
+    std::cout << "  corrupt <% corruption>            - Corrupts all torrents in download path\n";
     std::cout << "  clear                             - Clear the console\n";
     std::cout << "  help                              - Display this help message\n";
     std::cout << "  quit                              - Exit the application\n";
@@ -158,7 +159,7 @@ int main(int argc, char* argv[]) {
                         [](unsigned char c){ return std::tolower(c); });
 
             if (command == "quit" || command == "exit") {
-                std::cout << "Shutting down client...\n";
+                std::cout << "Shutting down client..." << std::endl;
                 running = false;
                 break;
             } else if (command == "help") {
@@ -170,25 +171,25 @@ int main(int argc, char* argv[]) {
                 std::string torrent_file;
                 if (iss >> torrent_file ) {
                     try {
-                        std::cout << "Adding torrent: " << torrent_file << "\n";
+                        std::cout << "Adding torrent: " << torrent_file << std::endl;
                         client->addTorrent(torrent_file);
                     } catch (const std::exception& e) {
-                        std::cerr << "Error adding torrent: " << e.what() << "\n";
+                        std::cerr << "Error adding torrent: " << e.what() << std::endl;
                     }
                 } else {
-                    std::cout << "Usage: add <torrent_file>\n";
+                    std::cout << "Usage: add <torrent_file>" << std::endl;
                 }
             } else if (command == "magnet") {
                 std::string info_hash;
                 if (iss >> info_hash) {
                     try {
-                        std::cout << "Adding magnet link with info hash: " << info_hash << "\n";
+                        std::cout << "Adding magnet link with info hash: " << info_hash << std::endl;
                         client->addMagnet(info_hash);
                     } catch (const std::exception& e) {
-                        std::cerr << "Error adding magnet link: " << e.what() << "\n";
+                        std::cerr << "Error adding magnet link: " << e.what() << std::endl;
                     }
                 } else {
-                    std::cout << "Usage: magnet <info_hash> <save_path>\n";
+                    std::cout << "Usage: magnet <info_hash> <save_path>" << std::endl;
                 }
             } else if (command == "status") {
                 client->printStatus();
@@ -196,26 +197,26 @@ int main(int argc, char* argv[]) {
                 std::string file_path;
                 if (iss >> file_path) {
                     try {
-                        std::cout << "Generating torrent file for: " << file_path << "\n";
+                        std::cout << "Generating torrent file for: " << file_path << std::endl;
                         client->generateTorrentFile(file_path);
-                        std::cout << "Torrent file generated successfully.\n";
+                        std::cout << "Torrent file generated successfully." << std::endl;
                     } catch (const std::exception& e) {
-                        std::cerr << "Error generating torrent file: " << e.what() << "\n";
+                        std::cerr << "Error generating torrent file: " << e.what() << std::endl;
                     }
                 } else {
-                    std::cout << "Usage: generate <file_path>\n";
+                    std::cout << "Usage: generate <file_path>" << std::endl;
                 }
             } else if (command == "search") {
                 std::string keyword;
                 if (iss >> keyword) {
                     try {
-                        std::cout << "Searching DHT for keyword: " << keyword << "\n";
+                        std::cout << "Searching DHT for keyword: " << keyword << std::endl;
                         client->searchIndex(keyword);
                     } catch (const std::exception& e) {
-                        std::cerr << "Error searching DHT: " << e.what() << "\n";
+                        std::cerr << "Error searching DHT: " << e.what() << std::endl;
                     }
                 } else {
-                    std::cout << "Usage: search <info_hash>\n";
+                    std::cout << "Usage: search <info_hash>" << std::endl;
                 }
             } 
             // else if (command == "connect") {
@@ -250,37 +251,45 @@ int main(int argc, char* argv[]) {
                 std::string save_file;
                 if (iss >> save_file) {
                     try {
-                        std::cout << "Saving DHT state to: " << save_file << "\n";
+                        std::cout << "Saving DHT state to: " << save_file << std::endl;
                         if (client->saveDHTState()) {
-                            std::cout << "DHT state saved successfully.\n";
+                            std::cout << "DHT state saved successfully." << std::endl;
                         } else {
-                            std::cerr << "Failed to save DHT state.\n";
+                            std::cerr << "Failed to save DHT state." << std::endl;
                         }
                     } catch (const std::exception& e) {
-                        std::cerr << "Error saving DHT state: " << e.what() << "\n";
+                        std::cerr << "Error saving DHT state: " << e.what() << std::endl;
                     }
                 } else {
-                    std::cout << "Usage: save <state_file>\n";
+                    std::cout << "Usage: save <state_file>" << std::endl;
                 }
             } else if (command == "load") {
                 std::string load_file;
                 if (iss >> load_file) {
                     try {
-                        std::cout << "Loading DHT state from: " << load_file << "\n";
+                        std::cout << "Loading DHT state from: " << load_file << std::endl;
                         if (client->loadDHTState(load_file)) {
-                            std::cout << "DHT state loaded successfully.\n";
+                            std::cout << "DHT state loaded successfully." << std::endl;
                         } else {
-                            std::cerr << "Failed to load DHT state.\n";
+                            std::cerr << "Failed to load DHT state." << std::endl;
                         }
                     } catch (const std::exception& e) {
-                        std::cerr << "Error loading DHT state: " << e.what() << "\n";
+                        std::cerr << "Error loading DHT state: " << e.what() << std::endl;
                     }
                 } else {
-                    std::cout << "Usage: load <state_file>\n";
+                    std::cout << "Usage: load <state_file>" << std::endl;
+                }
+            } else if (command == "corrupt") {
+                std::string corrupt_percentage;
+                if (iss >> corrupt_percentage) {
+                    std::cout << "Corrupting all torrents in session" << std::endl;
+                    client->corruptAllTorrents(std::stof(corrupt_percentage));
+                } else {
+                    std::cout << "Usage: corrupt <corrupt_percentage>" << std::endl;
                 }
             } else {
-                std::cout << "Unknown command: " << command << "\n";
-                std::cout << "Type 'help' for available commands\n";
+                std::cout << "Unknown command: " << command << std::endl;
+                std::cout << "Type 'help' for available commands" << std::endl;
             }
         }
     });

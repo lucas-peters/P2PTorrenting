@@ -153,6 +153,8 @@ public:
     // Converts a string representation of an info hash to a sha1_hash
     lt::sha1_hash stringToHash(const std::string& infoHashString) const;
 
+    void corruptTorrentData(const lt::sha1_hash& info_hash, double corruption_percent = 10.0);
+    void corruptAllTorrents(double corruption_percentage);
     // save/load the client's DHT state to/from a file
     // bool saveDHTState(const std::string& state_file) const;
     // bool loadDHTState(const std::string& state_file);
@@ -199,6 +201,10 @@ private:
     
     // Ban a node from the DHT network
     void banNode(const lt::tcp::endpoint& endpoint);
+    
+    // Enable malicious mode for testing reputation system
+    // When enabled, the client will deliberately serve corrupted data for the specified torrent
+    void enableMaliciousMode(const std::string& torrentFilePath, bool enable = true);
 };
 
 } // namespace torrent_p2p

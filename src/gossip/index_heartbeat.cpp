@@ -89,44 +89,4 @@ std::vector<lt::tcp::endpoint> IndexHeartbeat::getAliveIndexNodes() const {
     return alive_nodes;
 }
 
-// void IndexHeartbeat::checkNodeHealth() {
-//     std::lock_guard<std::mutex> lock(nodes_mutex_);
-    
-//     auto now = std::chrono::steady_clock::now();
-//     std::vector<lt::tcp::endpoint> failed_nodes;
-
-//     std::cout << "===== Current heartbeat status =====" << std::endl;
-//     for (const auto& entry : last_heartbeat_) {
-//         auto time_since_last_heartbeat = std::chrono::duration_cast<std::chrono::seconds>(now - entry.second).count();
-//         std::cout << "Node: " << entry.first.address().to_string() << ":" << entry.first.port() 
-//                   << " | Last seen: " << time_since_last_heartbeat << " seconds ago" << std::endl;
-//     }
-//     std::cout << "==================================" << std::endl;
-    
-//     // Check each tracked node's last heartbeat
-//     for (const auto& node : nodes_) {
-
-//         auto heartbeat_it = last_heartbeat_.find(node);
-//         // if (heartbeat_it == last_heartbeat_.end()) {
-//         //     // Node hasn't been heard from, mark as potentially failed
-//         //     // failed_nodes.push_back(node);
-//         //     continue;
-//         // } else 
-//         if ((now - heartbeat_it->second) >= NODE_TIMEOUT) {
-//             // Node hasn't responded within timeout period
-//             failed_nodes.push_back(node);
-//             std::cout << "*** Index node failed: " << node.address() << ":" << node.port() << " ***" << std::endl;
-//         }
-//     }
-    
-//     // Remove failed nodes from the bootstrap nodes list
-//     for (const auto& failed_node : failed_nodes) {
-//         auto it = std::find(nodes_.begin(), nodes_.end(), failed_node);
-//         if (it != nodes_.end()) {
-//             nodes_.erase(it);
-//             // need to rebalance sharding here
-//         }
-//     }
-// }
-
 } // namespace torrent_p2p

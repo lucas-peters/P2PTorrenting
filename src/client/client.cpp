@@ -647,6 +647,115 @@ void Client::banNode(const lt::tcp::endpoint& endpoint) {
     }
 }
 
+void Client::corruptAllTorrents(double corruption_percent) {
+    for (auto& torrent : torrents_) {
+        corruptTorrentData(torrent.first, corruption_percent);
+    }
+}
+
+void Client::corruptTorrentData(const lt::sha1_hash& info_hash, double corruption_percent) {
+    std::cout << "Attempting to corrupt torrent data for testing..." << std::endl;
+    
+    // Find the torrent
+    auto it = torrents_.find(info_hash);
+    if (it == torrents_.end()) {
+        std::cerr << "Torrent not found with hash: " << info_hash.to_string() << std::endl;
+        return;
+    }
+    
+    lt::torrent_handle handle = it->second;
+    if (!handle.is_valid()) {
+        std::cerr << "Invalid torrent handle" << std::endl;
+        return;
+    }
+    
+    // Get torrent info
+    std::shared_ptr<const lt::torrent_info> ti = handle.torrent_file();
+    if (!ti) {
+        std::cerr << "Missing torrent info" << std::endl;
+        return;
+    }
+    
+    std::cout << "Corrupting files for torrent: " << ti->name() << std::endl;
+    
+    // First pause the torrent
+    handle.pause();
+    std::cout << "Torrent paused" << std::endl;
+    
+    // Wait a moment for operations to complete
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    
+    // Corrupt each file in the torrent
+    for (lt::file_index_t i(0); i < ti->files().end_file(); ++i) {
+        std::string file_path = download_path_ + ti->files().file_path(i);
+        std::cout << "Processing file: " << file_path << std::endl;
+        
+        // Check if file exists
+        if (!std::filesystem::exists(file_path)) {
+            std::cerr << "File not found: " << file_path << std::endl;
+            continue;
+        }
+        
+        // Get file size
+        std::streamsize file_size = std::filesystem::file_size(file_path);
+        if (file_size < 1024) {
+            std::cout << "File too small to corrupt: " << file_path << std::endl;
+            continue;
+        }
+        
+        // Open file for binary reading/writing
+        std::fstream file(file_path, std::ios::in | std::ios::out | std::ios::binary);
+        if (!file) {
+            std::cerr << "Cannot open file: " << file_path << std::endl;
+            continue;
+        }
+        
+        // Calculate bytes to corrupt (at least 100 bytes)
+        size_t bytes_to_corrupt = std::max<size_t>(
+            static_cast<size_t>(file_size * corruption_percent / 100.0), 100);
+        
+        // Initialize random generator
+        std::random_device rd;
+        std::mt19937 rng(rd());
+        std::uniform_int_distribution<std::streamsize> dist(0, file_size - 1);
+        
+        std::cout << "Corrupting " << bytes_to_corrupt << " bytes in file: " << file_path << std::endl;
+        
+        // Corrupt random bytes in the file
+        for (size_t j = 0; j < bytes_to_corrupt; ++j) {
+            // Pick a random position
+            std::streampos pos = dist(rng);
+            file.seekg(pos);
+            
+            // Read the byte
+            char byte;
+            file.read(&byte, 1);
+            
+            // Corrupt the byte (flip all bits)
+            byte = ~byte;
+            
+            // Write it back
+            file.seekp(pos);
+            file.write(&byte, 1);
+        }
+        
+        file.close();
+        std::cout << "File corrupted: " << file_path << std::endl;
+    }
+    
+    // Enable seed mode to skip hash checking
+    std::cout << "Setting seed mode flag to skip hash checking..." << std::endl;
+    handle.set_flags(lt::torrent_flags::seed_mode);
+    
+    // Resume the torrent
+    handle.resume();
+    std::cout << "Torrent resumed with corrupted data" << std::endl;
+    
+    // Log completion
+    std::cout << "Torrent data corruption complete. When peers download from this client, "
+              << "they should detect bad pieces and trigger hash_failed_alert events." << std::endl;
+}
+
 // checks the torrent handle is valid
 // libtorrent sets seeding to true automatically
 // sets the seed flag to false, doesn't let other clients download from it
