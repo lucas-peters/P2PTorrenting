@@ -88,10 +88,10 @@ void Node::loadEnvConfig(const std::string& env) {
                     node[0].is_string() && node[1].is_number()) {
                     std::string ip = node[0].get<std::string>();
                     int port = node[1].get<int>();
-                    // don't add ourself
-                    if (ip_ == ip && port_ == port) {
-                        continue;
-                    }
+                    // // don't add ourself
+                    // if (ip_ == ip && port_ == port) {
+                    //     continue;
+                    // }
                     index_nodes_.emplace_back(ip, port);
                 } else {
                     std::cerr << "Invalid index node format" << std::endl;
@@ -362,7 +362,7 @@ void Node::connectToDHT() {
 void Node::setIP(const std::string& env) {
     // Check if PUBLIC_IP environment variable is set (highest priority)
     const char* publicIP = std::getenv("PUBLIC_IP");
-    if (publicIP) {
+    if (ip_ == "None" && publicIP) {
         ip_ = publicIP;
         std::cout << "Using public IP from environment variable: " << ip_ << std::endl;
     }
@@ -379,6 +379,12 @@ void Node::setIP(const std::string& env) {
     }
     
     std::cout << "Using IP: " << ip_ << std::endl;
+}
+
+std::string Node::generateRequestId() {
+    // Simple request ID generator
+    static int counter = 0;
+    return "req_" + std::to_string(++counter) + "_" + ip_ + "_" + std::to_string(port_);
 }
 // lt::sha1_hash Node::getMyNodeId() const {
 //     lt::sha1_hash node_id;

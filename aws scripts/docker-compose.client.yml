@@ -6,12 +6,9 @@ services:
       p2p-network:
         ipv4_address: 172.20.0.10
     ports:
-      - "6881:6881/tcp"
-      - "6881:6881/udp"
-      - "7881:7881/tcp"
-      - "7881:7881/udp"
-      - "8881:8881/tcp"
-      - "8881:8881/udp"
+      - "6881:6881"
+      - "7881:7881"
+      - "8881:8881"
     restart: unless-stopped
     volumes:
       - ./client1_data:/app/data
@@ -31,12 +28,9 @@ services:
       p2p-network:
         ipv4_address: 172.20.0.11
     ports:
-      - "6882:6881/tcp"
-      - "6882:6881/udp"
-      - "7882:7881/tcp"
-      - "7882:7881/udp"
-      - "8882:8881/tcp"
-      - "8882:8881/udp"
+      - "6882:6882"
+      - "7882:7882"
+      - "8882:8882"
     restart: unless-stopped
     volumes:
       - ./client2_data:/app/data
@@ -45,7 +39,7 @@ services:
     environment:
       - GOSSIP_HOST=172.20.0.11
       - PUBLIC_IP=${PUBLIC_IP:-172.20.0.11}
-    command: --port 6881 --env aws --ip PUBLIC_IP
+    command: --port 6882 --env aws --ip PUBLIC_IP
     stdin_open: true
     tty: true
 
@@ -56,12 +50,9 @@ services:
       p2p-network:
         ipv4_address: 172.20.0.12
     ports:
-      - "6883:6881/tcp"
-      - "6883:6881/udp"
-      - "7883:7881/tcp"
-      - "7883:7881/udp"
-      - "8883:8881/tcp"
-      - "8883:8881/udp"
+      - "6883:6883"
+      - "7883:7883"
+      - "8883:8883"
     restart: unless-stopped
     volumes:
       - ./client3_data:/app/data
@@ -70,7 +61,7 @@ services:
     environment:
       - GOSSIP_HOST=172.20.0.12
       - PUBLIC_IP=${PUBLIC_IP:-172.20.0.12}
-    command: --port 6881 --env aws --ip PUBLIC_IP
+    command: --port 6883 --env aws --ip PUBLIC_IP
     stdin_open: true
     tty: true
 
@@ -81,12 +72,9 @@ services:
       p2p-network:
         ipv4_address: 172.20.0.13
     ports:
-      - "6884:6881/tcp"
-      - "6884:6881/udp"
-      - "7884:7881/tcp"
-      - "7884:7881/udp"
-      - "8884:8881/tcp"
-      - "8884:8881/udp"
+      - "6884:6884"
+      - "7884:7884"
+      - "8884:8884"
     restart: unless-stopped
     volumes:
       - ./client4_data:/app/data
@@ -95,7 +83,7 @@ services:
     environment:
       - GOSSIP_HOST=172.20.0.13
       - PUBLIC_IP=${PUBLIC_IP:-172.20.0.13}
-    command: --port 6881 --env aws --ip PUBLIC_IP
+    command: --port 6884 --env aws --ip PUBLIC_IP
     stdin_open: true
     tty: true
 
@@ -106,12 +94,9 @@ services:
       p2p-network:
         ipv4_address: 172.20.0.14
     ports:
-      - "6885:6881/tcp"
-      - "6885:6881/udp"
-      - "7885:7881/tcp"
-      - "7885:7881/udp"
-      - "8885:8881/tcp"
-      - "8885:8881/udp"
+      - "6885:6885"
+      - "7885:7885"
+      - "8885:8885"
     restart: unless-stopped
     volumes:
       - ./client5_data:/app/data
@@ -120,7 +105,7 @@ services:
     environment:
       - GOSSIP_HOST=172.20.0.14
       - PUBLIC_IP=${PUBLIC_IP:-172.20.0.14}
-    command: --port 6881 --env aws --ip PUBLIC_IP
+    command: --port 6885 --env aws --ip PUBLIC_IP
     stdin_open: true
     tty: true
 

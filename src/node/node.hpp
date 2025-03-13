@@ -65,6 +65,8 @@ protected:
     void connectToDHT();
     void initializeSession();
 
+    std::string generateRequestId();
+
     // Used to set our own ip, so that other nodes know how to respond to us
     // In docker on EC2 this needs to be set as an environment variable
     void setIP(const std::string& env);

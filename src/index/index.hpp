@@ -36,13 +36,14 @@ private:
     void stop() override;
     // Handle DHT alerts
     void handleAlerts() override;
-    void handleIndexMessage(const lt::tcp::endpoint& sender, const IndexMessage& message);
-    void sendGiveMessage(const lt::tcp::endpoint& sender, const std::string& keyword, const std::string& request_id);
-    void handleKeywordAddMessage(const lt::tcp::endpoint& sender, const KeywordAddMessage& message);
-    void sendKeywordAddMessage(const lt::tcp::endpoint& target, const std::string& keyword, 
-                               const std::string& title, const std::string& magnet);
-    std::string generateRequestId();
-    void handleGiveMessage(const lt::tcp::endpoint& sender, const GiveMessage& message);
+    void handleIndexMessage(const IndexMessage& message);
+    void sendWantMessage(const IndexMessage& message);
+    void sendGiveMessage(const IndexMessage& message, const std::vector<std::pair<std::string, std::string>>& pairs);
+    void handleWantMessage(const IndexMessage& message);
+    void handleGiveMessage(const IndexMessage& message);
+    void handleKeywordAddMessage(const std::string& keyword, const std::string& title, const std::string& magnet);
+    void sendKeywordAddMessage(const lt::tcp::endpoint& target, const std::string& keyword,
+                                const std::string& title, const std::string& magnet);
 
     std::unordered_map<std::string, std::string> titleToMagnet;
     std::unordered_map<std::string, std::vector<std::string>> keywordToTitle;
@@ -51,17 +52,17 @@ private:
 
     mutable std::shared_mutex data_mutex_;
 
-    size_t getResponsibleNodeIndex(const std::string& keyword, size_t nodeCount);
-    bool isResponsibleForTorrent(const std::string& keyword, size_t nodeCount);
+    size_t getResponsibleNodeIndex(const std::string& keyword);
+    bool isResponsibleForTorrent(const std::string& keyword);
 
     void initializeHeartbeat();
-    
+
+    // message cache
+    std::unordered_set<std::string> message_cache_;
+    std::mutex cache_mutex_;
+
     // Heartbeat manager
     std::unique_ptr<IndexHeartbeat> heartbeat_manager_;
-
-    // bloom filtering to allow for faster searching on other nodes. Instead of waiting for messages
-    //BloomFilter bloom_filter_;
-    //std::vector<std::pair<lt::tcp::endpoint, Bloomfilter> other_blooms;
 };
 
 }// namespace

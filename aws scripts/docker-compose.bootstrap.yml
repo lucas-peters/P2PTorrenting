@@ -6,12 +6,9 @@ services:
       p2p-network:
         ipv4_address: 172.20.0.2
     ports:
-      - "6881:6881/tcp"
-      - "6881:6881/udp"
-      - "7881:7881/tcp"
-      - "7881:7881/udp"
-      - "8881:8881/tcp"
-      - "8881:8881/udp"
+      - "6881:6881"
+      - "7881:7881"
+      - "8881:8881"
     restart: unless-stopped
     volumes:
       - ./bootstrap_data:/app/data
@@ -27,12 +24,9 @@ services:
       p2p-network:
         ipv4_address: 172.20.0.6
     ports:
-      - "6885:6881/tcp"
-      - "6885:6881/udp"
-      - "7885:7881/tcp"
-      - "7885:7881/udp"
-      - "8885:8881/tcp"
-      - "8885:8881/udp"
+      - "6885:6885"
+      - "7885:7885"
+      - "8885:8885"
     volumes:
       - ./index_data:/app/data
     restart: unless-stopped
@@ -40,7 +34,7 @@ services:
       - bootstrap
     stdin_open: true  # Keep STDIN open
     tty: true         # Allocate a pseudo-TTY
-    command: --port 6881 --env docker
+    command: --port 6885 --env docker
     environment:
       - GOSSIP_HOST=172.20.0.6
       - PUBLIC_IP=${PUBLIC_IP:-172.20.0.6}

@@ -290,9 +290,8 @@ void Messenger::processIncomingMessages() {
     // Get a batch of messages from the queue
     std::vector<std::pair<lt::tcp::endpoint, IndexMessage>> messages_to_process;
     
-    // theses brackets create a limited scope for the std::lock_guard
+    // Lock
     {
-        // Lock the queue while we extract messages
         std::lock_guard<std::mutex> lock(receive_mutex_);
         
         // Get up to 10 messages at a time (to avoid processing too many at once)
@@ -304,9 +303,9 @@ void Messenger::processIncomingMessages() {
             receive_queue_.pop();
             count++;
         }
-    }
+    } // Lock is released here
     
-    // Process each message
+    // Process each message - without holding the lock
     for (const auto& incoming : messages_to_process) {
         const IndexMessage& message = incoming.second;
         const lt::tcp::endpoint sender(lt::make_address_v4(message.source_ip()), message.source_port());
@@ -316,22 +315,7 @@ void Messenger::processIncomingMessages() {
             if (message.lamport_timestamp() > 0) {
                 lamport_clock_.updateClock(message.lamport_timestamp());
             }
-            index_handler_(sender, message);
-            // Check which message type is set in the oneof field
-            // if (message.has_reputation()) {
-            //     // Handle reputation message
-            //     if (reputation_handler_) {
-            //         reputation_handler_(message.reputation(), sender);
-            //     } else {
-            //         std::cerr << "Gossip: Received reputation message but no handler is registered" << std::endl;
-            //     }
-            // }
-            // Add handlers for other message types as they're added to the protocol
-            // else if (message.has_content()) { ... }
-            
-            // else {
-            //     std::cerr << "Messenger: Received message with unknown type" << std::endl;
-            // }
+            index_handler_(message);
         } catch (const std::exception& e) {
             std::cerr << "Messenger: Error processing message: " << e.what() << std::endl;
         }

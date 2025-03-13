@@ -187,7 +187,7 @@ private:
     
     // callbacks
     void handleReputationMessage(const ReputationMessage& message, const lt::tcp::endpoint& sender);
-    void handleIndexMessage(const IndexMessage& message, const lt::tcp::endpoint& sender);
+    void handleIndexMessage(const IndexMessage& message);
 
     //threads
     std::unique_ptr<std::thread> alert_thread_;

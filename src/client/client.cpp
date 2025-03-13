@@ -63,8 +63,8 @@ void Client::start() {
 
     if (messenger_) {
         messenger_->setIndexHandler(
-            [this](const lt::tcp::endpoint& sender, const IndexMessage& message) {
-                this->handleIndexMessage(message, sender);
+            [this](const IndexMessage& message) {
+                this->handleIndexMessage(message);
             }
         );
         std::cout << "Index Handler set successfully" << std::endl;
@@ -543,7 +543,7 @@ void Client::handleReputationMessage(const ReputationMessage& message, const lt:
     }
 }
 
-void Client::handleIndexMessage(const IndexMessage& message, const lt::tcp::endpoint& sender) {
+void Client::handleIndexMessage(const IndexMessage& message) {
     // TODO
     if (message.has_givetorrent()) {
         std::cout << "Search Results: " << std::endl;
@@ -556,20 +556,23 @@ void Client::handleIndexMessage(const IndexMessage& message, const lt::tcp::endp
 
 void Client::addIndex(const std::string& title, const std::string& magnet) {
     if (!messenger_) {
-        std::cerr << "Client Messenger not initialized, cant add index" << std::endl;
+        std::cerr << "Client Messenger not initialized, can't add index" << std::endl;
         return;
     }
     try {
-    // for now, send to all index nodes. Need a better way to do this
-        for (auto& node : index_nodes_) {
-            lt::tcp::endpoint endpoint(lt::make_address_v4(node.first), node.second + 2000);
-            IndexMessage message;
-            message.set_source_ip(ip_);
-            AddMessage* addMsg = message.mutable_addtorrent();
-            addMsg->set_title(title);
-            addMsg->set_magnet(magnet);
-            messenger_->queueMessage(endpoint, message);
-        } 
+        // naive approach just send to first index in our list
+        auto& node = index_nodes_[0];
+        lt::tcp::endpoint endpoint(lt::make_address_v4(node.first), node.second + 2000);
+
+        IndexMessage message;
+        message.set_request_id(generateRequestId());
+
+        AddMessage* addMsg = message.mutable_addtorrent();
+        addMsg->set_title(title);
+        addMsg->set_magnet(magnet);
+
+        messenger_->queueMessage(endpoint, message);
+
     } catch (const std::exception& e) {
         std::cerr << "Error adding Index: " << e.what() << std::endl;
     }
@@ -581,16 +584,17 @@ void Client::searchIndex(const std::string& keyword) {
         return;
     }
     try {
-        for (auto& node : index_nodes_) {
-            lt::tcp::endpoint endpoint(lt::make_address_v4(node.first), node.second + 2000);
-            IndexMessage message;
-            message.set_source_ip(ip_); // port set by Messenger so that its consistent
-            WantMessage* wantMsg = message.mutable_wanttorrent();
-            std::cout << "Sending search messeage to endpoint: " << endpoint.address() << ":" << endpoint.port() << std::endl;
-            wantMsg->set_keyword(keyword);
-            wantMsg->set_request_identifier(""); // need to change this
-            messenger_->queueMessage(endpoint, message);
-        }
+        // naive approach just send to first index in our list
+        auto& node = index_nodes_[0];
+        lt::tcp::endpoint endpoint(lt::make_address_v4(node.first), node.second + 2000);
+        IndexMessage message;
+        message.set_request_id(generateRequestId());
+
+        WantMessage* wantMsg = message.mutable_wanttorrent();
+        std::cout << "Sending search messeage to endpoint: " << endpoint.address() << ":" << endpoint.port() << std::endl;
+        wantMsg->set_keyword(keyword);
+        messenger_->queueMessage(endpoint, message);
+        
     } catch (const std::exception& e) {
         std::cerr << "Error searching index: " << e.what() << std::endl;
     }
@@ -655,8 +659,6 @@ void Client::corruptAllTorrents(double corruption_percent) {
 
 void Client::corruptTorrentData(const lt::sha1_hash& info_hash, double corruption_percent) {
     std::cout << "Attempting to corrupt torrent data for testing..." << std::endl;
-    
-    // Find the torrent
     auto it = torrents_.find(info_hash);
     if (it == torrents_.end()) {
         std::cerr << "Torrent not found with hash: " << info_hash.to_string() << std::endl;
@@ -678,11 +680,9 @@ void Client::corruptTorrentData(const lt::sha1_hash& info_hash, double corruptio
     
     std::cout << "Corrupting files for torrent: " << ti->name() << std::endl;
     
-    // First pause the torrent
+    // pausing suspends other nodes ability to download from it, libtorrent treats it as not in the session
     handle.pause();
     std::cout << "Torrent paused" << std::endl;
-    
-    // Wait a moment for operations to complete
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
     
     // Corrupt each file in the torrent
@@ -690,7 +690,6 @@ void Client::corruptTorrentData(const lt::sha1_hash& info_hash, double corruptio
         std::string file_path = download_path_ + ti->files().file_path(i);
         std::cout << "Processing file: " << file_path << std::endl;
         
-        // Check if file exists
         if (!std::filesystem::exists(file_path)) {
             std::cerr << "File not found: " << file_path << std::endl;
             continue;
@@ -720,18 +719,15 @@ void Client::corruptTorrentData(const lt::sha1_hash& info_hash, double corruptio
         std::uniform_int_distribution<std::streamsize> dist(0, file_size - 1);
         
         std::cout << "Corrupting " << bytes_to_corrupt << " bytes in file: " << file_path << std::endl;
-        
-        // Corrupt random bytes in the file
+
         for (size_t j = 0; j < bytes_to_corrupt; ++j) {
-            // Pick a random position
+            // jump to a random position and read a byte
             std::streampos pos = dist(rng);
             file.seekg(pos);
-            
-            // Read the byte
             char byte;
             file.read(&byte, 1);
             
-            // Corrupt the byte (flip all bits)
+            // Flip the bits in the byte
             byte = ~byte;
             
             // Write it back
@@ -743,11 +739,11 @@ void Client::corruptTorrentData(const lt::sha1_hash& info_hash, double corruptio
         std::cout << "File corrupted: " << file_path << std::endl;
     }
     
-    // Enable seed mode to skip hash checking
+    // When seed mode is enabled libtorrent won't verify local hashes
     std::cout << "Setting seed mode flag to skip hash checking..." << std::endl;
     handle.set_flags(lt::torrent_flags::seed_mode);
     
-    // Resume the torrent
+    // Put the torrent back in the active session
     handle.resume();
     std::cout << "Torrent resumed with corrupted data" << std::endl;
     
