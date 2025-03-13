@@ -261,7 +261,27 @@ std::string Node::getDHTStats() const {
     }
     
     session_->post_dht_stats();
-    return "DHT stats requested";
+
+    // Wait for the alert
+    lt::time_duration timeout = lt::seconds(2); // Adjust timeout as needed
+    std::vector<lt::alert*> alerts;
+    session_->wait_for_alert(timeout);
+    session_->pop_alerts(&alerts);
+
+    for (auto const* alert : alerts) {
+        if (auto* dht_alert = lt::alert_cast<lt::dht_stats_alert>(alert)) {
+            int total_nodes = 0;
+            for (auto const& t : dht_alert->routing_table) {
+                total_nodes += t.num_nodes;
+            }
+
+            std::ostringstream result;
+            result << "DHT nodes in routing table: " << total_nodes;
+            return result.str();
+        }
+    }
+
+    return "No DHT stats received";
 }
 
 void Node::connectToDHT() {

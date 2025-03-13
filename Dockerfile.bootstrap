@@ -1,10 +1,12 @@
-# Base image with C++ build tools
+# ==============================================
+# Build Stage: Compile p2p_bootstrap + Drogon
+# ==============================================
 FROM ubuntu:22.04 AS builder
 
 # Avoid interactive prompts during installation
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Install only the dependencies needed for p2p_bootstrap (no Qt needed)
+# Install dependencies needed for p2p_bootstrap + Drogon
 RUN apt-get update && apt-get install -y \
     build-essential \
     cmake \
@@ -19,7 +21,27 @@ RUN apt-get update && apt-get install -y \
     libtorrent-rasterbar-dev \
     nlohmann-json3-dev \
     qtbase5-dev \
+    zlib1g-dev \
+    libbrotli-dev \
+    libsqlite3-dev \
+    libhiredis-dev \
+    libjsoncpp-dev \
+    libpq-dev \
+    uuid-dev \  
+    curl \
+    wget \
+    pkg-config \
     && rm -rf /var/lib/apt/lists/*
+
+# ✅ Fix: Install Drogon from source
+RUN git clone --depth 1 --branch v1.8.2 https://github.com/drogonframework/drogon.git /drogon \
+    && cd /drogon \
+    && git submodule update --init --recursive \  
+    && mkdir build \
+    && cd build \
+    && cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
+    && make -j$(nproc) \
+    && make install
 
 # Set up working directory
 WORKDIR /app
@@ -27,17 +49,19 @@ WORKDIR /app
 # Copy source code
 COPY . .
 
-# Build only p2p_bootstrap
+# ✅ Fix: Ensure CMake can find Drogon
 RUN rm -rf build && \
     mkdir -p build && \
     cd build && \
-    cmake .. -DBUILD_BOOTSTRAP_ONLY=ON && \
+    cmake .. -DBUILD_BOOTSTRAP_ONLY=ON -DCMAKE_PREFIX_PATH=/usr/local && \  
     make -j$(nproc) p2p_bootstrap
 
-# Create a smaller runtime image
+# ==============================================
+# Runtime Stage: Minimal Image to Run p2p_bootstrap
+# ==============================================
 FROM ubuntu:22.04
 
-# Install only runtime dependencies
+# Install only runtime dependencies for p2p_bootstrap + Drogon
 RUN apt-get update && apt-get install -y \
     libboost-system1.74.0 \
     libboost-thread1.74.0 \
@@ -45,6 +69,9 @@ RUN apt-get update && apt-get install -y \
     libboost-program-options1.74.0 \
     libtorrent-rasterbar2.0 \
     libprotobuf23 \
+    libssl3 \
+    libjsoncpp25 \
+    uuid-dev \  
     && rm -rf /var/lib/apt/lists/*
 
 # Set up working directory
@@ -54,8 +81,9 @@ WORKDIR /app
 COPY --from=builder /app/build/p2p_bootstrap .
 COPY --from=builder /app/config.json /app/
 
-# Expose the default bootstrap node port
-EXPOSE 6881 7881 8881
+# Expose ports for the bootstrap node
+EXPOSE 6881 7881 8881 8080
+
 # Run the bootstrap node
 ENTRYPOINT ["./p2p_bootstrap"]
 CMD ["--port", "6881", "--env", "docker"]

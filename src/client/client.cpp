@@ -249,6 +249,30 @@ void Client::printStatus() const {
     std::cout << std::endl;
 }
 
+std::string Client::getStatus() const {
+    if (!session_) {
+        return "Session not initialized";
+    }
+
+    if (torrents_.empty()) {
+        return "No active torrents";
+    }
+
+    std::ostringstream result;
+    result << "Active torrents:\n";
+
+    for (const auto& [hash, handle] : torrents_) {
+        auto status = handle.status();
+        result << "Torrent: " << hash.to_string() << "\n";
+        result << "\tProgress: " << (status.progress * 100) << "%\n";
+        result << "\tDownload Rate: " << status.download_rate << " B/s\n";
+        result << "\tUpload Rate: " << status.upload_rate << " B/s\n";
+        result << "\tState: " << status.state << "\n";
+    }
+
+    return result.str();
+}
+
 // libtorrent dht communicates through sending asynchronous alerts
 void Client::handleAlerts() {
     if (!session_) return;

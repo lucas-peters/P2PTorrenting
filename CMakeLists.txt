@@ -10,19 +10,16 @@ add_definitions(-DPROJECT_ROOT="${PROJECT_ROOT_DIR}")
 
 # Use Abseil from submodule
 message(STATUS "Using Abseil from submodule")
-# Prevent Abseil from overriding our compiler flags
 set(ABSL_PROPAGATE_CXX_STD ON)
-# Disable Abseil tests to speed up the build
 set(BUILD_TESTING OFF CACHE BOOL "Disable Abseil tests")
-# Add Abseil from the submodule
 add_subdirectory(third_party/abseil-cpp)
 
 # Find required packages
 find_package(LibtorrentRasterbar REQUIRED)
 find_package(Boost REQUIRED COMPONENTS system thread chrono)
 find_package(Protobuf REQUIRED)
-# Add Qt for GUI
 find_package(Qt5 COMPONENTS Widgets Core Gui REQUIRED)
+find_package(Drogon REQUIRED)
 
 # Print debug info
 message(STATUS "LibtorrentRasterbar include dirs: ${LibtorrentRasterbar_INCLUDE_DIRS}")
@@ -33,6 +30,7 @@ include_directories(
     ${CMAKE_CURRENT_BINARY_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
+
 set(PROTO_FILES 
     src/gossip/gossip.proto
     src/index/index.proto)
@@ -172,6 +170,7 @@ add_executable(p2p_client
 target_link_libraries(p2p_client PRIVATE
     node
     protobuf::libprotobuf
+    Drogon::Drogon  
 )
 
 target_include_directories(p2p_client PRIVATE src/client PUBLIC src)

@@ -133,6 +133,8 @@ public:
     // Print the status of all torrents
     void printStatus() const;
 
+    std::string getStatus() const;
+
     // Seach DHT network for peers with a specific info hash
     void searchDHT(const std::string& infoHash);
 
