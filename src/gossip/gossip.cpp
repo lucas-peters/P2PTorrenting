@@ -267,13 +267,13 @@ void Gossip::sendMessageAsync(const lt::tcp::endpoint& target, const GossipMessa
         
         // Use the gossip port (7881) instead of the target's port
         // This is because in Docker, all containers use the same internal port
-        bip::tcp::endpoint tcp_endpoint(target_address, port_);
+        //bip::tcp::endpoint tcp_endpoint(target_address, port_);
         
         // std::cout << "Connecting to gossip endpoint: " << tcp_endpoint.address().to_string() 
         //           << ":" << tcp_endpoint.port() << std::endl;
 
         socket->async_connect(tcp_endpoint,
-            [this, socket, buffer, tcp_endpoint](const boost::system::error_code& error) {
+            [this, socket, buffer, target](const boost::system::error_code& error) {
                 if (error) {
                     std::cerr << "Gossip SendMessageAsync: Failed to connect to target " 
                               << tcp_endpoint.address().to_string() << ":" << tcp_endpoint.port()
@@ -286,7 +286,7 @@ void Gossip::sendMessageAsync(const lt::tcp::endpoint& target, const GossipMessa
                 
                 // write asynch
                 ba::async_write(*socket, ba::buffer(*buffer),
-                     [socket, buffer, tcp_endpoint](const boost::system::error_code& error, std::size_t bytes_transferred) {
+                     [socket, buffer, target](const boost::system::error_code& error, std::size_t bytes_transferred) {
                         if (error) {
                             std::cerr << "Gossip SendMessageAsync: Failed to write message to "
                                       << tcp_endpoint.address().to_string() << ":" << tcp_endpoint.port()
