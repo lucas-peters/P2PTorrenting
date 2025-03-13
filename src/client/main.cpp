@@ -10,18 +10,11 @@
 #include <vector>
 #include <map>
 #include <functional>
+#include <mutex>
 
 using namespace torrent_p2p;
 namespace fs = std::filesystem;
 
-// // Global flag for graceful shutdown
-// volatile sig_atomic_t running = 1;
-
-// // Signal handler
-// void signal_handler(int signal) {
-//     std::cout << "Received signal " << signal << ", shutting down..." << std::endl;
-//     running = 0;
-// }
 // Function to display help information
 void displayHelp() {
     std::cout << "\n===== P2P Torrenting Client - Command Reference =====\n";
@@ -29,14 +22,14 @@ void displayHelp() {
     std::cout << "  magnet <magnet_link>              - Add a torrent via magnet link\n";
     std::cout << "  generate <file_path>              - Generate a torrent file from a file/directory\n";
     std::cout << "  status                            - Display status of all torrents\n";
-    std::cout << "  search <info_hash>                - Search DHT network for peers with specific info hash\n";
-    std::cout << "  connect <ip> <port>               - Connect to a specific bootstrap node\n";
+    std::cout << "  search <keyword>                  - Search for torrents by keyword\n";
     std::cout << "  dht                               - Display DHT statistics\n";
-    std::cout << "  gossip                            - Send a test gossip message\n";
     std::cout << "  save                              - Save DHT state to file\n";
-    std::cout << "  load                              - Load DHT state from file\n";
+    std::cout << "  load <state_file>                 - Load DHT state from file\n";
     std::cout << "  corrupt <% corruption>            - Corrupts all torrents in download path\n";
-    std::cout << "  clear                             - Clear the console\n";
+    // std::cout << "  pause <name>                      - Pause a torrent by name\n";
+    // std::cout << "  resume <name>                     - Resume a paused torrent by name\n";
+    // std::cout << "  remove <name>                     - Remove a torrent by name\n";
     std::cout << "  help                              - Display this help message\n";
     std::cout << "  quit                              - Exit the application\n";
     std::cout << "====================================================\n";
@@ -57,9 +50,6 @@ void processCommand(const std::string& input, std::unique_ptr<Client>& client, s
         return;
     } else if (command == "help") {
         displayHelp();
-    } else if (command == "clear" || command == "cls") {
-        // Clear screen - works on most terminals
-        std::cout << "\033[2J\033[1;1H";
     } else if (command == "add") {
         std::string torrent_file;
         if (iss >> torrent_file) {
@@ -109,37 +99,10 @@ void processCommand(const std::string& input, std::unique_ptr<Client>& client, s
                 std::cerr << "Error searching DHT: " << e.what() << std::endl;
             }
         } else {
-            std::cout << "Usage: search <info_hash>" << std::endl;
+            std::cout << "Usage: search <keyword>" << std::endl;
         }
-    
-    // else if (command == "connect") {
-    //     std::string ip;
-    //     int node_port;
-    //     if (iss >> ip >> node_port) {
-    //         try {
-            //             std::vector<std::pair<std::string, int>> bootstrap_nodes = {
-            //                 {ip, node_port}
-            //             };
-            //             std::cout << "Connecting to bootstrap node: " << ip << ":" << node_port << "\n";
-            //             client->connectToDHT(bootstrap_nodes);
-            //         } catch (const std::exception& e) {
-            //             std::cerr << "Error connecting to bootstrap node: " << e.what() << "\n";
-            //         }
-            //     } else {
-            //         std::cout << "Usage: connect <ip> <port>\n";
-            //     }
-            // } 
     } else if (command == "dht") {
         std::cout << client->getDHTStats() << std::endl;
-    
-    //  else if (command == "gossip") {
-    //     std::cout << "Sending gossip message...\n";
-    //     GossipMessage message;
-            //     message.set_source_ip("127.0.0.1");
-            //     message.set_source_port(port);
-            //     lt::tcp::endpoint exclude(lt::make_address_v4("127.0.0.1"), port);
-            //     client->gossip_->spreadMessage(message, exclude);
-            // } 
     } else if (command == "save") {
         if (client->saveDHTState()){
             std::cout << "DHT state saved successfully." << std::endl;
@@ -261,7 +224,7 @@ int main(int argc, char* argv[]) {
         client = std::make_unique<Client>(port, env, ip);
     }
 
-    // Create a named pipe for commands
+    // Create a named pipe for commands, will only work in docker
     std::string pipe_path = "/app/command_pipe";
     if (access(pipe_path.c_str(), F_OK) == -1) {
         if (mkfifo(pipe_path.c_str(), 0666) != 0) {
@@ -270,61 +233,116 @@ int main(int argc, char* argv[]) {
             std::cout << "Created command pipe at: " << pipe_path << std::endl;
         }
     }
+    
+    // mutex for stdin/stdout
+    std::mutex console_mutex;
+
+    // Display welcome message and commands
+    std::cout << "\n===== P2P Torrenting Client =====\n";
+    std::cout << "Client running on port: " << port << "\n";
+    std::cout << "Type 'help' for available commands\n";
+    std::cout << "================================\n\n";
+    
     // PIPE THREAD, this is the only way to pipe commands to running docker containers
     std::atomic<bool> running{true};
-    std::thread pipe_thread([&client, &running, pipe_path]() {
-        // Set up polling for both stdin and the named pipe
-        struct pollfd fds[2];
-        fds[0].fd = STDIN_FILENO;  // stdin
-        fds[0].events = POLLIN;
+    std::thread pipe_thread([&client, &running, pipe_path, &console_mutex]() {
+        // Set up file descriptors for select
+        fd_set master_fds, read_fds;
+        FD_ZERO(&master_fds);
+        
+        // Add stdin to the set
+        FD_SET(STDIN_FILENO, &master_fds);
+        int max_fd = STDIN_FILENO;
         
         // Open pipe for reading (non-blocking)
         int pipe_fd = open(pipe_path.c_str(), O_RDONLY | O_NONBLOCK);
         if (pipe_fd == -1) {
             std::cerr << "Failed to open command pipe for reading" << std::endl;
         } else {
-            fds[1].fd = pipe_fd;
-            fds[1].events = POLLIN;
+            FD_SET(pipe_fd, &master_fds);
+            max_fd = std::max(max_fd, pipe_fd);
         }
         
         // Buffer for commands
-        std::string input;
         char buffer[1024];
         
         // Command processing loop
         while (running) {
-            // Display prompt
-            std::cout << "> ";
-            std::cout.flush();
+            // Copy the master set to the read set
+            read_fds = master_fds;
             
-            // Use poll to wait for input from either stdin or pipe
-            int ready = poll(fds, pipe_fd != -1 ? 2 : 1, 1000); // 1 second timeout
+            // Set timeout for select (100ms)
+            struct timeval timeout;
+            timeout.tv_sec = 0;
+            timeout.tv_usec = 100000; // 100ms
             
-            if (ready > 0) {
-                // Check stdin
-                if (fds[0].revents & POLLIN) {
-                    std::getline(std::cin, input);
-                    // Process input as you already do...
-                    processCommand(input, client, running);
-                }
-                
-                // Check pipe
-                if (pipe_fd != -1 && (fds[1].revents & POLLIN)) {
-                    ssize_t bytes_read = read(pipe_fd, buffer, sizeof(buffer) - 1);
-                    if (bytes_read > 0) {
-                        buffer[bytes_read] = '\0';
-                        input = buffer;
-                        
-                        // Remove trailing newline if present
-                        if (!input.empty() && input.back() == '\n') {
-                            input.pop_back();
+            // Wait for input on any of the file descriptors
+            int ready = select(max_fd + 1, &read_fds, NULL, NULL, &timeout);
+            
+            if (ready == -1) {
+                // Error in select
+                std::cerr << "Error in select: " << strerror(errno) << std::endl;
+                continue;
+            } else if (ready == 0) {
+                continue;
+            }
+            
+            // Check if stdin has input
+            if (FD_ISSET(STDIN_FILENO, &read_fds)) {
+                std::string input;
+                {
+                    std::lock_guard<std::mutex> lock(console_mutex);
+                    if (!std::getline(std::cin, input)) {
+                        // EOF or error on stdin
+                        if (std::cin.eof()) {
+                            std::cout << "End of input, exiting..." << std::endl;
+                            running = false;
+                            break;
                         }
-                        
-                        // Echo the command for clarity
-                        std::cout << "\n> " << input << std::endl;
-                        
-                        // Process the command
-                        processCommand(input, client, running);
+                        continue;
+                    }
+                }
+                if (!input.empty()) {
+                    std::lock_guard<std::mutex> lock(console_mutex);
+                    processCommand(input, client, running);
+                    std::cout << "> " << std::flush;
+                } else {
+                    std::lock_guard<std::mutex> lock(console_mutex);
+                    std::cout << "> " << std::flush;
+                }
+            }
+            
+            // Check if pipe has input
+            if (pipe_fd != -1 && FD_ISSET(pipe_fd, &read_fds)) {
+                ssize_t bytes_read = read(pipe_fd, buffer, sizeof(buffer) - 1);
+                
+                if (bytes_read > 0) {
+                    // Null-terminate the buffer
+                    buffer[bytes_read] = '\0';
+                    std::string input(buffer);
+                    
+                    // Remove trailing newline if present
+                    if (!input.empty() && input.back() == '\n') {
+                        input.pop_back();
+                    }
+                    
+                    // Process the command with mutex protection
+                    std::lock_guard<std::mutex> lock(console_mutex);
+                    std::cout << "\nReceived command from pipe: " << input << std::endl;
+                    processCommand(input, client, running);
+                    std::cout << "> " << std::flush;
+                } else if (bytes_read == 0) {
+                    std::cerr << "Command pipe closed" << std::endl;
+                    close(pipe_fd);
+                    FD_CLR(pipe_fd, &master_fds);
+                    pipe_fd = -1;
+                } else {
+                    // Error reading from pipe
+                    if (errno != EAGAIN && errno != EWOULDBLOCK) {
+                        std::cerr << "Error reading from pipe: " << strerror(errno) << std::endl;
+                        close(pipe_fd);
+                        FD_CLR(pipe_fd, &master_fds);
+                        pipe_fd = -1;
                     }
                 }
             }
@@ -336,178 +354,20 @@ int main(int argc, char* argv[]) {
         }
     });
 
-    // Display welcome message and commands
-    std::cout << "\n===== P2P Torrenting Client =====\n";
-    std::cout << "Client running on port: " << port << "\n";
-    std::cout << "Type 'help' for available commands\n";
-    std::cout << "================================\n\n";
-
-    // MAIN THREAD, this is how to access the basic cli
-
-    std::thread user_thread([&client, &running]() {
-        // Command processing loop
-        std::string input;
-        while (running) {
-            std::cout << "> ";
-            std::cout.flush();  // Make sure the prompt is displayed
-            std::getline(std::cin, input);
-
-            std::istringstream iss(input);
-            std::string command;
-            iss >> command;
-
-            if (command.empty()) {
-                continue;
-            }
-            
-            // Convert command to lowercase for case-insensitive matching
-            std::transform(command.begin(), command.end(), command.begin(), 
-                        [](unsigned char c){ return std::tolower(c); });
-
-            if (command == "quit" || command == "exit") {
-                std::cout << "Shutting down client..." << std::endl;
-                running = false;
-                break;
-            } else if (command == "help") {
-                displayHelp();
-            } else if (command == "clear" || command == "cls") {
-                // Clear screen - works on most terminals
-                std::cout << "\033[2J\033[1;1H";
-            } else if (command == "add") {
-                std::string torrent_file;
-                if (iss >> torrent_file ) {
-                    try {
-                        std::cout << "Adding torrent: " << torrent_file << std::endl;
-                        client->addTorrent(torrent_file);
-                    } catch (const std::exception& e) {
-                        std::cerr << "Error adding torrent: " << e.what() << std::endl;
-                    }
-                } else {
-                    std::cout << "Usage: add <torrent_file>" << std::endl;
-                }
-            } else if (command == "magnet") {
-                std::string info_hash;
-                if (iss >> info_hash) {
-                    try {
-                        std::cout << "Adding magnet link with info hash: " << info_hash << std::endl;
-                        client->addMagnet(info_hash);
-                    } catch (const std::exception& e) {
-                        std::cerr << "Error adding magnet link: " << e.what() << std::endl;
-                    }
-                } else {
-                    std::cout << "Usage: magnet <info_hash> <save_path>" << std::endl;
-                }
-            } else if (command == "status") {
-                client->printStatus();
-            } else if (command == "generate") {
-                std::string file_path;
-                if (iss >> file_path) {
-                    try {
-                        std::cout << "Generating torrent file for: " << file_path << std::endl;
-                        client->generateTorrentFile(file_path);
-                        std::cout << "Torrent file generated successfully." << std::endl;
-                    } catch (const std::exception& e) {
-                        std::cerr << "Error generating torrent file: " << e.what() << std::endl;
-                    }
-                } else {
-                    std::cout << "Usage: generate <file_path>" << std::endl;
-                }
-            } else if (command == "search") {
-                std::string keyword;
-                if (iss >> keyword) {
-                    try {
-                        std::cout << "Searching DHT for keyword: " << keyword << std::endl;
-                        client->searchIndex(keyword);
-                    } catch (const std::exception& e) {
-                        std::cerr << "Error searching DHT: " << e.what() << std::endl;
-                    }
-                } else {
-                    std::cout << "Usage: search <info_hash>" << std::endl;
-                }
-            } 
-            // else if (command == "connect") {
-            //     std::string ip;
-            //     int node_port;
-            //     if (iss >> ip >> node_port) {
-            //         try {
-            //             std::vector<std::pair<std::string, int>> bootstrap_nodes = {
-            //                 {ip, node_port}
-            //             };
-            //             std::cout << "Connecting to bootstrap node: " << ip << ":" << node_port << "\n";
-            //             client->connectToDHT(bootstrap_nodes);
-            //         } catch (const std::exception& e) {
-            //             std::cerr << "Error connecting to bootstrap node: " << e.what() << "\n";
-            //         }
-            //     } else {
-            //         std::cout << "Usage: connect <ip> <port>\n";
-            //     }
-            // } 
-            else if (command == "dht") {
-                std::cout << client->getDHTStats() << std::endl;
-            }
-            //  else if (command == "gossip") {
-            //     std::cout << "Sending gossip message...\n";
-            //     GossipMessage message;
-            //     message.set_source_ip("127.0.0.1");
-            //     message.set_source_port(port);
-            //     lt::tcp::endpoint exclude(lt::make_address_v4("127.0.0.1"), port);
-            //     client->gossip_->spreadMessage(message, exclude);
-            // } 
-            else if (command == "save") {
-                if (client->saveDHTState()){
-                    std::cout << "DHT state saved successfully." << std::endl;
-                } else {
-                    std::cerr << "Failed to save DHT state." << std::endl;
-                }
-            } else if (command == "load") {
-                std::string load_file;
-                if (iss >> load_file) {
-                    try {
-                        std::cout << "Loading DHT state from: " << load_file << std::endl;
-                        if (client->loadDHTState(load_file)) {
-                            std::cout << "DHT state loaded successfully." << std::endl;
-                        } else {
-                            std::cerr << "Failed to load DHT state." << std::endl;
-                        }
-                    } catch (const std::exception& e) {
-                        std::cerr << "Error loading DHT state: " << e.what() << std::endl;
-                    }
-                } else {
-                    std::cout << "Usage: load <state_file>" << std::endl;
-                }
-            } else if (command == "corrupt") {
-                std::string corrupt_percentage;
-                if (iss >> corrupt_percentage) {
-                    std::cout << "Corrupting all torrents in session" << std::endl;
-                    client->corruptAllTorrents(std::stof(corrupt_percentage));
-                } else {
-                    std::cout << "Usage: corrupt <corrupt_percentage>" << std::endl;
-                }
-            } else {
-                std::cout << "Unknown command: " << command << std::endl;
-                std::cout << "Type 'help' for available commands" << std::endl;
-            }
-        }
-    });
-
     while (running) {
-    // Only print stats every 30 seconds to avoid cluttering the console
+        // Only print stats every 30 seconds to avoid cluttering the console
         std::this_thread::sleep_for(std::chrono::seconds(30));
         if (running) {
+            std::lock_guard<std::mutex> lock(console_mutex);
             std::cout << "\n[DHT Stats Update]\n" << client->getDHTStats() << std::endl;
             std::cout << "> ";
-            std::cout.flush(); // Make sure the prompt is displayed after stats
+            std::cout.flush();
         }
-    }
-
-    // Clean up
-    if (user_thread.joinable()) {
-        user_thread.join();
     }
     if (pipe_thread.joinable()) {
         pipe_thread.join();
     }
 
-    std::cout << "Client shutdown complete.\n";
+    std::cout << "Client terminated\n";
     return 0;
 }

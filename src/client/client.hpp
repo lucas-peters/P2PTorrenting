@@ -132,14 +132,16 @@ public:
     std::string createMagnetURI(const std::string& torrentFilePath) const;
     lt::sha1_hash stringToHash(const std::string& infoHashString) const; // converts a string representation of an info hash to a sha1_hash
     
+    void pauseTorrent(const std::string& name);
+    void resumeTorrent(const std::string& name);
+    void removeTorrent(const std::string& name);
+
+    lt::torrent_handle getTorrentHandleByName(const std::string& name) const; // Get handle by name
+    
     void searchDHT(const std::string& infoHash); // Seach DHT network for peers with a specific info hash, not really necessary
 
     void addIndex(const std::string& title, const std::string& magnet);
     void searchIndex(const std::string& keyword);
-
-    // by default a torrent starts seeding when added, these can be used to turn those flags on/off
-    // void startSeeding(const std::string& torrentFilePath);
-    // void stopSeeding(const std::string& torrentFilePath);
 
     void corruptTorrentData(const lt::sha1_hash& info_hash, double corruption_percent = 10.0);
     void corruptAllTorrents(double corruption_percentage);
@@ -153,7 +155,8 @@ public:
 private:
     // tracks all torrents currently in our session
     std::map<lt::sha1_hash, lt::torrent_handle> torrents_; 
-    // Start/stop the client
+    mutable std::mutex torrents_mutex_;
+
     void start() override;
     void stop() override;
 
@@ -165,7 +168,7 @@ private:
 
     // tracks what peers contributed what pieces of each torrent for reputation system
     std::unordered_map<lt::sha1_hash, std::unique_ptr<PieceTracker>> torrent_trackers_;
-    std::mutex torrent_tracker_mutex_;
+    mutable std::mutex torrent_tracker_mutex_;
 
     // peer cache for reputation system
     std::unordered_map<lt::tcp::endpoint, int, EndpointHash> peer_cache_;
@@ -185,10 +188,7 @@ private:
     std::unique_ptr<std::thread> alert_thread_;
     std::unique_ptr<std::thread> peer_cache_thread_;
 
-
-    // this is where we store torrents and downloads on docker images
-    // std::string torrent_path_ = "/app/torrents/";
-    // std::string download_path_ = "/app/downloads/";
+    // will be overwritten if we set env flag to docker or aws
     std::string torrent_path_ = "/Users/lucaspeters/Documents/GitHub/P2PTorrenting/6882/";
     std::string download_path_ = "/Users/lucaspeters/Documents/GitHub/P2PTorrenting/6882/";  
 

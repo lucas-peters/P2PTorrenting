@@ -101,6 +101,7 @@ void Client::stop() {
 }
 
 bool Client::hasTorrent(const lt::sha1_hash& hash) const {
+    std::lock_guard<std::mutex> lock(torrents_mutex_);
     return torrents_.find(hash) != torrents_.end();
 }
 
@@ -174,7 +175,10 @@ void Client::addTorrent(const std::string& torrentFilePath) {
         }
         
         lt::torrent_handle handle = session_->add_torrent(params);
-        torrents_[hash] = handle;
+        {
+            std::lock_guard<std::mutex> lock(torrents_mutex_);
+            torrents_[hash] = handle;
+        }
         
         std::cout << "Added torrent: " << params.ti->name() << std::endl;
         
@@ -227,7 +231,10 @@ void Client::addMagnet(const std::string& magnet) {
         params.save_path = download_path_;
         
         lt::torrent_handle handle = session_->add_torrent(params);
-        torrents_[hash] = handle;
+        {
+            std::lock_guard<std::mutex> lock(torrents_mutex_);
+            torrents_[hash] = handle;
+        }
         
         std::cout << "Added magnet link with info hash: " << hash.to_string() << std::endl;
         
@@ -247,21 +254,22 @@ void Client::printStatus() const {
     }
 
     std::cout << "Active torrents:" << std::endl;
-    for (const auto& [hash, handle] : torrents_) {
-        auto status = handle.status();
-        std::cout << "Torrent: " << hash.to_string() << std::endl;
-        std::cout << "\tProgress: " << (status.progress * 100) << "%" << std::endl;
-        std::cout << "\tDownload Rate: " << status.download_rate << std::endl;
-        std::cout << "\tUpload Rate: " << status.upload_rate << std::endl;
-        std::cout << "\tState: " << status.state << std::endl;
+    {
+        std::lock_guard<std::mutex> lock(torrents_mutex_);
+        for (const auto& [hash, handle] : torrents_) {
+            auto status = handle.status();
+            std::cout << "Torrent: " << hash.to_string() << std::endl;
+            std::cout << "\tProgress: " << (status.progress * 100) << "%" << std::endl;
+            std::cout << "\tDownload Rate: " << status.download_rate << std::endl;
+            std::cout << "\tUpload Rate: " << status.upload_rate << std::endl;
+            std::cout << "\tState: " << status.state << std::endl;
+        }
     }
     std::cout << std::endl;
 }
 
 // libtorrent dht communicates through sending asynchronous alerts
 void Client::handleAlerts() {
-    if (!session_) return;
-
     std::vector<lt::alert*> alerts;
     session_->pop_alerts(&alerts);
 
@@ -399,77 +407,48 @@ void Client::handleAlerts() {
 
     // gets download status for torrents actively downloading
     std::lock_guard<std::mutex> lock(progress_mutex_);
-    for (const auto& [hash, handle] : torrents_) {
-        if (!handle.is_valid()) continue;
-        
-        auto status = handle.status();
-        if (status.state == lt::torrent_status::downloading) {
-            auto it = download_progress_.find(hash);
-            if (it != download_progress_.end()) {
-                auto& progress = it->second;
-                auto now = std::chrono::steady_clock::now();
-                auto time_diff = std::chrono::duration_cast<std::chrono::milliseconds>(
-                    now - progress.last_update_time).count() / 1000.0;
-                
-                if (time_diff >= .1) {  // Update every 100ms
-                    progress.last_progress = progress.current_progress;
-                    progress.current_progress = status.progress;
+    {
+        std::lock_guard<std::mutex> lock(torrents_mutex_);
+        for (const auto& [hash, handle] : torrents_) {
+            if (!handle.is_valid()) continue;
+            
+            auto status = handle.status();
+            if (status.state == lt::torrent_status::downloading) {
+                auto it = download_progress_.find(hash);
+                if (it != download_progress_.end()) {
+                    auto& progress = it->second;
+                    auto now = std::chrono::steady_clock::now();
+                    auto time_diff = std::chrono::duration_cast<std::chrono::milliseconds>(
+                        now - progress.last_update_time).count() / 1000.0;
                     
-                    // Calculate speed (in KB/s)
-                    double progress_diff = progress.current_progress - progress.last_progress;
-                    double size_diff = progress_diff * status.total_wanted;
-                    double speed = size_diff / time_diff / 1024.0;
-                    
-                    // Update average speed with some smoothing
-                    if (progress.avg_speed_kBs == 0) {
-                        progress.avg_speed_kBs = speed;
-                    } else {
-                        progress.avg_speed_kBs = progress.avg_speed_kBs * 0.7 + speed * 0.3;
+                    if (time_diff >= .1) {  // Update every 100ms
+                        progress.last_progress = progress.current_progress;
+                        progress.current_progress = status.progress;
+                        
+                        // Calculate speed (in KB/s)
+                        double progress_diff = progress.current_progress - progress.last_progress;
+                        double size_diff = progress_diff * status.total_wanted;
+                        double speed = size_diff / time_diff / 1024.0;
+                        
+                        // Update average speed with some smoothing
+                        if (progress.avg_speed_kBs == 0) {
+                            progress.avg_speed_kBs = speed;
+                        } else {
+                            progress.avg_speed_kBs = progress.avg_speed_kBs * 0.7 + speed * 0.3;
+                        }
+                        
+                        // Calculate ETA
+                        double remaining_bytes = (1.0 - status.progress) * status.total_wanted;
+                        if (progress.avg_speed_kBs > 0) {
+                            progress.est_time_remaining_sec = remaining_bytes / (progress.avg_speed_kBs * 1024.0);
+                        }
+                        
+                        progress.last_update_time = now;
                     }
-                    
-                    // Calculate ETA
-                    double remaining_bytes = (1.0 - status.progress) * status.total_wanted;
-                    if (progress.avg_speed_kBs > 0) {
-                        progress.est_time_remaining_sec = remaining_bytes / (progress.avg_speed_kBs * 1024.0);
-                    }
-                    
-                    progress.last_update_time = now;
                 }
             }
         }
     }
-    // log the heck of out it
-    //printStatus();
-
-        
-        // } else if (auto* dht_log = lt::alert_cast<lt::dht_log_alert>(a)) {
-        //     // Log all DHT activity for debugging
-        //     std::cout << "[Client:" << port_ << "] DHT: " << dht_log->message() << std::endl;
-        // } else if (auto* state = lt::alert_cast<lt::state_update_alert>(a)) {
-        //     for (const lt::torrent_status& st : state->status) {
-        //         std::cout << "[Client:" << port_ << "] Progress: " << (st.progress * 100) << "%" << std::endl;
-        //     }
-        // } else if (auto* peers_alert = lt::alert_cast<lt::dht_get_peers_reply_alert>(a)) {
-        //     std::cout << "\nFound peers for info hash: " << peers_alert->info_hash << std::endl;
-        //     std::cout << "Number of peers: " << peers_alert->num_peers() << std::endl;
-        // } else if (auto* pa = lt::alert_cast<lt::peer_connect_alert>(a)) {
-        //     // We are ensuring that all peers are using ChaCha20 encryption
-        //     std::vector<lt::peer_info> peers;
-        //     pa->handle.get_peer_info(peers);
-        //     for (const auto& p : peers) {
-        //         if (p.ip == pa->ip) { // Find the peer that just connected
-        //             if (p.flags & lt::peer_info::rc4) {
-        //                 std::cout << "Peer " << p.ip << " is using RC4 encryption." << std::endl; // Should NEVER happen
-        //             } else {
-        //                 std::cout << "Peer " << p.ip << " is using ChaCha20 encryption." << std::endl; // Expected output
-        //             }
-        //         }
-        //     }
-        // 
-        // } else {
-        //     // Log all alert messages for debugging
-        //     std::cout << a->message() << std::endl;
-        // }
 }
 
 // dht will communicate back through alerts
@@ -713,6 +692,8 @@ void Client::banNode(const lt::tcp::endpoint& endpoint) {
 }
 
 void Client::corruptAllTorrents(double corruption_percent) {
+
+    std::lock_guard<std::mutex> lock(torrents_mutex_);
     for (auto& torrent : torrents_) {
         corruptTorrentData(torrent.first, corruption_percent);
     }
@@ -720,13 +701,16 @@ void Client::corruptAllTorrents(double corruption_percent) {
 
 void Client::corruptTorrentData(const lt::sha1_hash& info_hash, double corruption_percent) {
     std::cout << "Attempting to corrupt torrent data for testing..." << std::endl;
+    
+    std::lock_guard<std::mutex> lock(torrents_mutex_);
     auto it = torrents_.find(info_hash);
     if (it == torrents_.end()) {
         std::cerr << "Torrent not found with hash: " << info_hash.to_string() << std::endl;
         return;
     }
+
+    lt::torrent_handle handle = torrents_[info_hash];
     
-    lt::torrent_handle handle = it->second;
     if (!handle.is_valid()) {
         std::cerr << "Invalid torrent handle" << std::endl;
         return;
@@ -824,6 +808,8 @@ void Client::reportDownloadCompletion(const lt::sha1_hash& info_hash) {
         auto duration = std::chrono::duration_cast<std::chrono::seconds>(end_time - it->second).count();
         
         std::string torrent_name = "Unknown";
+        
+        std::lock_guard<std::mutex> lock(torrents_mutex_);
         auto handle_it = torrents_.find(info_hash);
         if (handle_it != torrents_.end() && handle_it->second.torrent_file()) {
             torrent_name = handle_it->second.torrent_file()->name();
@@ -853,7 +839,7 @@ void Client::reportDownloadCompletion(const lt::sha1_hash& info_hash) {
             auto status = handle_it->second.status();
             std::cout << "Total size: " << formatSize(status.total_wanted) << std::endl;
             std::cout << "Average speed: " << std::fixed << std::setprecision(2) 
-                      << (status.total_wanted / static_cast<double>(duration) / 1024.0) << " KB/s" << std::endl;
+                    << (status.total_wanted / static_cast<double>(duration) / 1024.0) << " KB/s" << std::endl;
         }
         
         std::cout << "=============================\n";
@@ -880,13 +866,78 @@ std::string Client::formatSize(std::int64_t bytes) const {
     return ss.str();
 }
 
-// checks the torrent handle is valid
-// libtorrent sets seeding to true automatically
-// sets the seed flag to false, doesn't let other clients download from it
-// void Client::stopSeeding(lt::torrent_handle& handle) {
-// }
+lt::torrent_handle Client::getTorrentHandleByName(const std::string& name) const {
+    std::lock_guard<std::mutex> lock(torrents_mutex_);
+    for (const auto& [hash, handle] : torrents_) {
+        if (handle.is_valid()) {
+            try {
+                lt::torrent_status status = handle.status();
+                if (status.name == name) {
+                    return handle;
+                }
+            } catch (const std::exception& e) {
+                std::cerr << "Error reading torrent status" << std::endl;
+                continue;
+            }
+        }
+    }
+    
+    throw std::runtime_error("Torrent with name '" + name + "' not found");
+}
 
-// void Client::startSeeding(lt::torrent_handle& handle) {
-// }
+void Client::pauseTorrent(const std::string& name) {
+    try {
+        lt::torrent_handle handle = getTorrentHandleByName(name);
+        if (!handle.is_valid()) {
+            std::cerr << "Invalid torrent handle for '" << name << "'" << std::endl;
+            return;
+        }
+        handle.pause();
+        std::cout << "Torrent '" << name << "' paused" << std::endl;
+    } catch (const std::exception& e) {
+        std::cerr << "Error pausing torrent: " << e.what() << std::endl;
+    }
+}
+
+void Client::resumeTorrent(const std::string& name) {
+    try {
+        lt::torrent_handle handle = getTorrentHandleByName(name);
+        if (!handle.is_valid()) {
+            std::cerr << "Invalid torrent handle for '" << name << "'" << std::endl;
+            return;
+        }
+        handle.resume();
+        handle.set_flags(lt::torrent_flags::auto_managed);
+        std::cout << "Torrent '" << name << "' resumed" << std::endl;
+    } catch (const std::exception& e) {
+        std::cerr << "Error resuming torrent: " << e.what() << std::endl;
+    }
+}
+
+void Client::removeTorrent(const std::string& name) {
+    try {
+        lt::torrent_handle handle;
+        lt::sha1_hash hash;
+        std::lock_guard<std::mutex> lock(torrents_mutex_);
+        handle = getTorrentHandleByName(name);
+        
+        if (!handle.is_valid()) {
+            std::cerr << "Invalid torrent handle for '" << name << "'" << std::endl;
+            return;
+        }
+        
+        hash = handle.info_hash();
+        lt::remove_flags_t removeFlags = lt::remove_flags_t{};
+        session_->remove_torrent(handle, removeFlags);            
+        torrents_.erase(hash);
+
+        std::lock_guard<std::mutex> tracker_lock(torrent_tracker_mutex_);
+        torrent_trackers_.erase(hash);
+
+        std::cout << "Torrent '" << name << "' removed" << std::endl;
+    } catch (const std::exception& e) {
+        std::cerr << "Error removing torrent: " << e.what() << std::endl;
+    }
+}
 
 } // namespace bracket

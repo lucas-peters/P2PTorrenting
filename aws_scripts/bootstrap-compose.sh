@@ -65,20 +65,18 @@ echo "Detecting public IP address..."
 PUBLIC_IP=$(curl -s http://169.254.169.254/latest/meta-data/public-ipv4)
 echo "Public IP: $PUBLIC_IP"
 
-# Exporting the PUBLIC_IP as an environment variable, so that it can be read in by all of the nodes
-export PUBLIC_IP
+# Create a .env file for docker-compose
+echo "Creating .env file for docker-compose..."
+echo "PUBLIC_IP=$PUBLIC_IP" > .env
 
 # Run docker-compose with the bootstrap configuration
 echo "Starting containers with docker-compose..."
-sudo docker-compose -f docker-compose.bootstrap.yml up -d
+sudo -E docker-compose -f docker-compose.bootstrap.yml up -d
 
 echo "Checking container status..."
 sudo docker ps
 
-echo "Deployment completed successfully!"
+echo "Deployment completed"
 echo "Bootstrap node is running at $PUBLIC_IP:6881"
-echo "Index node is running at $PUBLIC_IP:6885"
+echo "Index node is running at $PUBLIC_IP:6882"
 echo ""
-echo "To view logs:"
-echo "  docker logs bootstrap"
-echo "  docker logs index"

@@ -15,7 +15,7 @@ services:
     environment:
       - GOSSIP_HOST=172.20.0.2
       - PUBLIC_IP=${PUBLIC_IP:-172.20.0.2}  # Use external IP if provided, otherwise default to internal
-    command: --port 6881 --env docker
+    command: --port 6881 --env aws --ip ${PUBLIC_IP:-172.20.0.11}
 
   index:
     image: lucaspeters/index:latest
@@ -24,9 +24,9 @@ services:
       p2p-network:
         ipv4_address: 172.20.0.6
     ports:
-      - "6885:6885"
-      - "7885:7885"
-      - "8885:8885"
+      - "6882:6882"
+      - "7882:7882"
+      - "8882:8882"
     volumes:
       - ./index_data:/app/data
     restart: unless-stopped
@@ -34,7 +34,7 @@ services:
       - bootstrap
     stdin_open: true  # Keep STDIN open
     tty: true         # Allocate a pseudo-TTY
-    command: --port 6885 --env docker
+    command: --port 6885 --env aws --ip ${PUBLIC_IP:-172.20.0.11}
     environment:
       - GOSSIP_HOST=172.20.0.6
       - PUBLIC_IP=${PUBLIC_IP:-172.20.0.6}

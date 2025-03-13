@@ -64,21 +64,17 @@ echo "Detecting public IP address..."
 PUBLIC_IP=$(curl -s http://checkip.amazonaws.com)
 echo "Public IP: $PUBLIC_IP"
 
-# Export the PUBLIC_IP as an environment variable
-export PUBLIC_IP
+# Create a .env file for docker-compose
+echo "Creating .env file for docker-compose..."
+echo "PUBLIC_IP=$PUBLIC_IP" > .env
 
-# Run docker-compose with the bootstrap configuration
+# Run docker-compose with the client configuration
 echo "Starting containers with docker-compose..."
-sudo docker-compose -f docker-compose.client.yml up -d
+sudo -E docker-compose -f docker-compose.client.yml up -d
 
 # Check if containers are running
 echo "Checking container status..."
 sudo docker ps
 
-echo "Deployment completed successfully!"
-echo "Bootstrap node is running at $PUBLIC_IP:6881"
-echo "Index node is running at $PUBLIC_IP:6885"
+echo "Deployment completed"
 echo ""
-echo "To view logs:"
-echo "  docker logs bootstrap"
-echo "  docker logs index"

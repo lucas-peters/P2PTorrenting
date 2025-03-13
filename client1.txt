@@ -1,0 +1,398 @@
+Starting client on port: 6881 in environment docker
+Client 3 args
+Using IP: 172.20.0.21
+Using Docker/AWS config path: /app/config.json
+Loaded configuration for environment: docker
+Bootstrap nodes:
+  172.20.0.2:6881
+  172.20.0.3:6881
+  172.20.0.4:6881
+  172.20.0.5:6881
+  172.20.0.6:6881
+Index nodes:
+  172.20.0.11:6881
+  172.20.0.12:6881
+  172.20.0.13:6881
+  172.20.0.14:6881
+  172.20.0.15:6881
+Connecting to DHT bootstrap nodes...
+[Node:6881] Adding bootstrap node: 172.20.0.2:6881
+[Node:6881] Checking if bootstrap node is reachable...
+[Node:6881] Sending direct DHT request to 172.20.0.2:6881
+[Node:6881] Announcing to DHT with hash: e5b9bf343eabb370af0e504ca497d38243dc5702
+[Node:6881] Getting peers for hash: e5b9bf343eabb370af0e504ca497d38243dc5702
+[Node:6881] Adding bootstrap node: 172.20.0.3:6881
+[Node:6881] Checking if bootstrap node is reachable...
+[Node:6881] Sending direct DHT request to 172.20.0.3:6881
+[Node:6881] Announcing to DHT with hash: 09bfe02589578d9ff4d3736b1717365a5c090d5e
+[Node:6881] Getting peers for hash: 09bfe02589578d9ff4d3736b1717365a5c090d5e
+[Node:6881] Adding bootstrap node: 172.20.0.4:6881
+[Node:6881] Checking if bootstrap node is reachable...
+[Node:6881] Sending direct DHT request to 172.20.0.4:6881
+[Node:6881] Announcing to DHT with hash: 7e7bf3ec1d1af0fd5245da103b637901b4ef96f5
+[Node:6881] Getting peers for hash: 7e7bf3ec1d1af0fd5245da103b637901b4ef96f5
+[Node:6881] Adding bootstrap node: 172.20.0.5:6881
+[Node:6881] Checking if bootstrap node is reachable...
+[Node:6881] Sending direct DHT request to 172.20.0.5:6881
+[Node:6881] Announcing to DHT with hash: 2c49b7b7f9d2bbc4118c035e141bf4f6e3a27432
+[Node:6881] Getting peers for hash: 2c49b7b7f9d2bbc4118c035e141bf4f6e3a27432
+[Node:6881] Adding bootstrap node: 172.20.0.6:6881
+[Node:6881] Checking if bootstrap node is reachable...
+[Node:6881] Sending direct DHT request to 172.20.0.6:6881
+[Node:6881] Announcing to DHT with hash: 8b95fc147f4280a671ee53bedd4648e4366d1f1e
+[Node:6881] Getting peers for hash: 8b95fc147f4280a671ee53bedd4648e4366d1f1e
+Waiting for DHT to initialize...
+Creating Gossip object...
+Starting gossip on port 7881
+Started io_context thread
+Starting TCP acceptor on port 7881
+Creating new TCP acceptor on port 7881
+TCP acceptor created and listening on port 7881
+TCP acceptor started successfully
+IO context thread starting
+Started peer thread
+Started send thread
+Started message processing thread
+Gossip object created successfully
+ Creating Messenger
+Started io_context thread
+Starting TCP acceptor on port 8881
+Creating new TCP acceptor on port 8881
+TCP acceptor created and listening on port 8881
+Waiting for incoming connections on port 8881...
+TCP acceptor started successfully
+IO context thread starting
+Started send thread
+Started message processing thread
+Messenger object created successfully
+Setting reputation handler for Gossip...
+Reputation handler set successfully
+Index Handler set successfully
+Client started on port 6881
+Created command pipe at: /app/command_pipe
+
+===== P2P Torrenting Client =====
+Client running on port: 6881
+Type 'help' for available commands
+================================
+
+> 
+Received command from pipe: status
+No active torrents
+
+[DHT Stats Update]
+DHT stats requested
+> 
+[Client:6881] DHT nodes in routing table: 14
+[Client:6881] Routing table details:
+  Bucket 0: 14 nodes
+
+Received command from pipe: add DOOM1.wad
+Adding torrent: DOOM1.wad
+Error adding torrent: unexpected end of file in bencoded string
+
+[DHT Stats Update]
+DHT stats requested
+> 
+[Client:6881] DHT nodes in routing table: 15
+[Client:6881] Routing table details:
+  Bucket 0: 15 nodes
+
+Received command from pipe: add DOOM1.torrent
+Adding torrent: DOOM1.torrent
+params.ti->name(): DOOM1.wad
+params.save_path: /app/downloads/
+DOOM1.wad
+Torrent info:
+Total size: 4196020 bytes
+Piece length: 16384 bytes
+Number of pieces: 257
+Number of files: 1
+
+Files in torrent:
+File 0: DOOM1.wad (Size: 4196020 bytes)
+Found file at: /app/downloads/DOOM1.wad
+Actual file size: 4196020 bytes
+Added torrent: DOOM1.wad
+
+Initial torrent status:
+State: downloading
+Progress: 0%
+Total done: 0 bytes
+Total wanted: 4196020 bytes
+State: 1
+
+Piece verification:
+Checking files: 1
+Checking resume data: 0
+Index message sent asynchronously to: 172.20.0.11:8881
+Started download timer for torrent: Bl�Цt�qz����"�
+Started verifying pieces for torrent: DOOM1.wad
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+piece finished downloading
+
+===== Download Completed =====
+Torrent: DOOM1.wad
+Info Hash: Bl�Цt�qz����"�
+Total download time: 0s
+Total size: 4.00 MB
+Average speed: inf KB/s
+=============================
+
+Piece verification completed for torrent: DOOM1.wad
+All pieces verified successfully - torrent is complete

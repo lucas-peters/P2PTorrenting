@@ -17,7 +17,7 @@ services:
     environment:
       - GOSSIP_HOST=172.20.0.10
       - PUBLIC_IP=${PUBLIC_IP:-172.20.0.10}
-    command: --port 6881 --env aws --ip PUBLIC_IP
+    command: --port 6881 --env aws --ip ${PUBLIC_IP:-172.20.0.10}
     stdin_open: true
     tty: true
 
@@ -39,7 +39,7 @@ services:
     environment:
       - GOSSIP_HOST=172.20.0.11
       - PUBLIC_IP=${PUBLIC_IP:-172.20.0.11}
-    command: --port 6882 --env aws --ip PUBLIC_IP
+    command: --port 6882 --env aws --ip ${PUBLIC_IP:-172.20.0.11}
     stdin_open: true
     tty: true
 
@@ -61,7 +61,7 @@ services:
     environment:
       - GOSSIP_HOST=172.20.0.12
       - PUBLIC_IP=${PUBLIC_IP:-172.20.0.12}
-    command: --port 6883 --env aws --ip PUBLIC_IP
+    command: --port 6883 --env aws --ip ${PUBLIC_IP:-172.20.0.12}
     stdin_open: true
     tty: true
 
@@ -83,7 +83,7 @@ services:
     environment:
       - GOSSIP_HOST=172.20.0.13
       - PUBLIC_IP=${PUBLIC_IP:-172.20.0.13}
-    command: --port 6884 --env aws --ip PUBLIC_IP
+    command: --port 6884 --env aws --ip ${PUBLIC_IP:-172.20.0.13}
     stdin_open: true
     tty: true
 
@@ -105,7 +105,7 @@ services:
     environment:
       - GOSSIP_HOST=172.20.0.14
       - PUBLIC_IP=${PUBLIC_IP:-172.20.0.14}
-    command: --port 6885 --env aws --ip PUBLIC_IP
+    command: --port 6885 --env aws --ip ${PUBLIC_IP:-172.20.0.14}
     stdin_open: true
     tty: true
 

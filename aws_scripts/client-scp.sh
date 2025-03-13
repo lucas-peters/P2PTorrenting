@@ -14,7 +14,7 @@ FILES_TO_COPY=(
   #
   "docker-compose.client.yml"
   "client-compose.sh"
-  "randomize_dirs.sh"
+  #"randomize_dirs.sh"
 )
 
 # Check if key file exists
@@ -51,8 +51,8 @@ for IP in $IPS; do
   
   # Make client-compose.sh executable and run it
   #echo "Making client-compose.sh executable and running it..."
-  ssh -i "$KEY_FILE" -o StrictHostKeyChecking=no "$SSH_USER@$IP" "chmod +x ~/randomize_dirs.sh" #"~/randomize_dirs.sh"
-  ssh -i "$KEY_FILE" -o StrictHostKeyChecking=no "$SSH_USER@$IP" "chmod +x ~/client-compose.sh" #"~/client-compose.sh"
+  #ssh -i "$KEY_FILE" -o StrictHostKeyChecking=no "$SSH_USER@$IP" "chmod +x ~/randomize_dirs.sh" #"~/randomize_dirs.sh"
+  ssh -i "$KEY_FILE" -o StrictHostKeyChecking=no "$SSH_USER@$IP" "chmod +x ~/client-compose.sh && ~/client-compose.sh"
   
   # && ~/client-compose.sh"
   

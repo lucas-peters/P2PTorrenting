@@ -11,7 +11,7 @@ REMOTE_DIR="~/"
 
 # Files to copy
 FILES_TO_COPY=(
-  #
+  "docker-compose.bootstrap.yml"
   "bootstrap-compose.sh"
 )
 
@@ -23,14 +23,14 @@ if [ ! -f $(eval echo $KEY_FILE) ]; then
 fi
 
 # Check if static_ips.txt exists
-if [ ! -f "${PROJECT_DIR}/aws scripts/static_ips.txt" ]; then
+if [ ! -f "${PROJECT_DIR}/aws_scripts/static_ips.txt" ]; then
   echo "Error: static_ips.txt not found"
   exit 1
 fi
 
 # Read IPs from static_ips.txt
 echo "Reading EC2 instance IPs from static_ips.txt..."
-IPS=$(cat "${PROJECT_DIR}/aws scripts/static_ips.txt")
+IPS=$(cat "${PROJECT_DIR}/aws_scripts/static_ips.txt")
 
 # Loop through each IP
 for IP in $IPS; do
@@ -41,6 +41,7 @@ for IP in $IPS; do
   for FILE in $FILES_TO_COPY; do 
     ssh -i "$KEY_PAIR_NAME.pem" -o StrictHostKeyChecking=no ec2-user@$IP "rm -rf $FILE"
     scp -i "$KEY_PAIR_NAME.pem" -o StrictHostKeyChecking=no $FILE ec2-user@$IP:~/$FILE
-    ssh -i "$KEY_PAIR_NAME.pem" -o StrictHostKeyChecking=no ec2-user@$IP "chmod +x ~/$FILE && ~/$FILE"
   done
+  ssh -i "$KEY_PAIR_NAME.pem" -o StrictHostKeyChecking=no ec2-user@$IP "chmod +x ~/bootstrap-compose.sh && ~/bootstrap-compose.sh"
 done
+
