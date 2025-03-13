@@ -9,6 +9,7 @@ echo "======================================================"
 
 # Stop and remove all running containers
 echo "Stopping and removing all running containers..."
+sudo docker login
 sudo docker stop $(sudo docker ps -a -q) 2>/dev/null || true
 sudo docker rm $(sudo docker ps -a -q) 2>/dev/null || true
 
@@ -62,8 +63,9 @@ check_image_update "lucaspeters/index:latest"
 
 # Get the public IP of the EC2 instance, this is important because our nodes need a reference to their own ip
 echo "Detecting public IP address..."
-PUBLIC_IP=$(curl -s http://169.254.169.254/latest/meta-data/public-ipv4)
+PUBLIC_IP=$(curl -s http://checkip.amazonaws.com)
 echo "Public IP: $PUBLIC_IP"
+export PUBLIC_IP
 
 # Create a .env file for docker-compose
 echo "Creating .env file for docker-compose..."
@@ -71,7 +73,7 @@ echo "PUBLIC_IP=$PUBLIC_IP" > .env
 
 # Run docker-compose with the bootstrap configuration
 echo "Starting containers with docker-compose..."
-sudo -E docker-compose -f docker-compose.bootstrap.yml up -d
+sudo -E env PUBLIC_IP=$PUBLIC_IP docker-compose -f docker-compose.bootstrap.yml down
 
 echo "Checking container status..."
 sudo docker ps

@@ -266,7 +266,6 @@ void Gossip::sendMessageAsync(const lt::tcp::endpoint& target, const GossipMessa
         auto target_address = target.address();
         
         // Use the gossip port (7881) instead of the target's port
-        // This is because in Docker, all containers use the same internal port
         //bip::tcp::endpoint tcp_endpoint(target_address, port_);
         
         // std::cout << "Connecting to gossip endpoint: " << tcp_endpoint.address().to_string() 
@@ -546,7 +545,7 @@ void Gossip::spreadMessage(const GossipMessage& message, const lt::tcp::endpoint
 
     std::lock_guard<std::mutex> lock(outgoing_queue_mutex_);
     for (const auto & peer: peers) {
-        // std::cout << "peer: " << peer << std::endl;
+        std::cout << "peer: " << peer << std::endl;
         outgoing_messages_.push({peer, message});
     }
     // std::cout << "messages pushed to queue" << std::endl;

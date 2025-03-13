@@ -16,9 +16,9 @@ FILES_TO_COPY=(
 )
 
 # Check if key file exists
-if [ ! -f $(eval echo $KEY_FILE) ]; then
-  echo "Error: SSH key file not found at $KEY_FILE"
-  echo "Please update the KEY_FILE variable with the correct path to your AWS key"
+if [ ! -f "${KEY_PAIR_NAME}.pem" ]; then
+  echo "Error: SSH key file not found at ${KEY_PAIR_NAME}.pem"
+  echo "Please ensure your AWS key is in the current directory"
   exit 1
 fi
 
@@ -38,10 +38,14 @@ for IP in $IPS; do
   echo "Deploying to EC2 instance: $IP"
   echo "===================================================="
   echo "Copying setup script to instances..."
-  for FILE in $FILES_TO_COPY; do 
-    ssh -i "$KEY_PAIR_NAME.pem" -o StrictHostKeyChecking=no ec2-user@$IP "rm -rf $FILE"
-    scp -i "$KEY_PAIR_NAME.pem" -o StrictHostKeyChecking=no $FILE ec2-user@$IP:~/$FILE
+  for FILE in "${FILES_TO_COPY[@]}"; do 
+    echo "Copying ${PROJECT_DIR}/aws_scripts/${FILE} to ${SSH_USER}@${IP}:~/${FILE}"
+    ssh -i "${KEY_PAIR_NAME}.pem" -o StrictHostKeyChecking=no ${SSH_USER}@${IP} "rm -rf ${FILE}"
+    scp -i "${KEY_PAIR_NAME}.pem" -o StrictHostKeyChecking=no "${PROJECT_DIR}/aws_scripts/${FILE}" ${SSH_USER}@${IP}:~/${FILE}
   done
-  ssh -i "$KEY_PAIR_NAME.pem" -o StrictHostKeyChecking=no ec2-user@$IP "chmod +x ~/bootstrap-compose.sh && ~/bootstrap-compose.sh"
+  echo "Running bootstrap-compose.sh on ${IP}..."
 done
 
+for IP in $IPS; do
+  ssh -i "${KEY_PAIR_NAME}.pem" -o StrictHostKeyChecking=no ${SSH_USER}@${IP} "chmod +x ~/bootstrap-compose.sh && ~/bootstrap-compose.sh"
+done

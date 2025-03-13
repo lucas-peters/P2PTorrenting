@@ -9,6 +9,7 @@ echo "======================================================"
 
 # Stop and remove all running containers
 echo "Stopping and removing all running containers..."
+sudo docker login
 sudo docker stop $(sudo docker ps -a -q) 2>/dev/null || true
 sudo docker rm $(sudo docker ps -a -q) 2>/dev/null || true
 
@@ -63,6 +64,7 @@ check_image_update "lucaspeters/client:latest"
 echo "Detecting public IP address..."
 PUBLIC_IP=$(curl -s http://checkip.amazonaws.com)
 echo "Public IP: $PUBLIC_IP"
+export PUBLIC_IP=$PUBLIC_IP
 
 # Create a .env file for docker-compose
 echo "Creating .env file for docker-compose..."
@@ -70,7 +72,7 @@ echo "PUBLIC_IP=$PUBLIC_IP" > .env
 
 # Run docker-compose with the client configuration
 echo "Starting containers with docker-compose..."
-sudo -E docker-compose -f docker-compose.client.yml up -d
+sudo -E env PUBLIC_IP=$PUBLIC_IP docker-compose -f docker-compose.client.yml down
 
 # Check if containers are running
 echo "Checking container status..."

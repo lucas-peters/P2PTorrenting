@@ -885,59 +885,59 @@ lt::torrent_handle Client::getTorrentHandleByName(const std::string& name) const
     throw std::runtime_error("Torrent with name '" + name + "' not found");
 }
 
-void Client::pauseTorrent(const std::string& name) {
-    try {
-        lt::torrent_handle handle = getTorrentHandleByName(name);
-        if (!handle.is_valid()) {
-            std::cerr << "Invalid torrent handle for '" << name << "'" << std::endl;
-            return;
-        }
-        handle.pause();
-        std::cout << "Torrent '" << name << "' paused" << std::endl;
-    } catch (const std::exception& e) {
-        std::cerr << "Error pausing torrent: " << e.what() << std::endl;
-    }
-}
+// void Client::pauseTorrent(const std::string& name) {
+//     try {
+//         lt::torrent_handle handle = getTorrentHandleByName(name);
+//         if (!handle.is_valid()) {
+//             std::cerr << "Invalid torrent handle for '" << name << "'" << std::endl;
+//             return;
+//         }
+//         handle.pause();
+//         std::cout << "Torrent '" << name << "' paused" << std::endl;
+//     } catch (const std::exception& e) {
+//         std::cerr << "Error pausing torrent: " << e.what() << std::endl;
+//     }
+// }
 
-void Client::resumeTorrent(const std::string& name) {
-    try {
-        lt::torrent_handle handle = getTorrentHandleByName(name);
-        if (!handle.is_valid()) {
-            std::cerr << "Invalid torrent handle for '" << name << "'" << std::endl;
-            return;
-        }
-        handle.resume();
-        handle.set_flags(lt::torrent_flags::auto_managed);
-        std::cout << "Torrent '" << name << "' resumed" << std::endl;
-    } catch (const std::exception& e) {
-        std::cerr << "Error resuming torrent: " << e.what() << std::endl;
-    }
-}
+// void Client::resumeTorrent(const std::string& name) {
+//     try {
+//         lt::torrent_handle handle = getTorrentHandleByName(name);
+//         if (!handle.is_valid()) {
+//             std::cerr << "Invalid torrent handle for '" << name << "'" << std::endl;
+//             return;
+//         }
+//         handle.resume();
+//         handle.set_flags(lt::torrent_flags::auto_managed);
+//         std::cout << "Torrent '" << name << "' resumed" << std::endl;
+//     } catch (const std::exception& e) {
+//         std::cerr << "Error resuming torrent: " << e.what() << std::endl;
+//     }
+// }
 
-void Client::removeTorrent(const std::string& name) {
-    try {
-        lt::torrent_handle handle;
-        lt::sha1_hash hash;
-        std::lock_guard<std::mutex> lock(torrents_mutex_);
-        handle = getTorrentHandleByName(name);
+// void Client::removeTorrent(const std::string& name) {
+//     try {
+//         lt::torrent_handle handle;
+//         lt::sha1_hash hash;
+//         std::lock_guard<std::mutex> lock(torrents_mutex_);
+//         handle = getTorrentHandleByName(name);
         
-        if (!handle.is_valid()) {
-            std::cerr << "Invalid torrent handle for '" << name << "'" << std::endl;
-            return;
-        }
+//         if (!handle.is_valid()) {
+//             std::cerr << "Invalid torrent handle for '" << name << "'" << std::endl;
+//             return;
+//         }
         
-        hash = handle.info_hash();
-        lt::remove_flags_t removeFlags = lt::remove_flags_t{};
-        session_->remove_torrent(handle, removeFlags);            
-        torrents_.erase(hash);
+//         hash = handle.info_hash();
+//         lt::remove_flags_t removeFlags = lt::remove_flags_t{};
+//         session_->remove_torrent(handle, removeFlags);            
+//         torrents_.erase(hash);
 
-        std::lock_guard<std::mutex> tracker_lock(torrent_tracker_mutex_);
-        torrent_trackers_.erase(hash);
+//         std::lock_guard<std::mutex> tracker_lock(torrent_tracker_mutex_);
+//         torrent_trackers_.erase(hash);
 
-        std::cout << "Torrent '" << name << "' removed" << std::endl;
-    } catch (const std::exception& e) {
-        std::cerr << "Error removing torrent: " << e.what() << std::endl;
-    }
-}
+//         std::cout << "Torrent '" << name << "' removed" << std::endl;
+//     } catch (const std::exception& e) {
+//         std::cerr << "Error removing torrent: " << e.what() << std::endl;
+//     }
+// }
 
 } // namespace bracket

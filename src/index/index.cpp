@@ -83,13 +83,6 @@ std::vector<std::string> Index::generateKeywords(const std::string& title) {
     std::vector<std::string> keywords;
     std::string processedTitle = title;
     std::string currentWord;
-    
-    // Common words to filter out (stop words)
-    static const std::unordered_set<std::string> stopWords = {
-        "the", "it", "but", "on", "and", "for", "with", "this", "that", "from", "are", "was", "not",
-        "what", "all", "were", "when", "your", "can", "said", "there", "use", "each", "which",
-        "she", "he", "his", "her", "how", "their", "will", "other", "about", "out", "many", 
-    };
 
     std::replace(processedTitle.begin(), processedTitle.end(), '_', ' ');
     std::replace(processedTitle.begin(), processedTitle.end(), '.', ' ');
@@ -119,13 +112,9 @@ std::vector<std::string> Index::generateKeywords(const std::string& title) {
     std::istringstream iss(spacedTitle);
     
     while (iss >> currentWord) {
-        // remove empty words, short words, and words in our list
-        if (currentWord.empty() || currentWord.length() < 3 || stopWords.find(currentWord) != stopWords.end()) {
-            continue;
-        }
-
         keywords.push_back(currentWord);
     }
+
     std::cout << "Keywords Generated: " << std::endl;
     for(auto& keyword: keywords) {
         std::cout << keyword << std::endl;
@@ -217,7 +206,7 @@ std::vector<std::pair<std::string, std::string>> Index::searchTorrent(const std:
 void Index::sendKeywordAddMessage(const lt::tcp::endpoint& target, const std::string& keyword, 
                                  const std::string& title, const std::string& magnet) {
     if (!messenger_) {
-        std::cerr << "Error: Messenger not initialized, can't send keyword" << std::endl;
+        std::cout << "Error: Messenger not initialized, can't send keyword" << std::endl;
         return;
     }
     
@@ -234,11 +223,11 @@ void Index::sendKeywordAddMessage(const lt::tcp::endpoint& target, const std::st
 
 void Index::sendWantMessage(const IndexMessage& message) {
     if (!messenger_) {
-        std::cerr << "Error: Messenger not initialized, can't send want message" << std::endl;
+        std::cout << "Error: Messenger not initialized, can't send want message" << std::endl;
         return;
     }
     if (!message.has_wanttorrent()) {
-        std::cerr << "Incorrect message type passed to sendWantMessage" << std::endl;
+        std::cout << "Incorrect message type passed to sendWantMessage" << std::endl;
         return;
     }
     
@@ -253,15 +242,15 @@ void Index::sendWantMessage(const IndexMessage& message) {
         new_message.set_sender_port(port_);
         
         // Send to the primary node responsible for this keyword
-        lt::tcp::endpoint target(lt::make_address_v4(index_nodes_[i].first), index_nodes_[i].second);
-        messenger_->queueMessage(target, message);
+        lt::tcp::endpoint target(lt::make_address_v4(index_nodes_[i].first), index_nodes_[i].second + 2000);
+        messenger_->queueMessage(target, new_message);
         std::cout << "Forwarded search for keyword '" << message.wanttorrent().keyword() << "' to node " << i << std::endl;
     }
 }
 
 void Index::sendGiveMessage(const IndexMessage& message, const std::vector<std::pair<std::string, std::string>>& pairs) {
     if (!messenger_) {
-        std::cerr << "Error: Messenger not initialized, can't send give message" << std::endl;
+        std::cout << "Error: Messenger not initialized, can't send give message" << std::endl;
         return;
     }
     
@@ -307,16 +296,18 @@ void Index::handleIndexMessage(const IndexMessage& message) {
     // Check if we've seen this message before using message_id
     std::string cache_key;
     
-    if (message.request_id().size()) {
+    if (message.request_id().size() > 0) {
+        std::cout << "Received want message with request id: " << message.request_id() << "from: " << message.source_ip() << ":" << message.source_port() << std::endl;
         cache_key = message.request_id();
     } else {
+        std::cout << "Received want message without request id from: " << message.source_ip() << ":" << message.source_port() << std::endl;
         cache_key = message.source_ip() + ":" + 
                    std::to_string(message.source_port());
         
         if (message.has_wanttorrent()) {
-            cache_key += ":want:" + message.wanttorrent().keyword();
+            cache_key += ":want:" + message.wanttorrent().keyword() + std::to_string(std::time(nullptr));
         } else if (message.has_givetorrent()) {
-            cache_key += ":give:" + message.givetorrent().keyword();
+            cache_key += ":give:" + message.givetorrent().keyword() + std::to_string(std::time(nullptr));
         }
     }
     
@@ -325,10 +316,9 @@ void Index::handleIndexMessage(const IndexMessage& message) {
         std::lock_guard<std::mutex> lock(cache_mutex_);
         is_new_message = message_cache_.insert(cache_key).second;
         
-        // Limit cache size to prevent memory issues
-        if (message_cache_.size() > 10000) { // Arbitrary limit, adjust as needed
-            message_cache_.clear(); // Simple approach: just clear it when it gets too big
-
+        // limit cache size to prevent memory issues
+        if (message_cache_.size() > 10000) {
+            message_cache_.clear(); // naive cache
         }
     }
     

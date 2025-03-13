@@ -140,14 +140,14 @@ void processCommand(const std::string& input, std::unique_ptr<Client>& client, s
 }
 
 int main(int argc, char* argv[]) {
-    
-    // Parse command line arguments
-    int port = 6882;
+    // setting defaults in case flags aren't set
+    int port = 6881;
     std::string state_file = "";
     bool load_state = false;
     std::string env = "lucas";
     std::string ip = "None";
-    
+
+    // parsing input flags
     for (int i = 1; i < argc; i++) {
         std::string arg = argv[i];
         if (arg == "--port" || arg == "-p") {

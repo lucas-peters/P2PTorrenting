@@ -384,7 +384,7 @@ void Node::setIP(const std::string& env) {
 std::string Node::generateRequestId() {
     // Simple request ID generator
     static int counter = 0;
-    return "req_" + std::to_string(++counter) + "_" + ip_ + "_" + std::to_string(port_);
+    return "req_" + std::to_string(++counter) + "_" + ip_ + "_" + std::to_string(port_) + "_" + std::to_string(std::time(nullptr));
 }
 // lt::sha1_hash Node::getMyNodeId() const {
 //     lt::sha1_hash node_id;

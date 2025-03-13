@@ -28,7 +28,7 @@ void Messenger::start() {
     });
     std::cout << "Started io_context thread" << std::endl;
     
-    // Now start the acceptor
+    // starting acceptor
     try {
         std::cout << "Starting TCP acceptor on port " << port_ << std::endl;
         if(!acceptor_) {
@@ -37,11 +37,8 @@ void Messenger::start() {
                 io_context_,
                 bip::tcp::endpoint(bip::tcp::v4(), port_)
             );
-            
-            // Set the acceptor to reuse the address (helps with quick restarts)
             acceptor_->set_option(bip::tcp::acceptor::reuse_address(true));
             
-            // Check if acceptor is open
             if (!acceptor_->is_open()) {
                 std::cerr << "ERROR: TCP acceptor failed to open on port " << port_ << std::endl;
                 return;
@@ -91,18 +88,18 @@ void Messenger::stop() {
         work_guard_.reset();
     }
 
-    // Stop accepting new connections
+    // stop accepting new connections
     if (acceptor_ && acceptor_->is_open()) {
         std::cout << "Closing acceptor" << std::endl;
         boost::system::error_code ec;
         acceptor_->close(ec);
     }
     
-    // Stop io_context (this is redundant once work_guard is reset, but keeping for safety)
+    // stop io_context (this is redundant once work_guard is reset, but keeping for safety)
     std::cout << "Stopping io_context" << std::endl;
     io_context_.stop();
     
-    // Join threads
+    // join threads
     if (service_thread_ && service_thread_->joinable()) {
         service_thread_->join();
     }

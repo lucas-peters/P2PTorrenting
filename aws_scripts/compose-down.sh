@@ -17,21 +17,21 @@ if [ ! -f $(eval echo $KEY_FILE) ]; then
 fi
 
 # Check if client_ips.txt exists
-if [ ! -f "${PROJECT_DIR}/aws scripts/static_ips.txt" ]; then
+if [ ! -f "${PROJECT_DIR}/aws_scripts/static_ips.txt" ]; then
   echo "Error: static_ips.txt not found"
   exit 1
 fi
 
 # Check if static_ips.txt exists
-if [ ! -f "${PROJECT_DIR}/aws scripts/client_ips.txt" ]; then
+if [ ! -f "${PROJECT_DIR}/aws_scripts/client_ips.txt" ]; then
   echo "Error: static_ips.txt not found"
   exit 1
 fi
 
 Read IPs from static_ips.txt
 echo "Reading EC2 instance IPs from static_ips.txt..."
-IPS=$(cat "${PROJECT_DIR}/aws scripts/static_ips.txt")
-
+IPS=$(cat "${PROJECT_DIR}/aws_scripts/static_ips.txt")
+echo "wtf"
 # Loop through each IP
 for IP in $IPS; do
   echo "===================================================="
