@@ -175,7 +175,7 @@ docker cp "/Users/shanayaanna/Downloads/pedestrian.torrent" client2:/app/torrent
 ​To enable the Docker Engine API on your Mac's localhost, follow these steps:​
 
 Open Docker Desktop Preferences:
-
+- Create docker network using `docker network create p2p-network 172.20.0.0/16`
 - Click on the Docker icon in the status bar and select "Settings"​
 - Navigate to the "Docker Engine" tab.​
 - Modify the JSON configuration to include the desired API settings. For example, to enable the API on TCP port 2375:​
@@ -191,6 +191,10 @@ Open Docker Desktop Preferences:
 
 - run `npm install -g local-cors-proxy`
 - `lcp --proxyUrl http://127.0.0.1:2375` to avoid cors issue
+- cd to `frontend` and run `npm start`
+- make sure you run the latest docker build commands
+- start adding bootstrap nodes and client nodes from the GUI
+
 
 docker config
 ```

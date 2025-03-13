@@ -22,11 +22,11 @@ export const ClientNode = ({ container, setRetryGetContainer }) => {
     return () => clearInterval(interval); // Cleanup function to clear the interval
   }, []);
 
-  const CLIENT_API_PORT = container.Ports.filter(
+  const CLIENT_API_PORT_ON_HOST_MACHINE = container.Ports.filter(
     (port) => port.PrivatePort === 8080
   )[0]?.PublicPort;
 
-  const CLIENT_BASE_URL = `http://localhost:${CLIENT_API_PORT}`;
+  const CLIENT_BASE_API_URL = `http://localhost:${CLIENT_API_PORT_ON_HOST_MACHINE}`;
 
   const removeNode = async () => {
     setLoading(true);
@@ -42,7 +42,7 @@ export const ClientNode = ({ container, setRetryGetContainer }) => {
   const generateTorrent = async (path) => {
     setGeneratingTorrent({ ...generatingTorrent, [path]: true });
     try {
-      await axios.post(`${CLIENT_BASE_URL}/generate-torrent`, {
+      await axios.post(`${CLIENT_BASE_API_URL}/generate-torrent`, {
         path,
       });
     } catch (err) {
@@ -53,7 +53,7 @@ export const ClientNode = ({ container, setRetryGetContainer }) => {
 
   const addTorrent = async (file) => {
     try {
-      await axios.post(`${CLIENT_BASE_URL}/add-torrent`, {
+      await axios.post(`${CLIENT_BASE_API_URL}/add-torrent`, {
         file,
       });
     } catch (err) {
@@ -65,20 +65,20 @@ export const ClientNode = ({ container, setRetryGetContainer }) => {
   useEffect(() => {
     (async () => {
       try {
-        const res = await axios.get(`${CLIENT_BASE_URL}/dht-stats`);
+        const res = await axios.get(`${CLIENT_BASE_API_URL}/dht-stats`);
         setDhtStats(res.data);
       } catch (err) {}
     })();
-  }, [CLIENT_BASE_URL]);
+  }, [CLIENT_BASE_API_URL]);
 
   useEffect(() => {
     (async () => {
       try {
-        const res = await axios.get(`${CLIENT_BASE_URL}/status`);
+        const res = await axios.get(`${CLIENT_BASE_API_URL}/status`);
         setActiveTorrents(JSON.stringify(res.data));
       } catch (err) {}
     })();
-  }, [CLIENT_BASE_URL, retry]);
+  }, [CLIENT_BASE_API_URL, retry]);
 
   useEffect(() => {
     const fetchFiles = async ({ path }) => {
@@ -122,8 +122,6 @@ export const ClientNode = ({ container, setRetryGetContainer }) => {
       setTorrents(torrents)
     );
   }, [container]);
-
-  console.log("torrents", torrents);
 
   return (
     <div style={{ border: "1px solid black", padding: 4, margin: 4 }}>

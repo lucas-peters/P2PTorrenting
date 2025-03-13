@@ -50,7 +50,7 @@ function App() {
       .then(() => {
         setNewBootstrapId("");
         setNewBootstrapIp("");
-        setRetryGetContainer(retryGetContainer + 1);
+        setRetryGetContainer(retryGetContainer + 1); // refresh the page
       })
       .catch((err) => console.log(err));
   };
