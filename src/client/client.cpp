@@ -44,7 +44,7 @@ void Client::start() {
     peer_cache_thread_ = std::make_unique<std::thread>([this]() {
         while (session_) {
             updatePeerCache();
-            std::this_thread::sleep_for(std::chrono::seconds(60)); // for real use case this would be longer
+            std::this_thread::sleep_for(std::chrono::seconds(30));
         }
     });
 
@@ -79,13 +79,23 @@ void Client::stop() {
     if (session_) {
         // DHT will be automatically stopped when session is destroyed
         running_ = false;
-        gossip_->stop();
+        
+        // join threads
         if (alert_thread_ && alert_thread_->joinable()) {
             alert_thread_->join();
         }
         if (peer_cache_thread_ && peer_cache_thread_->joinable()) {
             peer_cache_thread_->join();
         }
+        
+        // Stop gossip and messenger
+        if (gossip_) {
+            gossip_->stop();
+        }
+        // if (messenger_) {
+        //     messenger_->stop();
+        // }
+        
         session_.reset();
     }
 }
@@ -116,10 +126,9 @@ void Client::addTorrent(const std::string& torrentFilePath) {
         params.save_path = download_path_;
         std::cout << "params.save_path: " << params.save_path << std::endl;
 
-        // this loop strips the absolute file path added by load_torrent_file, so thats in the correct format
+        // this loop strips the absolute file path added by load_torrent_file so thats in the correct format
         for (lt::file_index_t i(0); i < params.ti->files().end_file(); ++i) {
             std::string file_path = params.ti->files().file_path(i);
-            std::cout << "In this fucking loop" << std::endl;
             std::cout << file_path << std::endl;
             
             // Get just the filename without any path
@@ -362,6 +371,13 @@ void Client::handleAlerts() {
                 torrent_trackers_[info_hash]->record_good_piece(pfa->piece_index);
             }
         }
+        else if (auto* at = lt::alert_cast<lt::add_torrent_alert>(a)) {
+            // When a torrent is added, start the download timer
+            lt::sha1_hash info_hash = at->handle.info_hash();
+            if (!at->handle.status().is_seeding) {
+                startDownloadTimer(info_hash);
+            }
+        }
         else if (auto * tfa = lt::alert_cast<lt::torrent_finished_alert>(a)) {
             // Get the info hash directly - works with both older and newer libtorrent versions
             lt::sha1_hash info_hash = tfa->handle.info_hash();
@@ -377,8 +393,53 @@ void Client::handleAlerts() {
                 // Remove tracker for this torrent
                 torrent_trackers_.erase(info_hash);
             }
+            reportDownloadCompletion(info_hash);
         }
     }
+
+    // gets download status for torrents actively downloading
+    std::lock_guard<std::mutex> lock(progress_mutex_);
+    for (const auto& [hash, handle] : torrents_) {
+        if (!handle.is_valid()) continue;
+        
+        auto status = handle.status();
+        if (status.state == lt::torrent_status::downloading) {
+            auto it = download_progress_.find(hash);
+            if (it != download_progress_.end()) {
+                auto& progress = it->second;
+                auto now = std::chrono::steady_clock::now();
+                auto time_diff = std::chrono::duration_cast<std::chrono::milliseconds>(
+                    now - progress.last_update_time).count() / 1000.0;
+                
+                if (time_diff >= .1) {  // Update every 100ms
+                    progress.last_progress = progress.current_progress;
+                    progress.current_progress = status.progress;
+                    
+                    // Calculate speed (in KB/s)
+                    double progress_diff = progress.current_progress - progress.last_progress;
+                    double size_diff = progress_diff * status.total_wanted;
+                    double speed = size_diff / time_diff / 1024.0;
+                    
+                    // Update average speed with some smoothing
+                    if (progress.avg_speed_kBs == 0) {
+                        progress.avg_speed_kBs = speed;
+                    } else {
+                        progress.avg_speed_kBs = progress.avg_speed_kBs * 0.7 + speed * 0.3;
+                    }
+                    
+                    // Calculate ETA
+                    double remaining_bytes = (1.0 - status.progress) * status.total_wanted;
+                    if (progress.avg_speed_kBs > 0) {
+                        progress.est_time_remaining_sec = remaining_bytes / (progress.avg_speed_kBs * 1024.0);
+                    }
+                    
+                    progress.last_update_time = now;
+                }
+            }
+        }
+    }
+    // log the heck of out it
+    //printStatus();
 
         
         // } else if (auto* dht_log = lt::alert_cast<lt::dht_log_alert>(a)) {
@@ -671,7 +732,7 @@ void Client::corruptTorrentData(const lt::sha1_hash& info_hash, double corruptio
         return;
     }
     
-    // Get torrent info
+    // get torrent info hash from the torrent file
     std::shared_ptr<const lt::torrent_info> ti = handle.torrent_file();
     if (!ti) {
         std::cerr << "Missing torrent info" << std::endl;
@@ -685,7 +746,7 @@ void Client::corruptTorrentData(const lt::sha1_hash& info_hash, double corruptio
     std::cout << "Torrent paused" << std::endl;
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
     
-    // Corrupt each file in the torrent
+    // corrupt each file in the torrent, for our case we should only have single files
     for (lt::file_index_t i(0); i < ti->files().end_file(); ++i) {
         std::string file_path = download_path_ + ti->files().file_path(i);
         std::cout << "Processing file: " << file_path << std::endl;
@@ -694,15 +755,11 @@ void Client::corruptTorrentData(const lt::sha1_hash& info_hash, double corruptio
             std::cerr << "File not found: " << file_path << std::endl;
             continue;
         }
-        
-        // Get file size
         std::streamsize file_size = std::filesystem::file_size(file_path);
         if (file_size < 1024) {
             std::cout << "File too small to corrupt: " << file_path << std::endl;
             continue;
         }
-        
-        // Open file for binary reading/writing
         std::fstream file(file_path, std::ios::in | std::ios::out | std::ios::binary);
         if (!file) {
             std::cerr << "Cannot open file: " << file_path << std::endl;
@@ -710,10 +767,8 @@ void Client::corruptTorrentData(const lt::sha1_hash& info_hash, double corruptio
         }
         
         // Calculate bytes to corrupt (at least 100 bytes)
-        size_t bytes_to_corrupt = std::max<size_t>(
-            static_cast<size_t>(file_size * corruption_percent / 100.0), 100);
+        size_t bytes_to_corrupt = std::max<size_t>(static_cast<size_t>(file_size * corruption_percent / 100.0), 100);
         
-        // Initialize random generator
         std::random_device rd;
         std::mt19937 rng(rd());
         std::uniform_int_distribution<std::streamsize> dist(0, file_size - 1);
@@ -727,10 +782,9 @@ void Client::corruptTorrentData(const lt::sha1_hash& info_hash, double corruptio
             char byte;
             file.read(&byte, 1);
             
-            // Flip the bits in the byte
+            // flip the bits in the byte
             byte = ~byte;
-            
-            // Write it back
+
             file.seekp(pos);
             file.write(&byte, 1);
         }
@@ -739,17 +793,91 @@ void Client::corruptTorrentData(const lt::sha1_hash& info_hash, double corruptio
         std::cout << "File corrupted: " << file_path << std::endl;
     }
     
-    // When seed mode is enabled libtorrent won't verify local hashes
+    // when seed mode is enabled libtorrent won't verify local hashes
     std::cout << "Setting seed mode flag to skip hash checking..." << std::endl;
     handle.set_flags(lt::torrent_flags::seed_mode);
     
-    // Put the torrent back in the active session
+    // torrent is active again
     handle.resume();
     std::cout << "Torrent resumed with corrupted data" << std::endl;
-    
-    // Log completion
+
     std::cout << "Torrent data corruption complete. When peers download from this client, "
               << "they should detect bad pieces and trigger hash_failed_alert events." << std::endl;
+}
+
+void Client::startDownloadTimer(const lt::sha1_hash& info_hash) {
+    std::lock_guard<std::mutex> lock(progress_mutex_);
+    download_start_times_[info_hash] = std::chrono::steady_clock::now();
+    
+    DownloadProgress progress;
+    progress.last_update_time = std::chrono::steady_clock::now();
+    download_progress_[info_hash] = progress;
+    
+    std::cout << "Started download timer for torrent: " << info_hash.to_string() << std::endl;
+}
+
+void Client::reportDownloadCompletion(const lt::sha1_hash& info_hash) {
+    std::lock_guard<std::mutex> lock(progress_mutex_);
+    auto it = download_start_times_.find(info_hash);
+    if (it != download_start_times_.end()) {
+        auto end_time = std::chrono::steady_clock::now();
+        auto duration = std::chrono::duration_cast<std::chrono::seconds>(end_time - it->second).count();
+        
+        std::string torrent_name = "Unknown";
+        auto handle_it = torrents_.find(info_hash);
+        if (handle_it != torrents_.end() && handle_it->second.torrent_file()) {
+            torrent_name = handle_it->second.torrent_file()->name();
+        }
+        
+        std::cout << "\n===== Download Completed =====\n";
+        std::cout << "Torrent: " << torrent_name << std::endl;
+        std::cout << "Info Hash: " << info_hash.to_string() << std::endl;
+        
+        // Format duration
+        int hours = static_cast<int>(duration / 3600);
+        int minutes = static_cast<int>((duration - hours * 3600) / 60);
+        int seconds = static_cast<int>(duration % 60);
+        
+        std::cout << "Total download time: ";
+        if (hours > 0) {
+            std::cout << hours << "h " << minutes << "m " << seconds << "s";
+        } else if (minutes > 0) {
+            std::cout << minutes << "m " << seconds << "s";
+        } else {
+            std::cout << seconds << "s";
+        }
+        std::cout << std::endl;
+        
+        // Get total downloaded size
+        if (handle_it != torrents_.end()) {
+            auto status = handle_it->second.status();
+            std::cout << "Total size: " << formatSize(status.total_wanted) << std::endl;
+            std::cout << "Average speed: " << std::fixed << std::setprecision(2) 
+                      << (status.total_wanted / static_cast<double>(duration) / 1024.0) << " KB/s" << std::endl;
+        }
+        
+        std::cout << "=============================\n";
+        
+        // Clean up
+        download_start_times_.erase(it);
+        download_progress_.erase(info_hash);
+    }
+}
+
+// Helper method to format file sizes
+std::string Client::formatSize(std::int64_t bytes) const {
+    const char* suffixes[] = {"B", "KB", "MB", "GB", "TB"};
+    int suffix_idx = 0;
+    double size = static_cast<double>(bytes);
+    
+    while (size >= 1024 && suffix_idx < 4) {
+        size /= 1024;
+        suffix_idx++;
+    }
+    
+    std::stringstream ss;
+    ss << std::fixed << std::setprecision(2) << size << " " << suffixes[suffix_idx];
+    return ss.str();
 }
 
 // checks the torrent handle is valid

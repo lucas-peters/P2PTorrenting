@@ -124,42 +124,35 @@ public:
     Client(int port, const std::string& env, const std::string& ip, const std::string& state_file);
     ~Client();
     
-    // Torrent helpers
+    // methods that support adding torrents to libtorrent session
     void addTorrent(const std::string& torrentFilePath);
+    void addMagnet(const std::string& magnet);
     bool hasTorrent(const lt::sha1_hash& hash) const;
     void generateTorrentFile(const std::string& fileName);
-    // Get progress of a specific torrent
-   //double getProgress(const std::string& torrentFilePath);
-    // Print the status of all torrents
-    void printStatus() const;
-
-    // Seach DHT network for peers with a specific info hash
-    void searchDHT(const std::string& infoHash);
+    std::string createMagnetURI(const std::string& torrentFilePath) const;
+    lt::sha1_hash stringToHash(const std::string& infoHashString) const; // converts a string representation of an info hash to a sha1_hash
+    
+    void searchDHT(const std::string& infoHash); // Seach DHT network for peers with a specific info hash, not really necessary
 
     void addIndex(const std::string& title, const std::string& magnet);
     void searchIndex(const std::string& keyword);
-    
-
-    // Generate a magnet URI for a specific torrent
-    std::string createMagnetURI(const std::string& torrentFilePath) const;
-
-    // Add a magnet link to the client
-    void addMagnet(const std::string& magnet);
 
     // by default a torrent starts seeding when added, these can be used to turn those flags on/off
-    void startSeeding(const std::string& torrentFilePath);
-    void stopSeeding(const std::string& torrentFilePath);
-
-    // Converts a string representation of an info hash to a sha1_hash
-    lt::sha1_hash stringToHash(const std::string& infoHashString) const;
+    // void startSeeding(const std::string& torrentFilePath);
+    // void stopSeeding(const std::string& torrentFilePath);
 
     void corruptTorrentData(const lt::sha1_hash& info_hash, double corruption_percent = 10.0);
     void corruptAllTorrents(double corruption_percentage);
-    // save/load the client's DHT state to/from a file
-    // bool saveDHTState(const std::string& state_file) const;
-    // bool loadDHTState(const std::string& state_file);
+
+    // logging download/upload stats
+    void printStatus() const;
+    void startDownloadTimer(const lt::sha1_hash& info_hash);
+    void reportDownloadCompletion(const lt::sha1_hash& info_hash);
+    std::string formatSize(std::int64_t bytes) const;
 
 private:
+    // tracks all torrents currently in our session
+    std::map<lt::sha1_hash, lt::torrent_handle> torrents_; 
     // Start/stop the client
     void start() override;
     void stop() override;
@@ -167,44 +160,48 @@ private:
     // libtorrent sets alerts to communicate when events happen, such as when a torrent is downloading or when a peer sends a message
     void handleAlerts() override;
 
+    // automatically sets save paths to correct file path inside of our docker containers
     void setSavePaths(const std::string& env);
 
-    // tracks what peers contributed what pieces of each torrent
+    // tracks what peers contributed what pieces of each torrent for reputation system
     std::unordered_map<lt::sha1_hash, std::unique_ptr<PieceTracker>> torrent_trackers_;
     std::mutex torrent_tracker_mutex_;
 
-    // peer cache
+    // peer cache for reputation system
     std::unordered_map<lt::tcp::endpoint, int, EndpointHash> peer_cache_;
     std::mutex peers_mutex_;
     void updatePeerCache();
     void addPeerToCache(const std::string& ip, int port, const std::string& id = "");
     void updatePeerReputation(const std::string& peer_key, int delta);
-    
-    std::map<lt::sha1_hash, lt::torrent_handle> torrents_;    
-
+    // when reputation reaches a low enoug threshold, ban the node
+    void banNode(const lt::tcp::endpoint& endpoint); 
     // gossips to the dht network about the reputation of a node
     void sendGossip(std::vector<std::pair<lt::tcp::endpoint, int>> peer_reputation) const;
-    
-    // callbacks
     void handleReputationMessage(const ReputationMessage& message, const lt::tcp::endpoint& sender);
+
     void handleIndexMessage(const IndexMessage& message);
 
     //threads
     std::unique_ptr<std::thread> alert_thread_;
     std::unique_ptr<std::thread> peer_cache_thread_;
 
+
     // this is where we store torrents and downloads on docker images
     // std::string torrent_path_ = "/app/torrents/";
     // std::string download_path_ = "/app/downloads/";
     std::string torrent_path_ = "/Users/lucaspeters/Documents/GitHub/P2PTorrenting/6882/";
-    std::string download_path_ = "/Users/lucaspeters/Documents/GitHub/P2PTorrenting/6882/";
-    
-    // Ban a node from the DHT network
-    void banNode(const lt::tcp::endpoint& endpoint);
-    
-    // Enable malicious mode for testing reputation system
-    // When enabled, the client will deliberately serve corrupted data for the specified torrent
-    void enableMaliciousMode(const std::string& torrentFilePath, bool enable = true);
+    std::string download_path_ = "/Users/lucaspeters/Documents/GitHub/P2PTorrenting/6882/";  
+
+    struct DownloadProgress {
+        double last_progress = 0.0;
+        double current_progress = 0.0;
+        std::chrono::steady_clock::time_point last_update_time;
+        double avg_speed_kBs = 0.0;
+        double est_time_remaining_sec = 0.0;
+    };
+    std::map<lt::sha1_hash, DownloadProgress> download_progress_;
+    std::map<lt::sha1_hash, std::chrono::steady_clock::time_point> download_start_times_;
+    std::mutex progress_mutex_;
 };
 
 } // namespace torrent_p2p

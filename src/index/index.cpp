@@ -303,41 +303,6 @@ void Index::handleKeywordAddMessage(const std::string& keyword, const std::strin
     std::cout << "Received and stored keyword '" << keyword << "' for title: " << title << std::endl;
 }
 
-// // returns message give message to original sender
-// void Index::handleWantMessage(const IndexMessage& message) {
-//     if (!isResponsibleForTorrent(message.wanttorrent().keyword())) {
-//         sendWantMessage(message);
-//         return;
-//     }
-    
-//     std::vector<std::pair<std::string, std::string>> pairs = searchTorrent(message.wanttorrent().keyword());
-//     if (pairs.empty()) {
-//         sendWantMessage(message);
-//         return;
-//     }
-    
-//     sendGiveMessage(message, pairs);
-    
-// }
-
-// // Handles message asking for magnet link
-// void Index::handleGiveMessage(const IndexMessage& message) {
-//     std::string keyword = message.keyword();
-//     std::string request_id = message.request_identifier();
-    
-//     std::cout << "Received search results for keyword: " << keyword << std::endl;
-    
-//     // Process the results
-//     for (int i = 0; i < message.results_size(); i++) {
-//         const TorrentResult& result = message.results(i);
-//         std::cout << "Title: " << result.title() << ", Magnet: " << result.magnet() << std::endl;
-        
-//         // Store the results locally for future reference
-//         std::unique_lock<std::shared_mutex> lock(data_mutex_);
-//         titleToMagnet[result.title()] = result.magnet();
-//     }
-// }
-
 void Index::handleIndexMessage(const IndexMessage& message) {
     // Check if we've seen this message before using message_id
     std::string cache_key;

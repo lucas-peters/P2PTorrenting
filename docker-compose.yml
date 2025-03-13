@@ -281,6 +281,7 @@ services:
       - ./docker_directories/client1_torrents:/app/torrents
       - ./docker_directories/client1_downloads:/app/downloads
       - ./docker_directories/client1_data:/app/data
+      - ./docker_directories/client1_pipe:/app/command_pipe
     restart: unless-stopped
     stdin_open: true  # Keep STDIN open
     tty: true         # Allocate a pseudo-TTY
@@ -314,6 +315,7 @@ services:
       - ./docker_directories/client2_torrents:/app/torrents
       - ./docker_directories/client2_downloads:/app/downloads
       - ./docker_directories/client2_data:/app/data
+      - ./docker_directories/client2_pipe:/app/command_pipe
     restart: unless-stopped
     stdin_open: true  # Keep STDIN open
     tty: true         # Allocate a pseudo-TTY
@@ -347,6 +349,7 @@ services:
       - ./docker_directories/client3_torrents:/app/torrents
       - ./docker_directories/client3_downloads:/app/downloads
       - ./docker_directories/client3_data:/app/data
+      - ./docker_directories/client3_pipe:/app/command_pipe
     restart: unless-stopped
     stdin_open: true  # Keep STDIN open
     tty: true         # Allocate a pseudo-TTY
@@ -380,6 +383,7 @@ services:
       - ./docker_directories/client4_torrents:/app/torrents
       - ./docker_directories/client4_downloads:/app/downloads
       - ./docker_directories/client4_data:/app/data
+      - ./docker_directories/client4_pipe:/app/command_pipe
     restart: unless-stopped
     stdin_open: true  # Keep STDIN open
     tty: true         # Allocate a pseudo-TTY
@@ -413,6 +417,7 @@ services:
       - ./docker_directories/client5_torrents:/app/torrents
       - ./docker_directories/client5_downloads:/app/downloads
       - ./docker_directories/client5_data:/app/data
+      - ./docker_directories/client5_pipe:/app/command_pipe
     restart: unless-stopped
     stdin_open: true  # Keep STDIN open
     tty: true         # Allocate a pseudo-TTY
