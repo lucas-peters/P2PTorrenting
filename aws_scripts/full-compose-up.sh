@@ -52,12 +52,12 @@ for IP in $IPS; do
   echo "===================================================="
   echo "Docker Compose UP on $IP"
   echo "===================================================="
-  ssh -i "$KEY_PAIR_NAME.pem" -o StrictHostKeyChecking=no ec2-user@$IP "sudo docker-compose -f docker-compose.bootstrap.yml up -d"
+  ssh -i "$KEY_PAIR_NAME.pem" -o StrictHostKeyChecking=no ec2-user@$IP "sudo docker-compose -f docker-compose.bootstrap.yml up --build -d"
 done
 
 for IP in $C_IPS; do
   echo "===================================================="
   echo "Docker Compose UP on $IP"
   echo "===================================================="
-  ssh -i "$KEY_PAIR_NAME.pem" -o StrictHostKeyChecking=no ec2-user@$IP "sudo docker-compose -f docker-compose.client.yml up -d"
+  ssh -i "$KEY_PAIR_NAME.pem" -o StrictHostKeyChecking=no ec2-user@$IP "sudo docker-compose -f docker-compose.client.yml up --build -d"
 done

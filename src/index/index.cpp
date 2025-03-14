@@ -122,6 +122,7 @@ std::vector<std::string> Index::generateKeywords(const std::string& title) {
     return keywords;
 }
 
+// handling a client trying to add to index
 void Index::addTorrent(const std::string& title, const std::string& magnet) {
     std::vector<std::string> keywords;
     std::vector<std::pair<lt::tcp::endpoint, std::string>> keyword_distribution;
@@ -160,7 +161,7 @@ void Index::addTorrent(const std::string& title, const std::string& magnet) {
             // set an endpoint for the query
             else {
                 lt::tcp::endpoint target(lt::make_address_v4(index_nodes_[target_node_id].first), 
-                    index_nodes_[target_node_id].second);
+                    index_nodes_[target_node_id].second + 2000);
                 keyword_distribution.push_back({target, keyword});
             }
         }
