@@ -29,7 +29,7 @@ void BootstrapHeartbeat::stop() {
 void BootstrapHeartbeat::addNode(const lt::tcp::endpoint& node) {
     std::lock_guard<std::mutex> lock(nodes_mutex_);
     
-    // Check if node already exists
+    // check if node already exists
     auto it = std::find(nodes_.begin(), nodes_.end(), node);
     if (it == nodes_.end()) {
         nodes_.push_back(node);
@@ -44,7 +44,7 @@ void BootstrapHeartbeat::removeNode(const lt::tcp::endpoint& node) {
         nodes_.erase(it);
     }
     
-    // Remove from last heartbeat tracking
+    // stop tracking the node
     last_heartbeat_.erase(node);
 }
 
@@ -65,13 +65,9 @@ void BootstrapHeartbeat::heartbeatLoop() {
     std::cout << "Inside heartbeat loop" << std::endl;
     while (running_) {
         try {
-            // Send heartbeats to all bootstrap nodes
             sendHeartbeats();
-            
-            // Check health of nodes
             checkNodeHealth();
-            
-            // Sleep for heartbeat interval
+            // sleep for heartbeat interval
             std::this_thread::sleep_for(HEARTBEAT_INTERVAL);
         } catch (const std::exception& e) {
             std::cerr << "Heartbeat loop error: " << e.what() << std::endl;
@@ -82,27 +78,24 @@ void BootstrapHeartbeat::heartbeatLoop() {
 void BootstrapHeartbeat::sendHeartbeats() {
     std::lock_guard<std::mutex> lock(nodes_mutex_);
     std::cout << "----Sending Heartbeat----" << std::endl;
-    // Create a heartbeat message
+    // create a heartbeat message
     GossipMessage heartbeat_msg;
     heartbeat_msg.set_timestamp(std::time(nullptr));
     heartbeat_msg.set_message_id("heartbeat_ping_" + ip_ + "_" + std::to_string(port_) + "_" + std::to_string(std::time(nullptr)));
     heartbeat_msg.set_source_ip(ip_);
     heartbeat_msg.set_source_port(port_);
     
-    // Add a heartbeat-specific field to the message
+    // add a heartbeat-specific field to the message
     HeartbeatMessage* heartbeat = heartbeat_msg.mutable_heartbeat();
     heartbeat->set_type(HeartbeatMessage::PING);
     heartbeat->set_timestamp(std::time(nullptr));
     
-    // Send the heartbeat message using the new public method
+    // gossip the heartbeat message
     gossip_.spreadMessage(heartbeat_msg, lt::tcp::endpoint());
 }
 
 void BootstrapHeartbeat::processHeartbeatResponse(const lt::tcp::endpoint& sender) {
     std::lock_guard<std::mutex> lock(nodes_mutex_);
-
-    std::cout << "received heartbeat from: " << sender.address() << ":" << sender.port() << std::endl;
-    
     // Update the last heartbeat time for the sender
     last_heartbeat_[sender] = std::chrono::steady_clock::now();
 }
@@ -132,7 +125,7 @@ void BootstrapHeartbeat::checkNodeHealth() {
         } else if ((now - heartbeat_it->second) >= NODE_TIMEOUT) {
             // Node hasn't responded within timeout period
             failed_nodes.push_back(node);
-            std::cout << "*** Bootstrap node failed: " << node.address() << ":" << node.port() << " ***" << std::endl;
+            std::cout << "*** !!! NODE FAILED !!!: " << node.address() << ":" << node.port() << " ***" << std::endl;
         }
     }
     

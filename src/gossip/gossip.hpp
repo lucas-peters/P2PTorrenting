@@ -36,10 +36,8 @@ public:
     void start();
     void stop();
     
-    // Send a gossip message to a specific peer
     void sendGossipMessage(const lt::tcp::endpoint& target, const GossipMessage& message);
     
-    // Send a reputation message (convenience method)
     void sendReputationMessage(const lt::tcp::endpoint& target, const lt::tcp::endpoint& subject,
                               int reputation, const std::string& reason = "");
 
@@ -52,12 +50,10 @@ public:
     using ReputationHandler = std::function<void(const ReputationMessage&, const lt::tcp::endpoint&)>;
     using HeartbeatHandler = std::function<void(const lt::tcp::endpoint&)>;
     using IndexHeartbeatHandler = std::function<void(const lt::tcp::endpoint&)>;
-    using IndexSyncHandler = std::function<void(const IndexSyncMessage&, const lt::tcp::endpoint&)>;
     
     void setReputationHandler(ReputationHandler handler) { reputation_handler_ = handler; };
     void setHeartbeatHandler(HeartbeatHandler handler) { heartbeat_handler_ = handler; }
     void setIndexHeartbeatHandler(IndexHeartbeatHandler handler) { index_heartbeat_handler_ = handler; }
-    void setIndexSyncHandler(IndexSyncHandler handler) { index_sync_handler_ = handler; }
 
     // Send a message to a specific peer
     // void sendMessage(const lt::tcp::endpoint& target, const GossipMessage& message) {
@@ -86,7 +82,6 @@ private:
     // Message handlers - can add more to support multiple types of messages
     ReputationHandler reputation_handler_;
     HeartbeatHandler heartbeat_handler_;
-    IndexSyncHandler index_sync_handler_;
     IndexHeartbeatHandler index_heartbeat_handler_;
     
     // struct to help incoming message queue order messages by lamport timestamp

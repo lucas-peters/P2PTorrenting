@@ -1,9 +1,11 @@
+
 services:
-  bootstrap:
+  # Bootstrap nodes
+  bootstrap1:
     build:
       context: .
       dockerfile: Dockerfile.bootstrap
-    container_name: bootstrap
+    container_name: bootstrap1
     networks:
       p2p-network:
         ipv4_address: 172.20.0.2
@@ -16,16 +18,17 @@ services:
       - "8881:8881/udp"
     restart: unless-stopped
     volumes:
-      - ./bootstrap_data:/app/data
+      - ./bootstrap_data/bootstrap1:/app/data
     environment:
       - GOSSIP_HOST=172.20.0.2
-      - PUBLIC_IP=${PUBLIC_IP:-172.20.0.2}  # Use external IP if provided, otherwise default to internal
+      - PUBLIC_IP=172.20.0.2
+    command: ["--port", "6881", "--env", "docker", "--ip", "172.20.0.2"]
 
-  client1:
+  bootstrap2:
     build:
       context: .
-      dockerfile: Dockerfile.client
-    container_name: client1
+      dockerfile: Dockerfile.bootstrap
+    container_name: bootstrap2
     networks:
       p2p-network:
         ipv4_address: 172.20.0.3
@@ -36,24 +39,19 @@ services:
       - "7882:7881/udp"
       - "8882:8881/tcp"
       - "8882:8881/udp"
-    volumes:
-      - ./docker_directories/client1_torrents:/app/torrents
-      - ./docker_directories/client1_downloads:/app/downloads
-      - ./docker_directories/client1_data:/app/data
     restart: unless-stopped
-    depends_on:
-      - bootstrap
-    stdin_open: true  # Keep STDIN open
-    tty: true         # Allocate a pseudo-TTY
-    ##command: ["--port 6881 --env docker"]
+    volumes:
+      - ./bootstrap_data/bootstrap2:/app/data
     environment:
       - GOSSIP_HOST=172.20.0.3
+      - PUBLIC_IP=172.20.0.3
+    command: ["--port", "6881", "--env", "docker", "--ip", "172.20.0.3"]
 
-  client2:
+  bootstrap3:
     build:
       context: .
-      dockerfile: Dockerfile.client
-    container_name: client2
+      dockerfile: Dockerfile.bootstrap
+    container_name: bootstrap3
     networks:
       p2p-network:
         ipv4_address: 172.20.0.4
@@ -64,24 +62,19 @@ services:
       - "7883:7881/udp"
       - "8883:8881/tcp"
       - "8883:8881/udp"
-    volumes:
-      - ./docker_directories/client2_torrents:/app/torrents
-      - ./docker_directories/client2_downloads:/app/downloads
-      - ./docker_directories/client2_data:/app/data
     restart: unless-stopped
-    depends_on:
-      - bootstrap
-    stdin_open: true  # Keep STDIN open
-    tty: true         # Allocate a pseudo-TTY
-    #command: ["--port 6881 --env docker"]
+    volumes:
+      - ./bootstrap_data/bootstrap3:/app/data
     environment:
       - GOSSIP_HOST=172.20.0.4
+      - PUBLIC_IP=172.20.0.4
+    command: ["--port", "6881", "--env", "docker", "--ip", "172.20.0.4"]
 
-  client3:
+  bootstrap4:
     build:
       context: .
-      dockerfile: Dockerfile.client
-    container_name: client3
+      dockerfile: Dockerfile.bootstrap
+    container_name: bootstrap4
     networks:
       p2p-network:
         ipv4_address: 172.20.0.5
@@ -92,24 +85,19 @@ services:
       - "7884:7881/udp"
       - "8884:8881/tcp"
       - "8884:8881/udp"
-    volumes:
-      - ./docker_directories/client3_torrents:/app/torrents
-      - ./docker_directories/client3_downloads:/app/downloads
-      - ./docker_directories/client3_data:/app/data
     restart: unless-stopped
-    depends_on:
-      - bootstrap
-    stdin_open: true  # Keep STDIN open
-    tty: true         # Allocate a pseudo-TTY
-    #command: ["--port 6881 --env docker"]
+    volumes:
+      - ./bootstrap_data/bootstrap4:/app/data
     environment:
       - GOSSIP_HOST=172.20.0.5
+      - PUBLIC_IP=172.20.0.5
+    command: ["--port", "6881", "--env", "docker", "--ip", "172.20.0.5"]
 
-  index:
+  bootstrap5:
     build:
       context: .
-      dockerfile: Dockerfile.index
-    container_name: index
+      dockerfile: Dockerfile.bootstrap
+    container_name: bootstrap5
     networks:
       p2p-network:
         ipv4_address: 172.20.0.6
@@ -120,18 +108,329 @@ services:
       - "7885:7881/udp"
       - "8885:8881/tcp"
       - "8885:8881/udp"
+    restart: unless-stopped
+    volumes:
+      - ./bootstrap_data/bootstrap5:/app/data
+    environment:
+      - GOSSIP_HOST=172.20.0.6
+      - PUBLIC_IP=172.20.0.6
+    command: ["--port", "6881", "--env", "docker", "--ip", "172.20.0.6"]
+
+  # Index nodes
+  index1:
+    build:
+      context: .
+      dockerfile: Dockerfile.index
+    container_name: index1
+    networks:
+      p2p-network:
+        ipv4_address: 172.20.0.11
+    ports:
+      - "6891:6881/tcp"
+      - "6891:6881/udp"
+      - "7891:7881/tcp"
+      - "7891:7881/udp"
+      - "8891:8881/tcp"
+      - "8891:8881/udp"
+    restart: unless-stopped
+    volumes:
+      - ./index_data/index1:/app/data
+    environment:
+      - GOSSIP_HOST=172.20.0.11
+      - PUBLIC_IP=172.20.0.11
+    command: ["--port", "6881", "--env", "docker", "--ip", "172.20.0.11"]
+    depends_on:
+      - bootstrap1
+      - bootstrap2
+      - bootstrap3
+      - bootstrap4
+      - bootstrap5
+
+  index2:
+    build:
+      context: .
+      dockerfile: Dockerfile.index
+    container_name: index2
+    networks:
+      p2p-network:
+        ipv4_address: 172.20.0.12
+    ports:
+      - "6892:6881/tcp"
+      - "6892:6881/udp"
+      - "7892:7881/tcp"
+      - "7892:7881/udp"
+      - "8892:8881/tcp"
+      - "8892:8881/udp"
+    restart: unless-stopped
+    volumes:
+      - ./index_data/index2:/app/data
+    environment:
+      - GOSSIP_HOST=172.20.0.12
+      - PUBLIC_IP=172.20.0.12
+    command: ["--port", "6881", "--env", "docker", "--ip", "172.20.0.12"]
+    depends_on:
+      - bootstrap1
+      - bootstrap2
+      - bootstrap3
+      - bootstrap4
+      - bootstrap5
+
+  index3:
+    build:
+      context: .
+      dockerfile: Dockerfile.index
+    container_name: index3
+    networks:
+      p2p-network:
+        ipv4_address: 172.20.0.13
+    ports:
+      - "6893:6881/tcp"
+      - "6893:6881/udp"
+      - "7893:7881/tcp"
+      - "7893:7881/udp"
+      - "8893:8881/tcp"
+      - "8893:8881/udp"
+    restart: unless-stopped
+    volumes:
+      - ./index_data/index3:/app/data
+    environment:
+      - GOSSIP_HOST=172.20.0.13
+      - PUBLIC_IP=172.20.0.13
+    command: ["--port", "6881", "--env", "docker", "--ip", "172.20.0.13"]
+    depends_on:
+      - bootstrap1
+      - bootstrap2
+      - bootstrap3
+      - bootstrap4
+      - bootstrap5
+
+  index4:
+    build:
+      context: .
+      dockerfile: Dockerfile.index
+    container_name: index4
+    networks:
+      p2p-network:
+        ipv4_address: 172.20.0.14
+    ports:
+      - "6894:6881/tcp"
+      - "6894:6881/udp"
+      - "7894:7881/tcp"
+      - "7894:7881/udp"
+      - "8894:8881/tcp"
+      - "8894:8881/udp"
+    restart: unless-stopped
+    volumes:
+      - ./index_data/index4:/app/data
+    environment:
+      - GOSSIP_HOST=172.20.0.14
+      - PUBLIC_IP=172.20.0.14
+    command: ["--port", "6881", "--env", "docker", "--ip", "172.20.0.14"]
+    depends_on:
+      - bootstrap1
+      - bootstrap2
+      - bootstrap3
+      - bootstrap4
+      - bootstrap5
+
+  index5:
+    build:
+      context: .
+      dockerfile: Dockerfile.index
+    container_name: index5
+    networks:
+      p2p-network:
+        ipv4_address: 172.20.0.15
+    ports:
+      - "6895:6881/tcp"
+      - "6895:6881/udp"
+      - "7895:7881/tcp"
+      - "7895:7881/udp"
+      - "8895:8881/tcp"
+      - "8895:8881/udp"
+    restart: unless-stopped
+    volumes:
+      - ./index_data/index5:/app/data
+    environment:
+      - GOSSIP_HOST=172.20.0.15
+      - PUBLIC_IP=172.20.0.15
+    command: ["--port", "6881", "--env", "docker", "--ip", "172.20.0.15"]
+    depends_on:
+      - bootstrap1
+      - bootstrap2
+      - bootstrap3
+      - bootstrap4
+      - bootstrap5
+  # Client nodes
+  client1:
+    build:
+      context: .
+      dockerfile: Dockerfile.client
+    container_name: client1
+    networks:
+      p2p-network:
+        ipv4_address: 172.20.0.21
+    ports:
+      - "6901:6881/tcp"
+      - "6901:6881/udp"
+      - "7901:7881/tcp"
+      - "7901:7881/udp"
+      - "8901:8881/tcp"
+      - "8901:8881/udp"
+    volumes:
+      - ./docker_directories/client1_torrents:/app/torrents
+      - ./docker_directories/client1_downloads:/app/downloads
+      - ./docker_directories/client1_data:/app/data
+      # - ./docker_directories/client1_pipe:/app/command_pipe
+    restart: unless-stopped
+    stdin_open: true  # Keep STDIN open
+    tty: true         # Allocate a pseudo-TTY
+    environment:
+      - GOSSIP_HOST=172.20.0.21
+      - PUBLIC_IP=172.20.0.21
+    command: ["--port", "6881", "--env", "docker", "--ip", "172.20.0.21"]
+    depends_on:
+      - bootstrap1
+      - bootstrap2
+      - bootstrap3
+      - bootstrap4
+      - bootstrap5
+
+  client2:
+    build:
+      context: .
+      dockerfile: Dockerfile.client
+    container_name: client2
+    networks:
+      p2p-network:
+        ipv4_address: 172.20.0.22
+    ports:
+      - "6902:6881/tcp"
+      - "6902:6881/udp"
+      - "7902:7881/tcp"
+      - "7902:7881/udp"
+      - "8902:8881/tcp"
+      - "8902:8881/udp"
+    volumes:
+      - ./docker_directories/client2_torrents:/app/torrents
+      - ./docker_directories/client2_downloads:/app/downloads
+      - ./docker_directories/client2_data:/app/data
+      # - ./docker_directories/client2_pipe:/app/command_pipe
+    restart: unless-stopped
+    stdin_open: true  # Keep STDIN open
+    tty: true         # Allocate a pseudo-TTY
+    environment:
+      - GOSSIP_HOST=172.20.0.22
+      - PUBLIC_IP=172.20.0.22
+    command: ["--port", "6881", "--env", "docker", "--ip", "172.20.0.22"]
+    depends_on:
+      - bootstrap1
+      - bootstrap2
+      - bootstrap3
+      - bootstrap4
+      - bootstrap5
+
+  client3:
+    build:
+      context: .
+      dockerfile: Dockerfile.client
+    container_name: client3
+    networks:
+      p2p-network:
+        ipv4_address: 172.20.0.23
+    ports:
+      - "6903:6881/tcp"
+      - "6903:6881/udp"
+      - "7903:7881/tcp"
+      - "7903:7881/udp"
+      - "8903:8881/tcp"
+      - "8903:8881/udp"
     volumes:
       - ./docker_directories/client3_torrents:/app/torrents
       - ./docker_directories/client3_downloads:/app/downloads
       - ./docker_directories/client3_data:/app/data
+      # - ./docker_directories/client3_pipe:/app/command_pipe
     restart: unless-stopped
-    depends_on:
-      - bootstrap
     stdin_open: true  # Keep STDIN open
     tty: true         # Allocate a pseudo-TTY
-    #command: ["--port 6881 --env docker"]
     environment:
-      - GOSSIP_HOST=172.20.0.5
+      - GOSSIP_HOST=172.20.0.23
+      - PUBLIC_IP=172.20.0.23
+    command: ["--port", "6881", "--env", "docker", "--ip", "172.20.0.23"]
+    depends_on:
+      - bootstrap1
+      - bootstrap2
+      - bootstrap3
+      - bootstrap4
+      - bootstrap5
+
+  client4:
+    build:
+      context: .
+      dockerfile: Dockerfile.client
+    container_name: client4
+    networks:
+      p2p-network:
+        ipv4_address: 172.20.0.24
+    ports:
+      - "6904:6881/tcp"
+      - "6904:6881/udp"
+      - "7904:7881/tcp"
+      - "7904:7881/udp"
+      - "8904:8881/tcp"
+      - "8904:8881/udp"
+    volumes:
+      - ./docker_directories/client4_torrents:/app/torrents
+      - ./docker_directories/client4_downloads:/app/downloads
+      - ./docker_directories/client4_data:/app/data
+      # - ./docker_directories/client4_pipe:/app/command_pipe
+    restart: unless-stopped
+    stdin_open: true  # Keep STDIN open
+    tty: true         # Allocate a pseudo-TTY
+    environment:
+      - GOSSIP_HOST=172.20.0.24
+      - PUBLIC_IP=172.20.0.24
+    command: ["--port", "6881", "--env", "docker", "--ip", "172.20.0.24"]
+    depends_on:
+      - bootstrap1
+      - bootstrap2
+      - bootstrap3
+      - bootstrap4
+      - bootstrap5
+
+  client5:
+    build:
+      context: .
+      dockerfile: Dockerfile.client
+    container_name: client5
+    networks:
+      p2p-network:
+        ipv4_address: 172.20.0.25
+    ports:
+      - "6905:6881/tcp"
+      - "6905:6881/udp"
+      - "7905:7881/tcp"
+      - "7905:7881/udp"
+      - "8905:8881/tcp"
+      - "8905:8881/udp"
+    volumes:
+      - ./docker_directories/client5_torrents:/app/torrents
+      - ./docker_directories/client5_downloads:/app/downloads
+      - ./docker_directories/client5_data:/app/data
+      # - ./docker_directories/client5_pipe:/app/command_pipe
+    restart: unless-stopped
+    stdin_open: true  # Keep STDIN open
+    tty: true         # Allocate a pseudo-TTY
+    environment:
+      - GOSSIP_HOST=172.20.0.25
+      - PUBLIC_IP=172.20.0.25
+    command: ["--port", "6881", "--env", "docker", "--ip", "172.20.0.25"]
+    depends_on:
+      - bootstrap1
+      - bootstrap2
+      - bootstrap3
+      - bootstrap4
+      - bootstrap5
 
 networks:
   p2p-network:

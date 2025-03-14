@@ -9,12 +9,7 @@ BootstrapNode::BootstrapNode(int port, const std::string& env, const std::string
 
 BootstrapNode::BootstrapNode(int port, const std::string& env, const std::string& ip, const std::string& state_file) : Node(port, env, state_file, ip) {
     start();
-    // The base class constructor already loads the DHT state, so we don't need to call loadDHTState again
 }
-
-// BootstrapNode::BootstrapNode(int port, const std::vector<lt::tcp::endpoint>& bootstrap_nodes): Node(port), bootstrap_nodes_(bootstrap_nodes) {
-//     start();
-// }
 
 BootstrapNode::~BootstrapNode() {
     stop();
@@ -23,7 +18,7 @@ BootstrapNode::~BootstrapNode() {
 void BootstrapNode::start() {
     Node::start();
         
-    // Start periodic DHT announcements
+    // makes announcements to the dht so that nodes
     announceTimer_ = std::make_unique<std::thread>([this]() {
         while (running_) {
             try {
@@ -31,10 +26,10 @@ void BootstrapNode::start() {
                     std::cout << "[Bootstrap] Requesting DHT stats..." << std::endl;
                     session_->post_dht_stats();
                     
-                    // Force DHT bootstrap
+                    // using this to help discover peers faster
                     session_->dht_get_peers(lt::sha1_hash());
                     
-                    // Announce ourselves with a generated hash
+                    // use a hash to announce
                     lt::sha1_hash hash;
                     std::random_device rd;
                     std::mt19937 gen(rd());
@@ -45,7 +40,7 @@ void BootstrapNode::start() {
                     std::cout << "[Bootstrap] Announcing hash: " << hash << " on port " << port_ << std::endl;
                     session_->dht_announce(hash, port_);
                     
-                    // Print current DHT routing table
+                    // prints out routing table
                     lt::session_params params = session_->session_state();
                     std::cout << "[Bootstrap] DHT routing table has " << params.dht_state.nodes.size() << " nodes" << std::endl;
                     for (auto & node : params.dht_state.nodes) {
@@ -63,13 +58,13 @@ void BootstrapNode::start() {
     running_ = true;
     
     try {
-        // Initialize heartbeat after gossip is created
+        // heartbeat started here
         initializeHeartbeat();
     } catch (const std::exception& e) {
         std::cerr << "[Bootstrap] Exception during Heartbeat initialization: " << e.what() << std::endl;
     }
     
-    // Start handling alerts in a separate thread
+    // handle alerts thread
     std::thread([this]() {
         while (running_) {
             try {
@@ -115,20 +110,6 @@ void BootstrapNode::handleAlerts() {
                     total_nodes += t.num_nodes;
                 }
                 std::cout << "\n[Bootstrap] DHT nodes in routing table: " << total_nodes << std::endl;
-                
-                // Print detailed routing table info
-                if (total_nodes > 0) {
-                    std::cout << "[Bootstrap] Routing table details:" << std::endl;
-                    for (size_t i = 0; i < dht_stats->routing_table.size(); ++i) {
-                        const auto& bucket = dht_stats->routing_table[i];
-                        if (bucket.num_nodes > 0) {
-                            std::cout << "  Bucket " << i << ": " << bucket.num_nodes << " nodes" << std::endl;
-                        }
-                    }
-                }
-            // } else if (auto* dht_log = lt::alert_cast<lt::dht_log_alert>(a)) {
-            //     // Log all DHT activity for debugging
-            //     //std::cout << "[Bootstrap] DHT: " << dht_log->message() << std::endl;
             } else if (auto* node_alert = lt::alert_cast<lt::dht_bootstrap_alert>(a)) {
                 std::cout << "[Bootstrap] DHT bootstrap complete" << std::endl;
             } else if (auto* listen_failed = lt::alert_cast<lt::listen_failed_alert>(a)) {
@@ -136,10 +117,6 @@ void BootstrapNode::handleAlerts() {
                           << ": " << listen_failed->error.message() << std::endl;
             } else if (auto* listen_succeeded = lt::alert_cast<lt::listen_succeeded_alert>(a)) {
                 std::cout << "[Bootstrap] Successfully listening on port " << listen_succeeded->port << std::endl;
-            // } else {
-            //     // Log all alert messages for debugging
-            //     //std::cout << a->message() << std::endl;
-            // }
             }
         } catch (const std::exception& e) {
             std::cerr << "[Bootstrap] Error processing alert: " << e.what() << std::endl;
@@ -153,13 +130,10 @@ void BootstrapNode::initializeHeartbeat() {
         std::cerr << "[Bootstrap] Error: Cannot initialize heartbeat, gossip_ is null" << std::endl;
         return;
     }
-    
-    // First set the heartbeat handler with a safe implementation
     gossip_->setHeartbeatHandler([this](const lt::tcp::endpoint& sender) {
         std::cout << "[Bootstrap] Received heartbeat response from: " 
                   << sender.address() << ":" << sender.port() << std::endl;
         
-        // Check if heartbeat manager exists before forwarding
         if (heartbeat_manager_) {
             heartbeat_manager_->processHeartbeatResponse(sender);
         }
@@ -179,12 +153,12 @@ void BootstrapNode::initializeHeartbeat() {
             }
         }
         
-        // Create heartbeat manager
+        // create heartbeat manager
         try {
             heartbeat_manager_ = std::make_unique<BootstrapHeartbeat>(*gossip_, endpoint_nodes, ip_, port_ + 1000);
             std::cout << "[Bootstrap] Heartbeat manager created successfully" << std::endl;
             
-            // Start the heartbeat process
+            // start heartbeating
             heartbeat_manager_->start();
             std::cout << "[Bootstrap] Heartbeat started successfully" << std::endl;
         } catch (const std::exception& e) {

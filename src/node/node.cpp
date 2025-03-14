@@ -31,7 +31,7 @@ void Node::loadEnvConfig(const std::string& env) {
         config_path = "/app/config.json";
         std::cout << "Using Docker/AWS config path: " << config_path << std::endl;
     } else {
-        // For local development, use the project root from CMake
+        // use the project root from CMake
         config_path = std::string(PROJECT_ROOT) + "/config.json";
         std::cout << "Using local config path: " << config_path << std::endl;
     }
@@ -88,10 +88,6 @@ void Node::loadEnvConfig(const std::string& env) {
                     node[0].is_string() && node[1].is_number()) {
                     std::string ip = node[0].get<std::string>();
                     int port = node[1].get<int>();
-                    // don't add ourself
-                    if (ip_ == ip && port_ == port) {
-                        continue;
-                    }
                     index_nodes_.emplace_back(ip, port);
                 } else {
                     std::cerr << "Invalid index node format" << std::endl;
@@ -173,13 +169,14 @@ void Node::initializeSession() {
     pack.set_bool(lt::settings_pack::enable_incoming_utp, true);
     pack.set_bool(lt::settings_pack::enable_outgoing_tcp, true);
     pack.set_bool(lt::settings_pack::enable_incoming_tcp, true);
+    pack.set_bool(lt::settings_pack::dht_extended_routing_table, false);
     
     // Disable IP restrictions for local testing, by default it doesn't allow duplicate ips. i.e: localhost
     pack.set_bool(lt::settings_pack::dht_restrict_routing_ips, false);
     pack.set_bool(lt::settings_pack::dht_restrict_search_ips, false);
     pack.set_int(lt::settings_pack::dht_max_peers_reply, 100);
     pack.set_bool(lt::settings_pack::dht_ignore_dark_internet, false);
-    pack.set_int(lt::settings_pack::dht_max_fail_count, 100);
+    pack.set_int(lt::settings_pack::dht_max_fail_count, 5);
     
     // listen on all
     pack.set_str(lt::settings_pack::listen_interfaces, "0.0.0.0:" + std::to_string(port_));
@@ -268,7 +265,7 @@ std::pair<std::string, int> Node::getEndpoint() const {
         return {"not started", 0};
     }
     
-    return {"127.0.0.1", port_};
+    return {ip_, port_};
 }
 
 std::string Node::getDHTStats() const {
@@ -291,8 +288,6 @@ void Node::connectToDHT() {
         std::cout << "[Node:" << port_ << "] Adding bootstrap node: " << node.first << ":" << node.second << std::endl;
         
         try {
-            // First, check if the bootstrap node is reachable
-            std::cout << "[Node:" << port_ << "] Checking if bootstrap node is reachable..." << std::endl;
             lt::udp::endpoint ep(lt::make_address_v4(node.first), node.second);
             
             // Add the node to the DHT routing table
@@ -302,7 +297,7 @@ void Node::connectToDHT() {
             std::cout << "[Node:" << port_ << "] Sending direct DHT request to " << node.first << ":" << node.second << std::endl;
             session_->dht_direct_request(ep, lt::entry{}, lt::client_data_t{});
             
-            // Also announce ourselves with a generated hash
+            // announce with a generated hash
             lt::sha1_hash hash;
             std::random_device rd;
             std::mt19937 gen(rd());
@@ -313,7 +308,7 @@ void Node::connectToDHT() {
             std::cout << "[Node:" << port_ << "] Announcing to DHT with hash: " << hash << std::endl;
             session_->dht_announce(hash, port_);
             
-            // Also try to get peers for this hash to force DHT activity
+            // try to get peers for this hash to get in contact with more nodes
             std::cout << "[Node:" << port_ << "] Getting peers for hash: " << hash << std::endl;
             session_->dht_get_peers(hash);
         } catch (const std::exception& e) {
@@ -322,13 +317,12 @@ void Node::connectToDHT() {
         }
     }
     
-    // Start periodic DHT lookups //like a heartbeat
+    // periodic dht requests to stay in touch with other nodes
     std::thread([this]() {
         while (running_) {
             std::cout << "[Node:" << port_ << "] Running periodic DHT maintenance..." << std::endl;
             if (session_) {
                 try {
-                    // Request DHT stats to see what's happening
                     session_->post_dht_stats();
                     
                     // Try to get peers for an empty hash to force DHT activity
@@ -337,7 +331,7 @@ void Node::connectToDHT() {
                     // Get nodes from our DHT routing table
                     lt::session_params params = session_->session_state();
                     if (params.dht_state.nodes.empty()) {
-                        std::cout << "[Node:" << port_ << "] WARNING: No DHT nodes in routing table!" << std::endl;
+                        std::cout << "[Node:" << port_ << "] No nodes in routing table!" << std::endl;
                         
                         // Try to reconnect to bootstrap nodes
                         for (const auto& node : bootstrap_nodes_) {
@@ -354,24 +348,25 @@ void Node::connectToDHT() {
                     std::cerr << "[Node:" << port_ << "] Error in DHT maintenance: " << e.what() << std::endl;
                 }
             }
-            std::this_thread::sleep_for(std::chrono::seconds(5));
+            std::this_thread::sleep_for(std::chrono::seconds(60));
         }
     }).detach();
 }
 
+// used to get a reference of our own ip address, important so that other nodes can send back to us
 void Node::setIP(const std::string& env) {
-    // Check if PUBLIC_IP environment variable is set (highest priority)
+    // Check if PUBLIC_IP environment variable is set
     const char* publicIP = std::getenv("PUBLIC_IP");
-    if (publicIP) {
+    if (ip_ == "None" && publicIP) {
         ip_ = publicIP;
         std::cout << "Using public IP from environment variable: " << ip_ << std::endl;
     }
-    // If no public IP is set and ip_ is "None", use the bootstrap node IP
+    // if not use the bootstrap node IP
     else if (ip_ == "None" && !bootstrap_nodes_.empty()) {
         ip_ = bootstrap_nodes_[0].first;
     }
     
-    // For AWS/Docker environments, warn if no public IP is set
+    // Warn if no public IP is set when running in docker and aws
     if ((env == "aws" || env == "docker") && !publicIP) {
         std::cout << "WARNING: Running in " << env << " environment without PUBLIC_IP environment variable." << std::endl;
         std::cout << "DHT will use internal IP which may not be accessible from outside." << std::endl;
@@ -380,31 +375,10 @@ void Node::setIP(const std::string& env) {
     
     std::cout << "Using IP: " << ip_ << std::endl;
 }
-// lt::sha1_hash Node::getMyNodeId() const {
-//     lt::sha1_hash node_id;
-    
-//     // Try method 1: Get from session state
-//     try {
-//         lt::entry session_state = session_->save_state();
-//         if (session_state.find_key("dht state")) {
-//             lt::entry dht_state = session_state["dht state"];
-//             if (dht_state.find_key("node-id")) {
-//                 std::string node_id_str = dht_state["node-id"].string();
-//                 if (node_id_str.size() == 20) {
-//                     std::memcpy(node_id.data(), node_id_str.data(), 20);
-//                     return node_id;
-//                 }
-//             }
-//         }
-//     } catch (const std::exception& e) {
-//         std::cerr << "Error getting node ID from session state: " << e.what() << std::endl;
-//     }
-    
-//     // If we couldn't get it from session state, try other methods
-//     // (Add additional methods here based on your specific implementation)
-    
-//     // If all else fails, return an empty hash
-//     return node_id;
-// }
+
+std::string Node::generateRequestId() {
+    static int counter = 0;
+    return "req_" + std::to_string(++counter) + "_" + ip_ + "_" + std::to_string(port_) + "_" + std::to_string(std::time(nullptr));
+}
 
 } // namespace torrent_p2p

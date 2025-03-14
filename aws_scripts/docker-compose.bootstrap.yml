@@ -1,0 +1,26 @@
+services:
+  bootstrap:
+    image: lucaspeters/bootstrap:latest
+    container_name: bootstrap
+    network_mode: "host"
+    restart: unless-stopped
+    volumes:
+      - ./bootstrap_data:/app/data
+    environment:
+      - PUBLIC_IP=${PUBLIC_IP}
+    command: --port 6881 --env aws --ip ${PUBLIC_IP}
+
+  index:
+    image: lucaspeters/index:latest
+    container_name: index
+    network_mode: "host"
+    volumes:
+      - ./index_data:/app/data
+    restart: unless-stopped
+    depends_on:
+      - bootstrap
+    stdin_open: true  # Keep STDIN open
+    tty: true         # Allocate a pseudo-TTY
+    command: --port 6882 --env aws --ip ${PUBLIC_IP}
+    environment:
+      - PUBLIC_IP=${PUBLIC_IP}

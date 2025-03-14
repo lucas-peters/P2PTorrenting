@@ -7,7 +7,9 @@ message IndexMessage {
     uint32 source_port = 2;
     uint64 timestamp = 3;
     uint64 lamport_timestamp = 4;
-    string message_id = 5;
+    string request_id = 5;
+    string sender_ip = 6; // different than source port, might send to other index nodes and they need to be able to return
+    uint32 sender_port = 7;
 
     oneof message_type {
         AddMessage addTorrent = 10;
@@ -15,6 +17,8 @@ message IndexMessage {
         WantMessage wantTorrent = 12;
         GiveMessage giveTorrent = 13;
         KeywordAddMessage keywordAdd = 14;
+        KeywordTransferMessage keywordtransfer = 15;
+        NodeChangeMessage nodechange = 16;
     }
 }
 
@@ -29,15 +33,13 @@ message RemoveMessage {
 }
 
 message WantMessage {
-    string keyword = 1;
-    string request_identifier = 2;  // Renamed from request_id to avoid protobuf compatibility issues
+    string keyword = 1; // Renamed from request_id to avoid protobuf compatibility issues
 }
  
 message GiveMessage {
     string keyword = 1;
-    string request_identifier = 2;  // Renamed from request_id to avoid protobuf compatibility issues
-    repeated TorrentResult results = 3;
-    bool more_results = 4;  // Indicates if there are more results available
+    repeated TorrentResult results = 2;
+    bool more_results = 3;  // Indicates if there are more results available
 }
 
 message KeywordAddMessage {
@@ -49,4 +51,20 @@ message KeywordAddMessage {
 message TorrentResult {
     string title = 1;
     string magnet = 2;
+}
+
+message KeywordData {
+    string keyword = 1;
+    repeated string titles = 2;
+    repeated string magnets = 3;
+}
+
+message KeywordTransferMessage {
+    repeated KeywordData keyword_data = 1;
+}
+
+message NodeChangeMessage {
+    string ip = 1;
+    int32 port = 2;
+    bool is_join = 3;  // true for join, false for leave
 }

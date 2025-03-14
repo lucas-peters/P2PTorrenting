@@ -1,0 +1,257 @@
+Starting index node on port 6881 in environment docker
+Press Ctrl+C to exit
+Using IP: 172.20.0.11
+Using Docker/AWS config path: /app/config.json
+Loaded configuration for environment: docker
+Bootstrap nodes:
+  172.20.0.2:6881
+  172.20.0.3:6881
+  172.20.0.4:6881
+  172.20.0.5:6881
+  172.20.0.6:6881
+Index nodes:
+  172.20.0.11:6881
+  172.20.0.12:6881
+  172.20.0.13:6881
+  172.20.0.14:6881
+  172.20.0.15:6881
+Connecting to DHT bootstrap nodes...
+[Node:6881] Adding bootstrap node: 172.20.0.2:6881
+[Node:6881] Checking if bootstrap node is reachable...
+[Node:6881] Sending direct DHT request to 172.20.0.2:6881
+[Node:6881] Announcing to DHT with hash: 7d233d9e8e526d2d6c4b5a588a7222ab38c445db
+[Node:6881] Getting peers for hash: 7d233d9e8e526d2d6c4b5a588a7222ab38c445db
+[Node:6881] Adding bootstrap node: 172.20.0.3:6881
+[Node:6881] Checking if bootstrap node is reachable...
+[Node:6881] Sending direct DHT request to 172.20.0.3:6881
+[Node:6881] Announcing to DHT with hash: ab5c8ccd4e3b0521524748e57b3f46ac776399e6
+[Node:6881] Getting peers for hash: ab5c8ccd4e3b0521524748e57b3f46ac776399e6
+[Node:6881] Adding bootstrap node: 172.20.0.4:6881
+[Node:6881] Checking if bootstrap node is reachable...
+[Node:6881] Sending direct DHT request to 172.20.0.4:6881
+[Node:6881] Announcing to DHT with hash: 19ff3836be96e0c4582562c7a995dbc9d6900ec5
+[Node:6881] Getting peers for hash: 19ff3836be96e0c4582562c7a995dbc9d6900ec5
+[Node:6881] Adding bootstrap node: 172.20.0.5:6881
+[Node:6881] Checking if bootstrap node is reachable...
+[Node:6881] Sending direct DHT request to 172.20.0.5:6881
+[Node:6881] Announcing to DHT with hash: 2c166879151fde08aadedcbc9a7f3316f70278ba
+[Node:6881] Getting peers for hash: 2c166879151fde08aadedcbc9a7f3316f70278ba
+[Node:6881] Adding bootstrap node: 172.20.0.6:6881
+[Node:6881] Checking if bootstrap node is reachable...
+[Node:6881] Sending direct DHT request to 172.20.0.6:6881
+[Node:6881] Announcing to DHT with hash: 7ecce6a10273e7c6addb74321970fe429e7d90ae
+[Node:6881] Getting peers for hash: 7ecce6a10273e7c6addb74321970fe429e7d90ae
+Waiting for DHT to initialize...
+Creating Gossip object...
+Starting gossip on port 7881
+Started io_context thread
+Starting TCP acceptor on port 7881
+Creating new TCP acceptor on port 7881
+IO context thread starting
+TCP acceptor created and listening on port 7881
+TCP acceptor started successfully
+Started peer thread
+Started send thread
+Started message processing thread
+Gossip object created successfully
+ Creating Messenger
+Started io_context thread
+Starting TCP acceptor on port 8881
+Creating new TCP acceptor on port 8881
+TCP acceptor created and listening on port 8881
+Waiting for incoming connections on port 8881...
+TCP acceptor started successfully
+IO context thread starting
+Started send thread
+Started message processing thread
+Messenger object created successfully
+Index Handler set successfully
+This index node has ID: 0
+Total index nodes: 5
+[Index] Initializing Heartbeat
+[Index] Added endpoint: 172.20.0.11:6881
+[Index] Added endpoint: 172.20.0.12:6881
+[Index] Added endpoint: 172.20.0.13:6881
+[Index] Added endpoint: 172.20.0.14:6881
+[Index] Added endpoint: 172.20.0.15:6881
+CREATED HEARTBEAT OBJECT
+[IndexHeartbeat] Initializing with 5 index nodes
+[Index] Heartbeat manager created successfully
+HEARTBEAT THREAD STARTED
+[Index] Heartbeat started successfully
+Inside heartbeat loop
+[IndexHeartbeat] Sending heartbeats to 5 nodes
+===== Current heartbeat status =====
+==================================
+Received index heartbeat response from: 172.20.0.11:7881
+[IndexHeartbeat] Processed heartbeat response from: 172.20.0.11:7881
+Received index heartbeat response from: 172.20.0.15:7881
+[IndexHeartbeat] Processed heartbeat response from: 172.20.0.15:7881
+Received index heartbeat response from: 172.20.0.11:7881
+[IndexHeartbeat] Processed heartbeat response from: 172.20.0.11:7881
+Received index heartbeat response from: 172.20.0.12:7881
+[IndexHeartbeat] Processed heartbeat response from: 172.20.0.12:7881
+Received index heartbeat response from: 172.20.0.13:7881
+[IndexHeartbeat] Processed heartbeat response from: 172.20.0.13:7881
+[IndexHeartbeat] Sending heartbeats to 5 nodes
+===== Current heartbeat status =====
+Node: 172.20.0.13:7881 | Last seen: 0 seconds ago
+Node: 172.20.0.12:7881 | Last seen: 0 seconds ago
+Node: 172.20.0.15:7881 | Last seen: 0 seconds ago
+Node: 172.20.0.11:7881 | Last seen: 0 seconds ago
+==================================
+Received index heartbeat response from: 172.20.0.15:7881
+[IndexHeartbeat] Processed heartbeat response from: 172.20.0.15:7881
+Received index heartbeat response from: 172.20.0.14:7881
+[IndexHeartbeat] Processed heartbeat response from: 172.20.0.14:7881
+Received index heartbeat response from: 172.20.0.13:7881
+[IndexHeartbeat] Processed heartbeat response from: 172.20.0.13:7881
+[IndexHeartbeat] Sending heartbeats to 5 nodes
+===== Current heartbeat status =====
+Node: 172.20.0.14:7881 | Last seen: 0 seconds ago
+Node: 172.20.0.13:7881 | Last seen: 0 seconds ago
+Node: 172.20.0.12:7881 | Last seen: 5 seconds ago
+Node: 172.20.0.15:7881 | Last seen: 0 seconds ago
+Node: 172.20.0.11:7881 | Last seen: 5 seconds ago
+==================================
+Received index heartbeat response from: 172.20.0.13:7881
+[IndexHeartbeat] Processed heartbeat response from: 172.20.0.13:7881
+Received index heartbeat response from: 172.20.0.14:7881
+[IndexHeartbeat] Processed heartbeat response from: 172.20.0.14:7881
+[IndexHeartbeat] Sending heartbeats to 5 nodes
+===== Current heartbeat status =====
+Node: 172.20.0.14:7881 | Last seen: 0 seconds ago
+Node: 172.20.0.13:7881 | Last seen: 0 seconds ago
+Node: 172.20.0.12:7881 | Last seen: 10 seconds ago
+Node: 172.20.0.15:7881 | Last seen: 5 seconds ago
+Node: 172.20.0.11:7881 | Last seen: 10 seconds ago
+==================================
+Received index heartbeat response from: 172.20.0.14:7881
+[IndexHeartbeat] Processed heartbeat response from: 172.20.0.14:7881
+Received index heartbeat response from: 172.20.0.13:7881
+[IndexHeartbeat] Processed heartbeat response from: 172.20.0.13:7881
+Received index heartbeat response from: 172.20.0.11:7881
+[IndexHeartbeat] Processed heartbeat response from: 172.20.0.11:7881
+Received index heartbeat response from: 172.20.0.12:7881
+[IndexHeartbeat] Processed heartbeat response from: 172.20.0.12:7881
+Received index heartbeat response from: 172.20.0.15:7881
+[IndexHeartbeat] Processed heartbeat response from: 172.20.0.15:7881
+[IndexHeartbeat] Sending heartbeats to 5 nodes
+===== Current heartbeat status =====
+Node: 172.20.0.14:7881 | Last seen: 0 seconds ago
+Node: 172.20.0.13:7881 | Last seen: 0 seconds ago
+Node: 172.20.0.12:7881 | Last seen: 0 seconds ago
+Node: 172.20.0.15:7881 | Last seen: 0 seconds ago
+Node: 172.20.0.11:7881 | Last seen: 0 seconds ago
+==================================
+Received index heartbeat response from: 172.20.0.12:7881
+[IndexHeartbeat] Processed heartbeat response from: 172.20.0.12:7881
+Received index heartbeat response from: 172.20.0.11:7881
+[IndexHeartbeat] Processed heartbeat response from: 172.20.0.11:7881
+[IndexHeartbeat] Sending heartbeats to 5 nodes
+===== Current heartbeat status =====
+Node: 172.20.0.14:7881 | Last seen: 5 seconds ago
+Node: 172.20.0.13:7881 | Last seen: 5 seconds ago
+Node: 172.20.0.12:7881 | Last seen: 0 seconds ago
+Node: 172.20.0.15:7881 | Last seen: 5 seconds ago
+Node: 172.20.0.11:7881 | Last seen: 0 seconds ago
+==================================
+Received index heartbeat response from: 172.20.0.15:7881
+[IndexHeartbeat] Processed heartbeat response from: 172.20.0.15:7881
+Received index heartbeat response from: 172.20.0.12:7881
+[IndexHeartbeat] Processed heartbeat response from: 172.20.0.12:7881
+Received index heartbeat response from: 172.20.0.11:7881
+[IndexHeartbeat] Processed heartbeat response from: 172.20.0.11:7881
+Received index heartbeat response from: 172.20.0.13:7881
+[IndexHeartbeat] Processed heartbeat response from: 172.20.0.13:7881
+[IndexHeartbeat] Sending heartbeats to 5 nodes
+===== Current heartbeat status =====
+Node: 172.20.0.14:7881 | Last seen: 10 seconds ago
+Node: 172.20.0.13:7881 | Last seen: 0 seconds ago
+Node: 172.20.0.12:7881 | Last seen: 0 seconds ago
+Node: 172.20.0.15:7881 | Last seen: 0 seconds ago
+Node: 172.20.0.11:7881 | Last seen: 0 seconds ago
+==================================
+Received index heartbeat response from: 172.20.0.12:7881
+[IndexHeartbeat] Processed heartbeat response from: 172.20.0.12:7881
+Received index heartbeat response from: 172.20.0.14:7881
+[IndexHeartbeat] Processed heartbeat response from: 172.20.0.14:7881
+Received index heartbeat response from: 172.20.0.13:7881
+[IndexHeartbeat] Processed heartbeat response from: 172.20.0.13:7881
+Received index heartbeat response from: 172.20.0.15:7881
+[IndexHeartbeat] Processed heartbeat response from: 172.20.0.15:7881
+Received index heartbeat response from: 172.20.0.11:7881
+[IndexHeartbeat] Processed heartbeat response from: 172.20.0.11:7881
+[IndexHeartbeat] Sending heartbeats to 5 nodes
+===== Current heartbeat status =====
+Node: 172.20.0.14:7881 | Last seen: 0 seconds ago
+Node: 172.20.0.13:7881 | Last seen: 0 seconds ago
+Node: 172.20.0.12:7881 | Last seen: 0 seconds ago
+Node: 172.20.0.15:7881 | Last seen: 0 seconds ago
+Node: 172.20.0.11:7881 | Last seen: 0 seconds ago
+==================================
+Accepted new connection from 172.20.0.23:60366
+Received Message Request From:  172.20.0.23:60366
+Waiting for incoming connections on port 8881...
+Received message from 172.20.0.23:60366
+Received addTorrent message
+Keywords Generated: 
+pedestrian
+pdf
+sending to index: 0
+sending to index: 1
+sending to index: 2
+sending to index: 4
+sending to index: 0
+sending to index: 1
+Title already in mapping
+Title: pedestrian.pdf Magnet: magnet:?xt=urn:btih:c510d461bdfcdb9984a381edea86e231c2149ff1&xt=urn:btmh:1220ee2a2a09b2879f428b73e43f99f15a923bcebe85e230043e3d89c5483a73b06d&dn=pedestrian.pdf
+Sent keyword 'pedestrian' to node at 172.20.0.12:6881
+Sent keyword 'pedestrian' to node at 172.20.0.13:6881
+Sent keyword 'pdf' to node at 172.20.0.15:6881
+Title already in mapping
+Title: pedestrian.pdf Magnet: magnet:?xt=urn:btih:c510d461bdfcdb9984a381edea86e231c2149ff1&xt=urn:btmh:1220ee2a2a09b2879f428b73e43f99f15a923bcebe85e230043e3d89c5483a73b06d&dn=pedestrian.pdf
+Sent keyword 'pdf' to node at 172.20.0.12:6881
+Index message sent asynchronously to: 172.20.0.12:6881
+Index message sent asynchronously to: 172.20.0.13:6881
+Index message sent asynchronously to: 172.20.0.15:6881
+Index message sent asynchronously to: 172.20.0.12:6881
+Received index heartbeat response from: 172.20.0.13:7881
+[IndexHeartbeat] Processed heartbeat response from: 172.20.0.13:7881
+Received index heartbeat response from: 172.20.0.14:7881
+[IndexHeartbeat] Processed heartbeat response from: 172.20.0.14:7881
+Received index heartbeat response from: 172.20.0.11:7881
+[IndexHeartbeat] Processed heartbeat response from: 172.20.0.11:7881
+[IndexHeartbeat] Sending heartbeats to 5 nodes
+===== Current heartbeat status =====
+Node: 172.20.0.14:7881 | Last seen: 0 seconds ago
+Node: 172.20.0.13:7881 | Last seen: 0 seconds ago
+Node: 172.20.0.12:7881 | Last seen: 5 seconds ago
+Node: 172.20.0.15:7881 | Last seen: 5 seconds ago
+Node: 172.20.0.11:7881 | Last seen: 0 seconds ago
+==================================
+Accepted new connection from 172.20.0.23:54284
+Received Message Request From:  172.20.0.23:54284
+Waiting for incoming connections on port 8881...
+Received message from 172.20.0.23:54284
+Received wantTorrent message
+No matching torrents found for keyword: pedestrian
+No results found for keyword 'pedestrian'
+Sent give message to node: 172.20.0.23:8881
+Index message sent asynchronously to: 172.20.0.23:8881
+Received index heartbeat response from: 172.20.0.13:7881
+[IndexHeartbeat] Processed heartbeat response from: 172.20.0.13:7881
+Received index heartbeat response from: 172.20.0.14:7881
+[IndexHeartbeat] Processed heartbeat response from: 172.20.0.14:7881
+Received index heartbeat response from: 172.20.0.12:7881
+[IndexHeartbeat] Processed heartbeat response from: 172.20.0.12:7881
+Received index heartbeat response from: 172.20.0.11:7881
+[IndexHeartbeat] Processed heartbeat response from: 172.20.0.11:7881
+[IndexHeartbeat] Sending heartbeats to 5 nodes
+===== Current heartbeat status =====
+Node: 172.20.0.14:7881 | Last seen: 0 seconds ago
+Node: 172.20.0.13:7881 | Last seen: 0 seconds ago
+Node: 172.20.0.12:7881 | Last seen: 0 seconds ago
+Node: 172.20.0.15:7881 | Last seen: 10 seconds ago
+Node: 172.20.0.11:7881 | Last seen: 0 seconds ago
+==================================

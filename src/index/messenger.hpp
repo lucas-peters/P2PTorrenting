@@ -43,7 +43,7 @@ public:
     Messenger(lt::session& session, int port, std::string ip);
     ~Messenger() { stop(); }
     
-    using IndexHandler = std::function<void(const lt::tcp::endpoint&, const IndexMessage&)>;
+    using IndexHandler = std::function<void(const IndexMessage&)>;
     void setIndexHandler(IndexHandler handler) {index_handler_ = handler;}
     
     void queueMessage(const lt::tcp::endpoint& target, const IndexMessage& msg);

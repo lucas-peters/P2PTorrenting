@@ -28,7 +28,7 @@ void Messenger::start() {
     });
     std::cout << "Started io_context thread" << std::endl;
     
-    // Now start the acceptor
+    // starting acceptor
     try {
         std::cout << "Starting TCP acceptor on port " << port_ << std::endl;
         if(!acceptor_) {
@@ -37,11 +37,8 @@ void Messenger::start() {
                 io_context_,
                 bip::tcp::endpoint(bip::tcp::v4(), port_)
             );
-            
-            // Set the acceptor to reuse the address (helps with quick restarts)
             acceptor_->set_option(bip::tcp::acceptor::reuse_address(true));
             
-            // Check if acceptor is open
             if (!acceptor_->is_open()) {
                 std::cerr << "ERROR: TCP acceptor failed to open on port " << port_ << std::endl;
                 return;
@@ -91,18 +88,18 @@ void Messenger::stop() {
         work_guard_.reset();
     }
 
-    // Stop accepting new connections
+    // stop accepting new connections
     if (acceptor_ && acceptor_->is_open()) {
         std::cout << "Closing acceptor" << std::endl;
         boost::system::error_code ec;
         acceptor_->close(ec);
     }
     
-    // Stop io_context (this is redundant once work_guard is reset, but keeping for safety)
+    // stop io_context (this is redundant once work_guard is reset, but keeping for safety)
     std::cout << "Stopping io_context" << std::endl;
     io_context_.stop();
     
-    // Join threads
+    // join threads
     if (service_thread_ && service_thread_->joinable()) {
         service_thread_->join();
     }
@@ -128,7 +125,6 @@ void Messenger::startAccept() {
         
         std::cout << "Waiting for incoming connections on port " << port_ << "..." << std::endl;
         
-        // registering acceptor callback with io_context_, spawns a thread to handle this in background
         acceptor_->async_accept(*socket, [this, socket](const boost::system::error_code& error) {
             if (!error) {
                 std::cout << "Accepted new connection from " << socket->remote_endpoint().address() 
@@ -149,7 +145,7 @@ void Messenger::startAccept() {
 
 // asynchronously reads messages from the socket and passes them to handleReceivedMessage()
 void Messenger::handleAccept(std::shared_ptr<boost::asio::ip::tcp::socket> socket) {
-    // ee the endpoint of the sender
+    // get the endpoint of the sender
     lt::tcp::endpoint sender(
         socket->remote_endpoint().address(),
         socket->remote_endpoint().port()
@@ -290,9 +286,8 @@ void Messenger::processIncomingMessages() {
     // Get a batch of messages from the queue
     std::vector<std::pair<lt::tcp::endpoint, IndexMessage>> messages_to_process;
     
-    // theses brackets create a limited scope for the std::lock_guard
+    // Lock
     {
-        // Lock the queue while we extract messages
         std::lock_guard<std::mutex> lock(receive_mutex_);
         
         // Get up to 10 messages at a time (to avoid processing too many at once)
@@ -304,9 +299,9 @@ void Messenger::processIncomingMessages() {
             receive_queue_.pop();
             count++;
         }
-    }
+    } // Lock is released here
     
-    // Process each message
+    // Process each message - without holding the lock
     for (const auto& incoming : messages_to_process) {
         const IndexMessage& message = incoming.second;
         const lt::tcp::endpoint sender(lt::make_address_v4(message.source_ip()), message.source_port());
@@ -316,22 +311,7 @@ void Messenger::processIncomingMessages() {
             if (message.lamport_timestamp() > 0) {
                 lamport_clock_.updateClock(message.lamport_timestamp());
             }
-            index_handler_(sender, message);
-            // Check which message type is set in the oneof field
-            // if (message.has_reputation()) {
-            //     // Handle reputation message
-            //     if (reputation_handler_) {
-            //         reputation_handler_(message.reputation(), sender);
-            //     } else {
-            //         std::cerr << "Gossip: Received reputation message but no handler is registered" << std::endl;
-            //     }
-            // }
-            // Add handlers for other message types as they're added to the protocol
-            // else if (message.has_content()) { ... }
-            
-            // else {
-            //     std::cerr << "Messenger: Received message with unknown type" << std::endl;
-            // }
+            index_handler_(message);
         } catch (const std::exception& e) {
             std::cerr << "Messenger: Error processing message: " << e.what() << std::endl;
         }

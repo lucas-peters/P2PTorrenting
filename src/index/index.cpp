@@ -3,17 +3,13 @@
 
 namespace torrent_p2p {
     Index::Index(int port, const std::string& env, const std::string& ip) : Node(port, env, ip) {
-        // Call the base class start() method first to initialize messenger_
         Node::start();
-        // Then call our own start() method
         start();
     }
 
     Index::Index(int port, const std::string& env, const std::string& ip,
         const std::string& state_file) : Node(port, env, ip, state_file) {
-        // Call the base class start() method first to initialize messenger_
         Node::start();
-        // Then call our own start() method
         start();
     }
 
@@ -47,8 +43,8 @@ void Index::start() {
 
     if (messenger_) {
         messenger_->setIndexHandler(
-            [this](const lt::tcp::endpoint& sender, const IndexMessage& message) {
-                this->handleIndexMessage(sender, message);
+            [this](const IndexMessage& message) {
+                this->handleIndexMessage(message);
             }
         );
         std::cout << "Index Handler set successfully" << std::endl;
@@ -56,7 +52,7 @@ void Index::start() {
         std::cerr << "ERROR: Messenger object not initialized in Index::start()" << std::endl;
     }
     
-    // Find our node ID in the index_nodes_ list
+    // get our id
     int count = 0;
     for (auto& node : index_nodes_) {
         if (ip_ == node.first) {
@@ -76,7 +72,6 @@ void Index::start() {
     std::cout << "Total index nodes: " << total_nodes_ << std::endl;
 
     try {
-        // Initialize heartbeat after gossip is created
         initializeHeartbeat();
     } catch (const std::exception& e) {
         std::cerr << "[Index] Exception during Heartbeat initialization: " << e.what() << std::endl;
@@ -87,14 +82,6 @@ std::vector<std::string> Index::generateKeywords(const std::string& title) {
     std::vector<std::string> keywords;
     std::string processedTitle = title;
     std::string currentWord;
-    
-    // Common words to filter out (stop words)
-    static const std::unordered_set<std::string> stopWords = {
-        "the", "it", "but", "on", "and", "for", "with", "this", "that", "from", "are", "was", "not",
-        "but", "what", "all", "were", "when", "your", "can", "said", "there", "use",
-        "each", "which", "she", "he", "his", "her", "how", "their", "will", "other", 
-        "about", "out", "many", 
-    };
 
     std::replace(processedTitle.begin(), processedTitle.end(), '_', ' ');
     std::replace(processedTitle.begin(), processedTitle.end(), '.', ' ');
@@ -124,13 +111,9 @@ std::vector<std::string> Index::generateKeywords(const std::string& title) {
     std::istringstream iss(spacedTitle);
     
     while (iss >> currentWord) {
-        // remove empty words, short words, and words in our list
-        if (currentWord.empty() || currentWord.length() < 3 || stopWords.find(currentWord) != stopWords.end()) {
-            continue;
-        }
-
         keywords.push_back(currentWord);
     }
+
     std::cout << "Keywords Generated: " << std::endl;
     for(auto& keyword: keywords) {
         std::cout << keyword << std::endl;
@@ -139,53 +122,83 @@ std::vector<std::string> Index::generateKeywords(const std::string& title) {
     return keywords;
 }
 
+// handling a client trying to add to index
 void Index::addTorrent(const std::string& title, const std::string& magnet) {
-    // If we are already tracking this torrent don't bother
-    std::unique_lock<std::shared_mutex> lock(data_mutex_);
-    if (titleToMagnet.find(title) != titleToMagnet.end())
-        return;
+    std::vector<std::string> keywords;
+    std::vector<std::pair<lt::tcp::endpoint, std::string>> keyword_distribution;
+    bool already_tracking = false;
     
-    // Store the torrent locally regardless of sharding
-    // This ensures we have the magnet link when needed
-    titleToMagnet[title] = magnet;
+    { // Lock
+        std::unique_lock<std::shared_mutex> lock(data_mutex_);
+        
+        // If we are already tracking this torrent don't bother
+        if (titleToMagnet.find(title) != titleToMagnet.end()) {
+            already_tracking = true;
+        } else {
+            // store the torrent locally regardless of sharding
+            titleToMagnet[title] = magnet;
+            keywords = generateKeywords(title);
+        }
+    } // Lock released
 
-    std::vector<std::string> keywords = generateKeywords(title);
+    if (already_tracking) {
+        std::cout << "already tracking" << std::endl;
+        return;
+    }
     
-    // Distribute keywords to responsible nodes
     for (auto& keyword : keywords) {
-        size_t keyword_node_id = getResponsibleNodeIndex(keyword, total_nodes_);
+        size_t keyword_node_id = getResponsibleNodeIndex(keyword);
         
         // Distribute to primary and replica nodes
         for (int i = 0; i <= NUM_REPLICATIONS; i++) {
+            std::cout << "sending to index: " << (keyword_node_id + i) % total_nodes_ << std::endl;
             size_t target_node_id = (keyword_node_id + i) % total_nodes_;
             
-            // If this node is responsible, store locally
+            // If this node is responsible, add to local processing list
             if (target_node_id == id_) {
-                if (keywordToTitle.find(keyword) == keywordToTitle.end()) {
-                    keywordToTitle[keyword] = std::vector<std::string>{title};
-                } else {
-                    auto& titles = keywordToTitle[keyword];
-                    if (std::find(titles.begin(), titles.end(), title) == titles.end()) {
-                        titles.push_back(title);
-                    }
-                }
-                std::cout << "Stored keyword '" << keyword << "' locally for title: " << title << std::endl;
+                keyword_distribution.push_back({lt::tcp::endpoint(), keyword});
             } 
-            // Otherwise, send to the responsible node
+            // set an endpoint for the query
             else {
-                // converting {string, int} to lt::tcp::endpoint
                 lt::tcp::endpoint target(lt::make_address_v4(index_nodes_[target_node_id].first), 
-                    index_nodes_[target_node_id].second);
-                sendKeywordAddMessage(target, keyword, title, magnet);
+                    index_nodes_[target_node_id].second + 2000);
+                keyword_distribution.push_back({target, keyword});
             }
         }
     }
+
+    // if target is null, we handle locally, if its set send it to other indexes
+    for (const auto& [target, keyword] : keyword_distribution) {
+        if (target == lt::tcp::endpoint()) {
+            handleKeywordAddMessage(keyword, title, magnet);
+        } else {
+            sendKeywordAddMessage(target, keyword, title, magnet);
+        }
+    }
+}
+
+std::vector<std::pair<std::string, std::string>> Index::searchTorrent(const std::string& keyword) {
+    std::vector<std::pair<std::string, std::string>> pairs;
+
+    std::shared_lock<std::shared_mutex> lock(data_mutex_);
+    if (keywordToTitle.find(keyword) == keywordToTitle.end()) {
+        std::cout << "No matching torrents found for keyword: " << keyword << std::endl;
+        return pairs;
+    }
+    
+    std::vector<std::string> titles = keywordToTitle[keyword];
+    for (auto& title : titles) {
+        std::cout << "Found torrent match: " << title << std::endl;
+        pairs.push_back({title, titleToMagnet[title]});
+    }
+    
+    return pairs;
 }
 
 void Index::sendKeywordAddMessage(const lt::tcp::endpoint& target, const std::string& keyword, 
                                  const std::string& title, const std::string& magnet) {
     if (!messenger_) {
-        std::cerr << "Error: Messenger not initialized, can't send keyword" << std::endl;
+        std::cout << "Error: Messenger not initialized, can't send keyword" << std::endl;
         return;
     }
     
@@ -200,18 +213,64 @@ void Index::sendKeywordAddMessage(const lt::tcp::endpoint& target, const std::st
               << target.address().to_string() << ":" << target.port() << std::endl;
 }
 
-void Index::handleKeywordAddMessage(const lt::tcp::endpoint& sender, const KeywordAddMessage& message) {
-    std::string keyword = message.keyword();
-    std::string title = message.title();
-    std::string magnet = message.magnet();
+void Index::sendWantMessage(const IndexMessage& message) {
+    if (!messenger_) {
+        std::cout << "Error: Messenger not initialized, can't send want message" << std::endl;
+        return;
+    }
+    if (!message.has_wanttorrent()) {
+        std::cout << "Incorrect message type passed to sendWantMessage" << std::endl;
+        return;
+    }
+    
+    size_t responsibleNode = getResponsibleNodeIndex(message.wanttorrent().keyword());
+
+    for (size_t i = 0; i <= NUM_REPLICATIONS; i++) {
+        if (i == id_)
+            continue;
+
+        IndexMessage new_message = message;
+        new_message.set_sender_ip(ip_);
+        new_message.set_sender_port(port_);
+        
+        // Send to the primary node responsible for this keyword
+        lt::tcp::endpoint target(lt::make_address_v4(index_nodes_[i].first), index_nodes_[i].second + 2000);
+        messenger_->queueMessage(target, new_message);
+        std::cout << "Forwarded search for keyword '" << message.wanttorrent().keyword() << "' to node " << i << std::endl;
+    }
+}
+
+void Index::sendGiveMessage(const IndexMessage& message, const std::vector<std::pair<std::string, std::string>>& pairs) {
+    if (!messenger_) {
+        std::cout << "Error: Messenger not initialized, can't send give message" << std::endl;
+        return;
+    }
+    
+    IndexMessage new_message = message;
+    new_message.set_sender_ip(ip_);
+    new_message.set_sender_port(port_);
+    GiveMessage* giveMsg = new_message.mutable_givetorrent();
+    for (auto& pair: pairs) {
+        TorrentResult* result = giveMsg->add_results();
+        result->set_title(pair.first);
+        result->set_magnet(pair.second);
+    }
+    
+    messenger_->queueMessage(lt::tcp::endpoint(lt::make_address_v4(new_message.source_ip()), new_message.source_port()), new_message);
+    std::cout << "Sent give message to node: " << new_message.source_ip() << ":" << new_message.source_port() << std::endl;
+}
+
+
+
+void Index::handleKeywordAddMessage(const std::string& keyword, const std::string& title, const std::string& magnet) {
     
     std::unique_lock<std::shared_mutex> lock(data_mutex_);
     
-    // Store the torrent information
+    // check if we are already tracking this title
     if (titleToMagnet.find(title) == titleToMagnet.end()) {
         titleToMagnet[title] = magnet;
+        std::cout << "added title to mapping" << std::endl;
     }
-    
     // Add the keyword mapping
     if (keywordToTitle.find(keyword) == keywordToTitle.end()) {
         keywordToTitle[keyword] = std::vector<std::string>{title};
@@ -225,133 +284,125 @@ void Index::handleKeywordAddMessage(const lt::tcp::endpoint& sender, const Keywo
     std::cout << "Received and stored keyword '" << keyword << "' for title: " << title << std::endl;
 }
 
-std::vector<std::pair<std::string, std::string>> Index::searchTorrent(const std::string& keyword) {
-    std::vector<std::pair<std::string, std::string>> pairs;
+void Index::handleIndexMessage(const IndexMessage& message) {
+    // Check if we've seen this message before using message_id
+    std::string cache_key;
     
-    // Check if this node is responsible for the keyword
-    size_t keyword_node_id = getResponsibleNodeIndex(keyword, total_nodes_);
-    bool is_responsible = false;
-    
-    // Check if we're primary or replica for this keyword
-    for (int i = 0; i <= NUM_REPLICATIONS; i++) {
-        if (id_ == (keyword_node_id + i) % total_nodes_) {
-            is_responsible = true;
-            break;
+    if (message.request_id().size() > 0) {
+        std::cout << "Received want message with request id: " << message.request_id() << "from: " << message.source_ip() << ":" << message.source_port() << std::endl;
+        cache_key = message.request_id();
+    } else {
+        std::cout << "Received want message without request id from: " << message.source_ip() << ":" << message.source_port() << std::endl;
+        cache_key = message.source_ip() + ":" + 
+                   std::to_string(message.source_port());
+        
+        if (message.has_wanttorrent()) {
+            cache_key += ":want:" + message.wanttorrent().keyword() + std::to_string(std::time(nullptr));
+        } else if (message.has_givetorrent()) {
+            cache_key += ":give:" + message.givetorrent().keyword() + std::to_string(std::time(nullptr));
         }
     }
     
-    // If we're responsible, search locally
-    if (is_responsible) {
-        std::shared_lock<std::shared_mutex> lock(data_mutex_);
-        if (keywordToTitle.find(keyword) == keywordToTitle.end()) {
-            std::cout << "No matching torrents found for keyword: " << keyword << std::endl;
-            return pairs;
+    bool is_new_message = false;
+    {
+        std::lock_guard<std::mutex> lock(cache_mutex_);
+        is_new_message = message_cache_.insert(cache_key).second;
+        
+        // limit cache size to prevent memory issues
+        if (message_cache_.size() > 10000) {
+            message_cache_.clear(); // naive cache
         }
-        
-        std::vector<std::string> titles = keywordToTitle[keyword];
-        for (auto& title : titles) {
-            std::cout << "Found torrent match: " << title << std::endl;
-            pairs.push_back({title, titleToMagnet[title]});
-        }
-    } 
-    // Otherwise, forward the search to the responsible node
-    else {
-        IndexMessage message;
-        WantMessage* wantMsg = message.mutable_wanttorrent();
-        wantMsg->set_keyword(keyword);
-        wantMsg->set_request_identifier(generateRequestId());
-        
-        // Send to the primary node responsible for this keyword
-        lt::tcp::endpoint target(lt::make_address_v4(index_nodes_[keyword_node_id].first), 
-                    index_nodes_[keyword_node_id].second);
-        messenger_->queueMessage(target, message);
-        std::cout << "Forwarded search for keyword '" << keyword << "' to responsible node" << std::endl;
-        
-        // Note: In a real implementation, we would wait for the response
-        // For simplicity, we're returning an empty result set here
     }
     
-    return pairs;
-}
-
-std::string Index::generateRequestId() {
-    // Simple request ID generator
-    static int counter = 0;
-    return "req_" + std::to_string(++counter) + "_" + std::to_string(time(nullptr));
-}
-
-void Index::sendGiveMessage(const lt::tcp::endpoint& sender, const std::string& keyword, const std::string& request_identifier) {
-    std::vector<std::pair<std::string, std::string>> pairs = searchTorrent(keyword);
-
-    IndexMessage responseMsg;
-
-    GiveMessage* giveMsg = responseMsg.mutable_givetorrent();
-    giveMsg->set_keyword(keyword);
-    giveMsg->set_request_identifier(request_identifier);
-
-    for (auto& pair : pairs) {
-        TorrentResult* resultMsg = giveMsg->add_results();
-        resultMsg->set_title(pair.first);
-        resultMsg->set_magnet(pair.second);
-    }
-
-
-    messenger_->queueMessage(sender, responseMsg);
-    std::cout << "Sent: " << pairs.size() << " search results for keyword: " << keyword << std::endl;
-
-}
-
-void Index::handleGiveMessage(const lt::tcp::endpoint& sender, const GiveMessage& message) {
-    std::string keyword = message.keyword();
-    std::string request_id = message.request_identifier();
-    
-    std::cout << "Received search results for keyword: " << keyword << std::endl;
-    
-    // Process the results
-    for (int i = 0; i < message.results_size(); i++) {
-        const TorrentResult& result = message.results(i);
-        std::cout << "Title: " << result.title() << ", Magnet: " << result.magnet() << std::endl;
-        
-        // Store the results locally for future reference
-        std::unique_lock<std::shared_mutex> lock(data_mutex_);
-        titleToMagnet[result.title()] = result.magnet();
+    if (!is_new_message) {
+        std::cout << "Ignoring duplicate message (already in cache)" << std::endl;
+        return;
     }
     
-    // In a real implementation, we would notify the waiting client about these results
-}
-
-void Index::handleIndexMessage(const lt::tcp::endpoint& sender, const IndexMessage& message) {
     if (message.has_addtorrent()) {
         std::cout << "Received addTorrent message" << std::endl;
-        const AddMessage& addMsg = message.addtorrent();
-        addTorrent(addMsg.title(), addMsg.magnet());
+        addTorrent(message.addtorrent().title(), message.addtorrent().magnet());
+
     } else if (message.has_wanttorrent()) {
         std::cout << "Received wantTorrent message" << std::endl;
-        const WantMessage& wantMsg = message.wanttorrent();
-        sendGiveMessage(sender, wantMsg.keyword(), wantMsg.request_identifier());
+        handleWantMessage(message);
+
     } else if (message.has_givetorrent()) {
         std::cout << "Received giveTorrent message" << std::endl;
-        const GiveMessage& giveMsg = message.givetorrent();
-        handleGiveMessage(sender, giveMsg);
+        handleGiveMessage(message);
+
     } else if (message.has_keywordadd()) {
         std::cout << "Received keywordAdd message" << std::endl;
         const KeywordAddMessage& keywordMsg = message.keywordadd();
-        handleKeywordAddMessage(sender, keywordMsg);
+        handleKeywordAddMessage(keywordMsg.keyword(), keywordMsg.title(), keywordMsg.magnet());
     }
 }
 
-size_t Index::getResponsibleNodeIndex(const std::string& keyword, size_t nodeCount) {
-    std::hash<std::string> hasher;
-    size_t hash = hasher(keyword);
+void Index::handleWantMessage(const IndexMessage& message) {
+    const std::string& keyword = message.wanttorrent().keyword();
     
-    return hash % nodeCount;
+    // Check if we're responsible for this keyword
+    if (!isResponsibleForTorrent(keyword)) {
+        std::cout << "Not responsible for keyword '" << keyword << "', forwarding" << std::endl;
+        sendWantMessage(message);
+        return;
+    }
+    std::vector<std::pair<std::string, std::string>> pairs = searchTorrent(keyword);
+    
+    if (pairs.empty()) {
+        std::cout << "No results found for keyword '" << keyword << "'" << std::endl;
+    }
+    
+    // Send results back (even if empty)
+    sendGiveMessage(message, pairs);
 }
 
-bool Index::isResponsibleForTorrent(const std::string& keyword, size_t nodeCount) {
-    size_t responsibleId = getResponsibleNodeIndex(keyword, nodeCount);
+void Index::handleGiveMessage(const IndexMessage& message) {
+    if (!message.has_givetorrent()) {
+        std::cerr << "Invalid message type in handleGiveMessage" << std::endl;
+        return;
+    }
+    
+    const GiveMessage& giveMsg = message.givetorrent();
+    std::string keyword = giveMsg.keyword();
+    std::string request_id = message.request_id();
+    
+    std::cout << "Received " << giveMsg.results_size() << " results for keyword '" 
+              << keyword << "' (request: " << request_id << ")" << std::endl;
+    
+    // Process the results
+    for (int i = 0; i < giveMsg.results_size(); i++) {
+        const TorrentResult& result = giveMsg.results(i);
+        std::cout << "Result " << (i+1) << ": " << result.title() << std::endl;
+        
+        // Store the result locally
+        std::unique_lock<std::shared_mutex> lock(data_mutex_);
+        titleToMagnet[result.title()] = result.magnet();
+    }
+}
+
+// Determines which node is responsible for the keyword mapping
+size_t Index::getResponsibleNodeIndex(const std::string& keyword) {
+    // taking a hash of the keyword
+    unsigned long hash = 5381;
+    for (char c : keyword) {
+        hash = ((hash << 5) + hash) + c; 
+    }
+    
+    std::cout << "Keyword: " << keyword << " hashes to node: " << hash % total_nodes_ << std::endl;
+    // mod the hash by the number of nodes to get the responsible id
+    return hash % total_nodes_;
+}
+
+// Determines if we are responsible for the mapping
+bool Index::isResponsibleForTorrent(const std::string& keyword) {
+    size_t responsibleNode = getResponsibleNodeIndex(keyword);
+    
+    // Check if we are the primary node or one of the replica nodes
     for (int i = 0; i <= NUM_REPLICATIONS; i++) {
-        if (id_ == (responsibleId + i) % nodeCount)
+        if (id_ == (responsibleNode + i) % total_nodes_) {
             return true;
+        }
     }
     return false;
 }

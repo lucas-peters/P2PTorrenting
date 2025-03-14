@@ -18,16 +18,8 @@ public:
     IndexHeartbeat(Gossip& gossip, const std::vector<lt::tcp::endpoint>& index_nodes,
     const std::string& ip, const int port);
     ~IndexHeartbeat();
-
-    // void addIndexNode(const lt::tcp::endpoint& node);
-    // void removeIndexNode(const lt::tcp::endpoint& node);
-    // bool isIndexNodeAlive(const lt::tcp::endpoint& node) const;
-    
     std::vector<lt::tcp::endpoint> getAliveIndexNodes() const;
     void processHeartbeatResponse(const lt::tcp::endpoint& sender) override;
-    
-    // Request index synchronization with other nodes
-    void requestIndexSync(const lt::tcp::endpoint& target);
 
 private:
     void sendHeartbeats() override;

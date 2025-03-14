@@ -85,20 +85,18 @@ void Gossip::stop() {
     if (!running_) return;
     running_ = false;
 
-    // First, reset the work guard to allow io_context to finish
     if (work_guard_) {
         std::cout << "Releasing work guard to allow io_context to exit" << std::endl;
         work_guard_.reset();
     }
-    
-    // Stop accepting new connections
+
     if (acceptor_ && acceptor_->is_open()) {
         std::cout << "Closing acceptor" << std::endl;
         boost::system::error_code ec;
         acceptor_->close(ec);
     }
     
-    // Stop io_context (this is redundant once work_guard is reset, but keeping for safety)
+    // Stop io_context
     std::cout << "Stopping io_context" << std::endl;
     io_context_.stop();
     
@@ -147,13 +145,13 @@ void Gossip::startAccept() {
         
         auto socket = std::make_shared<bip::tcp::socket>(io_context_);
         
-        std::cout << "Waiting for incoming connections on port " << port_ << "..." << std::endl;
+        // std::cout << "Waiting for incoming connections on port " << port_ << "..." << std::endl;
         
         // registering acceptor callback with io_context_, spawns a thread to handle this in background
         acceptor_->async_accept(*socket, [this, socket](const boost::system::error_code& error) {
             if (!error) {
-                std::cout << "Accepted new connection from " << socket->remote_endpoint().address() 
-                          << ":" << socket->remote_endpoint().port() << std::endl;
+                // std::cout << "Accepted new connection from " << socket->remote_endpoint().address() 
+                //           << ":" << socket->remote_endpoint().port() << std::endl;
                 // This function deals with logic once a message has been accepted on the socket
                 handleAccept(socket);
             } else {
@@ -175,7 +173,7 @@ void Gossip::handleAccept(std::shared_ptr<boost::asio::ip::tcp::socket> socket) 
         socket->remote_endpoint().address(),
         socket->remote_endpoint().port()
     );
-    std::cout << "Received Gossip from: " << sender << std::endl;
+    // std::cout << "Received Gossip from: " << sender << std::endl;
     auto size_buffer = std::make_shared<uint32_t>(0);
 
     // This async read call reads the first 4 bytes to get the message size
@@ -216,7 +214,7 @@ void Gossip::handleReceivedMessage(const lt::tcp::endpoint& sender, const std::v
         }
 
         if (inCache(message.message_id())) {
-            //std::cout << "Ignoring duplicate gossip message" << std::endl;
+            // std::cout << "Ignoring duplicate gossip message" << std::endl;
             return;
         }
         addToCache(message.message_id());
@@ -232,7 +230,7 @@ void Gossip::handleReceivedMessage(const lt::tcp::endpoint& sender, const std::v
         }
         spreadMessage(message, sender);
         
-        std::cout << "Received and forwarded message from " << sender.address() << ":" << sender.port() << std::endl;
+        // std::cout << "Received and forwarded message from " << sender.address() << ":" << sender.port() << std::endl;
     } catch (const std::exception& e) {
         std::cerr << "Gossip HandleReceivedMessage: " << e.what() << std::endl;
     }
@@ -266,36 +264,35 @@ void Gossip::sendMessageAsync(const lt::tcp::endpoint& target, const GossipMessa
         auto target_address = target.address();
         
         // Use the gossip port (7881) instead of the target's port
-        // This is because in Docker, all containers use the same internal port
-        bip::tcp::endpoint tcp_endpoint(target_address, port_);
+        //bip::tcp::endpoint tcp_endpoint(target_address, port_);
         
-        std::cout << "Connecting to gossip endpoint: " << tcp_endpoint.address().to_string() 
-                  << ":" << tcp_endpoint.port() << std::endl;
+        // std::cout << "Connecting to gossip endpoint: " << tcp_endpoint.address().to_string() 
+        //           << ":" << tcp_endpoint.port() << std::endl;
 
-        socket->async_connect(tcp_endpoint,
-            [this, socket, buffer, tcp_endpoint](const boost::system::error_code& error) {
+        socket->async_connect(target,
+            [this, socket, buffer, target](const boost::system::error_code& error) {
                 if (error) {
-                    std::cerr << "Gossip SendMessageAsync: Failed to connect to target " 
-                              << tcp_endpoint.address().to_string() << ":" << tcp_endpoint.port()
-                              << " - Error: " << error.message() << std::endl;
+                    // std::cerr << "Gossip SendMessageAsync: Failed to connect to target " 
+                    //           << target.address().to_string() << ":" << target.port()
+                    //           << " - Error: " << error.message() << std::endl;
                     return;
                 }
                 
-                std::cout << "Successfully connected to " << tcp_endpoint.address().to_string() 
-                          << ":" << tcp_endpoint.port() << std::endl;
+                // std::cout << "Successfully connected to " << target.address().to_string() 
+                //           << ":" << target.port() << std::endl;
                 
                 // write asynch
                 ba::async_write(*socket, ba::buffer(*buffer),
-                     [socket, buffer, tcp_endpoint](const boost::system::error_code& error, std::size_t bytes_transferred) {
+                     [socket, buffer, target](const boost::system::error_code& error, std::size_t bytes_transferred) {
                         if (error) {
                             std::cerr << "Gossip SendMessageAsync: Failed to write message to "
-                                      << tcp_endpoint.address().to_string() << ":" << tcp_endpoint.port()
+                                      << target.address().to_string() << ":" << target.port()
                                       << " - Error: " << error.message() << std::endl;
                             return;
                         }
                         
-                        std::cout << "Successfully wrote " << bytes_transferred << " bytes to "
-                                  << tcp_endpoint.address().to_string() << ":" << tcp_endpoint.port() << std::endl;
+                        // std::cout << "Successfully wrote " << bytes_transferred << " bytes to "
+                        //           << tcp_endpoint.address().to_string() << ":" << tcp_endpoint.port() << std::endl;
                         
                         boost::system::error_code ec;
                         socket->shutdown(bip::tcp::socket::shutdown_both, ec);
@@ -305,7 +302,7 @@ void Gossip::sendMessageAsync(const lt::tcp::endpoint& target, const GossipMessa
     } catch (const std::exception& e) {
         std::cerr << "Gossip SendMessageAsync: " << e.what() << std::endl;
     }
-    std::cout << "Message sent asynchronously to: " << target << std::endl;
+    //std::cout << "Message sent asynchronously to: " << target << std::endl;
 }
 
 // processes messages that are in the outgoing message queue
@@ -324,11 +321,11 @@ void Gossip::processOutgoingMessages() {
     }
 
     for (auto& msg : messages_to_process) {
-        if (msg.second.has_heartbeat() && msg.second.heartbeat().type() == HeartbeatMessage::PING) {
-            std::cout << "Spreading ping from source: " << msg.second.source_ip() << ":" << msg.second.source_port() << std::endl;
-        } else if (msg.second.has_heartbeat() && msg.second.heartbeat().type() == HeartbeatMessage::PONG) {
-            std::cout << "Spreading pong from source: " << msg.second.source_ip() << ":" << msg.second.source_port() << std::endl;
-        }
+        // if (msg.second.has_heartbeat() && msg.second.heartbeat().type() == HeartbeatMessage::PING) {
+        //     std::cout << "Spreading ping from source: " << msg.second.source_ip() << ":" << msg.second.source_port() << std::endl;
+        // } else if (msg.second.has_heartbeat() && msg.second.heartbeat().type() == HeartbeatMessage::PONG) {
+        //     std::cout << "Spreading pong from source: " << msg.second.source_ip() << ":" << msg.second.source_port() << std::endl;
+        // }
         // attaching lamport clock timestamp to outgoing message
         msg.second.set_lamport_timestamp(lamport_clock_.getClock());
         lamport_clock_.incrementClock();
@@ -384,11 +381,11 @@ void Gossip::processIncomingMessages() {
                 const auto& heartbeat = message.heartbeat();
                 
                 if (heartbeat.type() == HeartbeatMessage::PING) {
-                    std::cout << "Received ping from source: " << message.source_port() << ":" << message.source_ip();
+                    //std::cout << "Received ping from source: " << message.source_port() << ":" << message.source_ip();
                     // only send a response if we are connected to a bootstrap node
                     if (heartbeat_handler_) {
                         // Respond with a PONG
-                        std::cout << "making a pong" << std::endl;
+                        //std::cout << "making a pong" << std::endl;
                         GossipMessage pong_msg;
                         pong_msg.set_source_ip(ip_);
                         pong_msg.set_source_port(port_);
@@ -402,7 +399,7 @@ void Gossip::processIncomingMessages() {
                         spreadMessage(pong_msg, lt::tcp::endpoint());
                     }
                 } else if (heartbeat.type() == HeartbeatMessage::PONG) {
-                    std::cout << "Received pong from source: " << message.source_port() << ":" << message.source_ip();
+                    //std::cout << "Received pong from source: " << message.source_port() << ":" << message.source_ip();
                     // Notify heartbeat handler if exists
                     if (heartbeat_handler_) {
                         lt::tcp::endpoint source(lt::make_address_v4(message.source_ip()), message.source_port());
@@ -432,14 +429,7 @@ void Gossip::processIncomingMessages() {
                         index_heartbeat_handler_(source);
                     }
                 }
-            } else if (message.has_index_sync()) {
-                // Handle index sync message
-                if (index_sync_handler_) {
-                    index_sync_handler_(message.index_sync(), sender);
-                } else {
-                    std::cerr << "Gossip: Received index sync message but no handler is registered" << std::endl;
-                }
-            }
+            } 
             else {
                 std::cerr << "Gossip: Received message with unknown type" << std::endl;
             }
@@ -490,22 +480,15 @@ std::string Gossip::generateMessageId(const GossipMessage& message) const {
 void Gossip::updateKnownPeers() {
     auto peers = session_.session_state().dht_state.nodes;
     std::lock_guard<std::mutex> lock(peers_mutex_);
+    // refreshing list of known peers entirely, get rid of stale entries
+    known_peers_.clear();
     // Add new peers to the list, avoiding duplicates
     for (const auto& peer : peers) {
+        // sometimes there are weird ports in the dht_state
+        if (peer.port() < 6881 || peer.port() > 6885) continue;
         // Create a new endpoint with port + 1000 for gossip
         lt::tcp::endpoint gossip_peer(peer.address(), peer.port() + 1000);
-        
-        bool exists = false;
-        for (const auto& known : known_peers_) {
-            if (known.address() == gossip_peer.address() && known.port() == gossip_peer.port()) {
-                exists = true;
-                break;
-            }
-        }
-        
-        if (!exists) {
-            known_peers_.push_back(gossip_peer);
-        }
+        known_peers_.push_back(gossip_peer);
     }
 }
 
@@ -541,7 +524,7 @@ std::vector<lt::tcp::endpoint> Gossip::selectRandomPeers(size_t count, const lt:
 
 void Gossip::spreadMessage(const GossipMessage& message, const lt::tcp::endpoint& exclude) {
     // std::cout << "spreading message" << std::endl;
-    auto peers = selectRandomPeers(3, exclude);
+    auto peers = selectRandomPeers(2, exclude);
     // std::cout << "selected random peers" << std::endl;
 
     std::lock_guard<std::mutex> lock(outgoing_queue_mutex_);

@@ -65,4 +65,4 @@ EXPOSE 6881 7881 8881
 
 # Run the client
 ENTRYPOINT ["./p2p_client"]
-CMD ["--port", "6881", "--env", "docker"]
+CMD ["--port", "6881", "--env", "aws"]

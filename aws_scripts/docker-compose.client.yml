@@ -1,0 +1,75 @@
+services:
+  client1:
+    image: lucaspeters/client
+    container_name: client1
+    network_mode: "host"
+    restart: unless-stopped
+    volumes:
+      - ./client1_data:/app/data
+      - ./client1_torrents:/app/torrents
+      - ./client1_downloads:/app/downloads
+    environment:
+      - PUBLIC_IP=${PUBLIC_IP}
+    command: --port 6881 --env aws --ip ${PUBLIC_IP}
+    stdin_open: true
+    tty: true
+
+  client2:
+    image: lucaspeters/client
+    container_name: client2
+    network_mode: "host"
+    restart: unless-stopped
+    volumes:
+      - ./client2_data:/app/data
+      - ./client2_torrents:/app/torrents
+      - ./client2_downloads:/app/downloads
+    environment:
+      - PUBLIC_IP=${PUBLIC_IP}
+    command: --port 6882 --env aws --ip ${PUBLIC_IP}
+    stdin_open: true
+    tty: true
+
+  client3:
+    image: lucaspeters/client
+    container_name: client3
+    network_mode: "host"
+    restart: unless-stopped
+    volumes:
+      - ./client3_data:/app/data
+      - ./client3_torrents:/app/torrents
+      - ./client3_downloads:/app/downloads
+    environment:
+      - PUBLIC_IP=${PUBLIC_IP}
+    command: --port 6883 --env aws --ip ${PUBLIC_IP}
+    stdin_open: true
+    tty: true
+
+  # client4:
+  #   image: lucaspeters/client
+  #   container_name: client4
+  #   network_mode: "host"
+  #   restart: unless-stopped
+  #   volumes:
+  #     - ./client4_data:/app/data
+  #     - ./client4_torrents:/app/torrents
+  #     - ./client4_downloads:/app/downloads
+  #   environment:
+  #     - PUBLIC_IP=${PUBLIC_IP}
+  #   command: --port 6884 --env aws --ip ${PUBLIC_IP}
+  #   stdin_open: true
+  #   tty: true
+
+  # client5:
+  #   image: lucaspeters/client
+  #   container_name: client5
+  #   network_mode: "host"
+  #   restart: unless-stopped
+  #   volumes:
+  #     - ./client5_data:/app/data
+  #     - ./client5_torrents:/app/torrents
+  #     - ./client5_downloads:/app/downloads
+  #   environment:
+  #     - PUBLIC_IP=${PUBLIC_IP}
+  #   command: --port 6885 --env aws --ip ${PUBLIC_IP}
+  #   stdin_open: true
+  #   tty: true

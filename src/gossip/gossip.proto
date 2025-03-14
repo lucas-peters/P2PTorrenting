@@ -15,19 +15,16 @@ message GossipMessage {
   oneof message_type {
     ReputationMessage reputation = 10;
     HeartbeatMessage heartbeat = 11;
-    IndexSyncMessage index_sync = 12;
     // Add more message types here as needed
   }
 }
 
-// Reputation message
 message ReputationMessage {
   string subject_ip = 1;
   uint32 subject_port = 2;
   int32 reputation = 3;
 }
 
-//Bootstrap Heartbeat Message
 message HeartbeatMessage {
     enum Type {
         PING = 0;
@@ -37,19 +34,4 @@ message HeartbeatMessage {
     }
     Type type = 1;
     int64 timestamp = 2;
-}
-
-// Index Sync Message for synchronizing index data between nodes
-message IndexSyncMessage {
-    enum Type {
-        REQUEST_FULL = 0;
-        RESPONSE_FULL = 1;
-        REQUEST_PARTIAL = 2;
-        RESPONSE_PARTIAL = 3;
-    }
-    Type type = 1;
-    int64 timestamp = 2;
-    // For partial sync requests, specify the time range
-    int64 start_timestamp = 3;
-    int64 end_timestamp = 4;
 }
