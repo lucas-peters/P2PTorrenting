@@ -48,8 +48,8 @@ protected:
     std::unique_ptr<std::thread> heartbeat_thread_;
     std::atomic<bool> running_;
     mutable std::mutex nodes_mutex_;
-    const std::chrono::seconds HEARTBEAT_INTERVAL{5};
-    const std::chrono::seconds NODE_TIMEOUT{15};
+    const std::chrono::seconds HEARTBEAT_INTERVAL{10};
+    const std::chrono::seconds NODE_TIMEOUT{45};
 
     virtual void heartbeatLoop();
     virtual void sendHeartbeats();

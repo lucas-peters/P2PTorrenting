@@ -52,7 +52,7 @@ void Index::start() {
         std::cerr << "ERROR: Messenger object not initialized in Index::start()" << std::endl;
     }
     
-    // Find our node ID in the index_nodes_ list
+    // get our id
     int count = 0;
     for (auto& node : index_nodes_) {
         if (ip_ == node.first) {
@@ -72,7 +72,6 @@ void Index::start() {
     std::cout << "Total index nodes: " << total_nodes_ << std::endl;
 
     try {
-        // Initialize heartbeat after gossip is created
         initializeHeartbeat();
     } catch (const std::exception& e) {
         std::cerr << "[Index] Exception during Heartbeat initialization: " << e.what() << std::endl;
@@ -124,7 +123,6 @@ std::vector<std::string> Index::generateKeywords(const std::string& title) {
 }
 
 void Index::addTorrent(const std::string& title, const std::string& magnet) {
-    // Prepare data structures to hold what we'll need after releasing the lock
     std::vector<std::string> keywords;
     std::vector<std::pair<lt::tcp::endpoint, std::string>> keyword_distribution;
     bool already_tracking = false;
@@ -136,11 +134,8 @@ void Index::addTorrent(const std::string& title, const std::string& magnet) {
         if (titleToMagnet.find(title) != titleToMagnet.end()) {
             already_tracking = true;
         } else {
-            // Store the torrent locally regardless of sharding
-            // This ensures we have the magnet link when needed
+            // store the torrent locally regardless of sharding
             titleToMagnet[title] = magnet;
-            
-            // Generate keywords while holding the lock to ensure consistent state
             keywords = generateKeywords(title);
         }
     } // Lock released
@@ -160,26 +155,22 @@ void Index::addTorrent(const std::string& title, const std::string& magnet) {
             
             // If this node is responsible, add to local processing list
             if (target_node_id == id_) {
-                // We'll handle these locally after all remote messages are queued
                 keyword_distribution.push_back({lt::tcp::endpoint(), keyword});
             } 
-            // Otherwise, prepare to send to the responsible node
+            // set an endpoint for the query
             else {
-                // converting {string, int} to lt::tcp::endpoint
                 lt::tcp::endpoint target(lt::make_address_v4(index_nodes_[target_node_id].first), 
                     index_nodes_[target_node_id].second);
                 keyword_distribution.push_back({target, keyword});
             }
         }
     }
-    
-    // Process all keyword distributions without holding the lock
+
+    // if target is null, we handle locally, if its set send it to other indexes
     for (const auto& [target, keyword] : keyword_distribution) {
         if (target == lt::tcp::endpoint()) {
-            // Local processing
             handleKeywordAddMessage(keyword, title, magnet);
         } else {
-            // Remote processing
             sendKeywordAddMessage(target, keyword, title, magnet);
         }
     }
@@ -389,15 +380,20 @@ void Index::handleGiveMessage(const IndexMessage& message) {
     }
 }
 
-// Determine which node is responsible for the keyword mapping
+// Determines which node is responsible for the keyword mapping
 size_t Index::getResponsibleNodeIndex(const std::string& keyword) {
-    std::hash<std::string> hasher;
-    size_t hash = hasher(keyword);
+    // taking a hash of the keyword
+    unsigned long hash = 5381;
+    for (char c : keyword) {
+        hash = ((hash << 5) + hash) + c; 
+    }
     
+    std::cout << "Keyword: " << keyword << " hashes to node: " << hash % total_nodes_ << std::endl;
+    // mod the hash by the number of nodes to get the responsible id
     return hash % total_nodes_;
 }
 
-// Determine if we are responsible for the mapping
+// Determines if we are responsible for the mapping
 bool Index::isResponsibleForTorrent(const std::string& keyword) {
     size_t responsibleNode = getResponsibleNodeIndex(keyword);
     

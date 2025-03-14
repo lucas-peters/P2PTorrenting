@@ -9,7 +9,7 @@ echo "======================================================"
 
 # Stop and remove all running containers
 echo "Stopping and removing all running containers..."
-sudo docker login
+#sudo docker login --username lucaspeters --password-stdin Won3mta3!O!O
 sudo docker stop $(sudo docker ps -a -q) 2>/dev/null || true
 sudo docker rm $(sudo docker ps -a -q) 2>/dev/null || true
 
@@ -71,8 +71,8 @@ echo "Creating .env file for docker-compose..."
 echo "PUBLIC_IP=$PUBLIC_IP" > .env
 
 # Run docker-compose with the client configuration
-echo "Starting containers with docker-compose..."
-sudo -E env PUBLIC_IP=$PUBLIC_IP docker-compose -f docker-compose.client.yml down
+# echo "Starting containers with docker-compose..."
+# sudo -E env PUBLIC_IP=$PUBLIC_IP docker-compose -f docker-compose.client.yml up -d
 
 # Check if containers are running
 echo "Checking container status..."

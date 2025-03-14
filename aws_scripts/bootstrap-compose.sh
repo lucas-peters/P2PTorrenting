@@ -9,7 +9,7 @@ echo "======================================================"
 
 # Stop and remove all running containers
 echo "Stopping and removing all running containers..."
-sudo docker login
+#sudo docker login
 sudo docker stop $(sudo docker ps -a -q) 2>/dev/null || true
 sudo docker rm $(sudo docker ps -a -q) 2>/dev/null || true
 
@@ -73,7 +73,7 @@ echo "PUBLIC_IP=$PUBLIC_IP" > .env
 
 # Run docker-compose with the bootstrap configuration
 echo "Starting containers with docker-compose..."
-sudo -E env PUBLIC_IP=$PUBLIC_IP docker-compose -f docker-compose.bootstrap.yml down
+# sudo -E env PUBLIC_IP=$PUBLIC_IP docker-compose -f docker-compose.bootstrap.yml up -d
 
 echo "Checking container status..."
 sudo docker ps

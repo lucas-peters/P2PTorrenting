@@ -14,7 +14,6 @@
 #include <random>
 #include <algorithm>
 #include <queue>
-#include <chrono>
 
 #include <libtorrent/session.hpp>
 
@@ -35,13 +34,6 @@ struct MessageComparator {
         // Higher timestamp = lower priority (we want oldest messages first)
         return a.second.lamport_timestamp() > b.second.lamport_timestamp();
     }
-};
-
-// Connection information structure
-struct ConnectionInfo {
-    std::shared_ptr<bip::tcp::socket> socket;
-    std::chrono::steady_clock::time_point last_used;
-    bool is_active;
 };
 
 // Messenger is for one-to-one messages between client and index
@@ -79,7 +71,6 @@ private:
     std::unique_ptr<std::thread> service_thread_;
     std::unique_ptr<std::thread> send_thread_;
     std::unique_ptr<std::thread> receive_thread_;
-    std::unique_ptr<std::thread> connection_cleanup_thread_;
     
     // Queues
     std::queue<std::pair<lt::tcp::endpoint, IndexMessage>> send_queue_;
@@ -89,13 +80,9 @@ private:
         MessageComparator
     > receive_queue_;
     
-    // Connection tracking
-    std::unordered_map<std::string, ConnectionInfo> connections_;
-    
     // Mutexes
     std::mutex send_mutex_;
     std::mutex receive_mutex_;
-    std::mutex connections_mutex_;
     
     LamportClock lamport_clock_;
     
@@ -105,13 +92,7 @@ private:
     void handleReceivedMessage(const lt::tcp::endpoint& sender, const std::vector<char>& buffer);
     void processOutgoingMessages();
     void processIncomingMessages();
-    void cleanupConnections();
     void sendMessageAsync(const lt::tcp::endpoint& target, const IndexMessage& msg);
-    
-    // Connection management
-    std::string endpointToString(const lt::tcp::endpoint& endpoint);
-    std::shared_ptr<bip::tcp::socket> getOrCreateConnection(const lt::tcp::endpoint& target);
-    void updateConnectionStatus(const std::string& endpoint_str, bool is_active);
 };
 
 } // namespace

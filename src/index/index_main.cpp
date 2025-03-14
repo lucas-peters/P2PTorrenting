@@ -3,19 +3,9 @@
 #include <thread>
 #include <chrono>
 #include <sstream>
-#include <csignal>
 #include <string>
 
 using namespace torrent_p2p;
-
-// Global flag for graceful shutdown
-volatile sig_atomic_t running = 1;
-
-// Signal handler
-void signal_handler(int signal) {
-    std::cout << "Received signal " << signal << ", shutting down..." << std::endl;
-    running = 0;
-}
 
 void displayHelp(const char* programName) {
     std::cout << "Usage: " << programName << " [options]\n";
@@ -27,16 +17,13 @@ void displayHelp(const char* programName) {
 }
 
 int main(int argc, char* argv[]) {
-    // Register signal handler for graceful shutdown
-    std::signal(SIGINT, signal_handler);
-    std::signal(SIGTERM, signal_handler);
-    
-    // Default values
+    // default vals
     int port = 6883;
     std::string env = "lucas";
     std::string ip = "None";
+    bool running = true;
     
-    // Parse command line arguments
+    // parsing cli
     for (int i = 1; i < argc; i++) {
         std::string arg = argv[i];
         if (arg == "--port" || arg == "-p") {
@@ -56,7 +43,6 @@ int main(int argc, char* argv[]) {
             if (i + 1 < argc) {
                 env = argv[i + 1];
                 i++;
-                // Validate environment
                 if (env != "lucas" && env != "docker" && env != "aws" && env != "shanaya") {
                     std::cerr << "Invalid environment: " << env << std::endl;
                     std::cerr << "Valid environments are: lucas, docker, aws, shanaya" << std::endl;
@@ -89,7 +75,7 @@ int main(int argc, char* argv[]) {
 
     try {
         Index node(port, env, ip);
-        // Spin the loop, so Node doesn't die
+        // continuously spin so main loop doesn't exit
         while(running) {
             std::this_thread::sleep_for(std::chrono::seconds(60));
         }

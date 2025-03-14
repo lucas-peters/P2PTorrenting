@@ -51,24 +51,6 @@ void IndexHeartbeat::processHeartbeatResponse(const lt::tcp::endpoint& sender) {
     }
 }
 
-void IndexHeartbeat::requestIndexSync(const lt::tcp::endpoint& target) {
-    std::cout << "[IndexHeartbeat] Requesting index sync from: " 
-              << target.address().to_string() << ":" << target.port() << std::endl;
-    // Create a sync request message
-    GossipMessage sync_msg;
-    sync_msg.set_timestamp(std::time(nullptr));
-    sync_msg.set_message_id("index_sync_" + std::to_string(std::time(nullptr)));
-    
-    // Add an index sync field to the message
-    IndexSyncMessage* sync = sync_msg.mutable_index_sync();
-    sync->set_type(IndexSyncMessage::REQUEST_FULL);
-    sync->set_timestamp(std::time(nullptr));
-    
-    // Send the sync message
-    gossip_.spreadMessage(sync_msg, target);
-    std::cout << "[IndexHeartbeat] Requested index sync with: " << target.address().to_string() << ":" << target.port() << std::endl;
-}
-
 std::vector<lt::tcp::endpoint> IndexHeartbeat::getAliveIndexNodes() const {
     std::lock_guard<std::mutex> lock(nodes_mutex_);
     

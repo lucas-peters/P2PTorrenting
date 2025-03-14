@@ -140,14 +140,14 @@ void processCommand(const std::string& input, std::unique_ptr<Client>& client, s
 }
 
 int main(int argc, char* argv[]) {
-    // setting defaults in case flags aren't set
-    int port = 6881;
+    
+    // Parse command line arguments
+    int port = 6882;
     std::string state_file = "";
     bool load_state = false;
     std::string env = "lucas";
     std::string ip = "None";
-
-    // parsing input flags
+    
     for (int i = 1; i < argc; i++) {
         std::string arg = argv[i];
         if (arg == "--port" || arg == "-p") {
@@ -244,6 +244,7 @@ int main(int argc, char* argv[]) {
     std::cout << "================================\n\n";
     
     // PIPE THREAD, this is the only way to pipe commands to running docker containers
+    // tjos
     std::atomic<bool> running{true};
     std::thread pipe_thread([&client, &running, pipe_path, &console_mutex]() {
         // Set up file descriptors for select
@@ -292,8 +293,8 @@ int main(int argc, char* argv[]) {
                 std::string input;
                 {
                     std::lock_guard<std::mutex> lock(console_mutex);
+                    
                     if (!std::getline(std::cin, input)) {
-                        // EOF or error on stdin
                         if (std::cin.eof()) {
                             std::cout << "End of input, exiting..." << std::endl;
                             running = false;
@@ -302,6 +303,7 @@ int main(int argc, char* argv[]) {
                         continue;
                     }
                 }
+                
                 if (!input.empty()) {
                     std::lock_guard<std::mutex> lock(console_mutex);
                     processCommand(input, client, running);
@@ -317,16 +319,13 @@ int main(int argc, char* argv[]) {
                 ssize_t bytes_read = read(pipe_fd, buffer, sizeof(buffer) - 1);
                 
                 if (bytes_read > 0) {
-                    // Null-terminate the buffer
                     buffer[bytes_read] = '\0';
                     std::string input(buffer);
                     
-                    // Remove trailing newline if present
                     if (!input.empty() && input.back() == '\n') {
                         input.pop_back();
                     }
                     
-                    // Process the command with mutex protection
                     std::lock_guard<std::mutex> lock(console_mutex);
                     std::cout << "\nReceived command from pipe: " << input << std::endl;
                     processCommand(input, client, running);
@@ -348,7 +347,7 @@ int main(int argc, char* argv[]) {
             }
         }
         
-        // Close pipe if open
+        // close pipe if open
         if (pipe_fd != -1) {
             close(pipe_fd);
         }
@@ -357,12 +356,6 @@ int main(int argc, char* argv[]) {
     while (running) {
         // Only print stats every 30 seconds to avoid cluttering the console
         std::this_thread::sleep_for(std::chrono::seconds(30));
-        if (running) {
-            std::lock_guard<std::mutex> lock(console_mutex);
-            std::cout << "\n[DHT Stats Update]\n" << client->getDHTStats() << std::endl;
-            std::cout << "> ";
-            std::cout.flush();
-        }
     }
     if (pipe_thread.joinable()) {
         pipe_thread.join();

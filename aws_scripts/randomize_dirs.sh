@@ -4,10 +4,10 @@
 NUM_CLIENTS=5  # Number of client directories to create
 TORRENTS_SOURCE="$HOME/torrents"  # Source directory for torrent files
 DOWNLOADS_SOURCE="$HOME/downloads"  # Source directory for download files
-MIN_TORRENTS=2  # Minimum number of torrents per client
-MAX_TORRENTS=5  # Maximum number of torrents per client
-MIN_DOWNLOADS=2  # Minimum number of downloads per client
-MAX_DOWNLOADS=5  # Maximum number of downloads per client
+MIN_TORRENTS=6  # Minimum number of torrents per client
+MAX_TORRENTS=6 # Maximum number of torrents per client
+MIN_DOWNLOADS=6  # Minimum number of downloads per client
+MAX_DOWNLOADS=6  # Maximum number of downloads per client
 
 # Function to get a random number between min and max (inclusive)
 random_number() {
@@ -63,12 +63,12 @@ random_files() {
 
 # Remove existing client directories
 echo "Removing existing client directories..."
-rm -rf client*_data client*_torrents client*_downloads
+sudo rm -rf client*_data client*_torrents client*_downloads
 
 # Create new client directories
 echo "Creating new client directories..."
 for i in $(seq 1 $NUM_CLIENTS); do
-    mkdir -p client${i}_data client${i}_torrents client${i}_downloads
+    sudo mkdir -p client${i}_data client${i}_torrents client${i}_downloads
     
     # Determine random number of torrents and downloads for this client
     num_torrents=$(random_number $MIN_TORRENTS $MAX_TORRENTS)
@@ -81,7 +81,7 @@ for i in $(seq 1 $NUM_CLIENTS); do
     
     # Copy torrent files to client directory
     for file in "${torrent_files[@]}"; do
-        cp "$TORRENTS_SOURCE/$file" client${i}_torrents/
+        sudo cp "$TORRENTS_SOURCE/$file" client${i}_torrents/
         echo "  Copied torrent: $file"
     done
     
@@ -90,13 +90,13 @@ for i in $(seq 1 $NUM_CLIENTS); do
     
     # Copy download files to client directory
     for file in "${download_files[@]}"; do
-        cp "$DOWNLOADS_SOURCE/$file" client${i}_downloads/
+        sudo cp "$DOWNLOADS_SOURCE/$file" client${i}_downloads/
         echo "  Copied download: $file"
     done
 done
 
 # Set appropriate permissions
 echo "Setting permissions..."
-chmod -R 777 client*
+sudo chmod -R 777 client*
 
 echo "Client directory setup complete!"

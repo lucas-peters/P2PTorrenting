@@ -23,7 +23,6 @@ class BootstrapNode : public Node {
 public:
     BootstrapNode(int port = 6881, const std::string& env = "aws", const std::string& ip = "None");
     BootstrapNode(int port, const std::string& env, const std::string& ip, const std::string& state_file);
-    //BootstrapNode(int port, const std::vector<lt::tcp::endpoint>& bootstrap_nodes, const std::string& env);
 
     ~BootstrapNode();
 
@@ -31,7 +30,7 @@ private:
     std::unique_ptr<std::thread> announceTimer_;
     void start() override;
     void stop() override;
-    // Handle DHT alerts
+
     void handleAlerts() override;
     
     void initializeHeartbeat();

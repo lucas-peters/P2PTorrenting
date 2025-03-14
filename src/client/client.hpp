@@ -188,9 +188,9 @@ private:
     std::unique_ptr<std::thread> alert_thread_;
     std::unique_ptr<std::thread> peer_cache_thread_;
 
-    // will be overwritten if we set env flag to docker or aws
-    std::string torrent_path_ = "/Users/lucaspeters/Documents/GitHub/P2PTorrenting/6882/";
-    std::string download_path_ = "/Users/lucaspeters/Documents/GitHub/P2PTorrenting/6882/";  
+    // will be overwritten if we set env flag to docker or aws (done automatically by docker compose)
+    std::string torrent_path_ = "/Users/lucaspeters/Documents/GitHub/P2PTorrenting/torrents/";
+    std::string download_path_ = "/Users/lucaspeters/Documents/GitHub/P2PTorrenting/downloads/";  
 
     struct DownloadProgress {
         double last_progress = 0.0;
@@ -199,6 +199,7 @@ private:
         double avg_speed_kBs = 0.0;
         double est_time_remaining_sec = 0.0;
     };
+    
     std::map<lt::sha1_hash, DownloadProgress> download_progress_;
     std::map<lt::sha1_hash, std::chrono::steady_clock::time_point> download_start_times_;
     std::mutex progress_mutex_;

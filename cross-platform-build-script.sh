@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# This script builds all 3 docker images for AMD64 architecture used by the EC2s
+# and pushes them to the docker registry
+
 # Exit on error
 set -e
 

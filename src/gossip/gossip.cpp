@@ -85,20 +85,18 @@ void Gossip::stop() {
     if (!running_) return;
     running_ = false;
 
-    // First, reset the work guard to allow io_context to finish
     if (work_guard_) {
         std::cout << "Releasing work guard to allow io_context to exit" << std::endl;
         work_guard_.reset();
     }
-    
-    // Stop accepting new connections
+
     if (acceptor_ && acceptor_->is_open()) {
         std::cout << "Closing acceptor" << std::endl;
         boost::system::error_code ec;
         acceptor_->close(ec);
     }
     
-    // Stop io_context (this is redundant once work_guard is reset, but keeping for safety)
+    // Stop io_context
     std::cout << "Stopping io_context" << std::endl;
     io_context_.stop();
     
@@ -216,7 +214,7 @@ void Gossip::handleReceivedMessage(const lt::tcp::endpoint& sender, const std::v
         }
 
         if (inCache(message.message_id())) {
-            //std::cout << "Ignoring duplicate gossip message" << std::endl;
+            // std::cout << "Ignoring duplicate gossip message" << std::endl;
             return;
         }
         addToCache(message.message_id());
@@ -271,24 +269,24 @@ void Gossip::sendMessageAsync(const lt::tcp::endpoint& target, const GossipMessa
         // std::cout << "Connecting to gossip endpoint: " << tcp_endpoint.address().to_string() 
         //           << ":" << tcp_endpoint.port() << std::endl;
 
-        socket->async_connect(tcp_endpoint,
+        socket->async_connect(target,
             [this, socket, buffer, target](const boost::system::error_code& error) {
                 if (error) {
-                    std::cerr << "Gossip SendMessageAsync: Failed to connect to target " 
-                              << tcp_endpoint.address().to_string() << ":" << tcp_endpoint.port()
-                              << " - Error: " << error.message() << std::endl;
+                    // std::cerr << "Gossip SendMessageAsync: Failed to connect to target " 
+                    //           << target.address().to_string() << ":" << target.port()
+                    //           << " - Error: " << error.message() << std::endl;
                     return;
                 }
                 
-                // std::cout << "Successfully connected to " << tcp_endpoint.address().to_string() 
-                //           << ":" << tcp_endpoint.port() << std::endl;
+                // std::cout << "Successfully connected to " << target.address().to_string() 
+                //           << ":" << target.port() << std::endl;
                 
                 // write asynch
                 ba::async_write(*socket, ba::buffer(*buffer),
                      [socket, buffer, target](const boost::system::error_code& error, std::size_t bytes_transferred) {
                         if (error) {
                             std::cerr << "Gossip SendMessageAsync: Failed to write message to "
-                                      << tcp_endpoint.address().to_string() << ":" << tcp_endpoint.port()
+                                      << target.address().to_string() << ":" << target.port()
                                       << " - Error: " << error.message() << std::endl;
                             return;
                         }
@@ -431,14 +429,7 @@ void Gossip::processIncomingMessages() {
                         index_heartbeat_handler_(source);
                     }
                 }
-            } else if (message.has_index_sync()) {
-                // Handle index sync message
-                if (index_sync_handler_) {
-                    index_sync_handler_(message.index_sync(), sender);
-                } else {
-                    std::cerr << "Gossip: Received index sync message but no handler is registered" << std::endl;
-                }
-            }
+            } 
             else {
                 std::cerr << "Gossip: Received message with unknown type" << std::endl;
             }
@@ -489,22 +480,15 @@ std::string Gossip::generateMessageId(const GossipMessage& message) const {
 void Gossip::updateKnownPeers() {
     auto peers = session_.session_state().dht_state.nodes;
     std::lock_guard<std::mutex> lock(peers_mutex_);
+    // refreshing list of known peers entirely, get rid of stale entries
+    known_peers_.clear();
     // Add new peers to the list, avoiding duplicates
     for (const auto& peer : peers) {
+        // sometimes there are weird ports in the dht_state
+        if (peer.port() < 6881 || peer.port() > 6885) continue;
         // Create a new endpoint with port + 1000 for gossip
         lt::tcp::endpoint gossip_peer(peer.address(), peer.port() + 1000);
-        
-        bool exists = false;
-        for (const auto& known : known_peers_) {
-            if (known.address() == gossip_peer.address() && known.port() == gossip_peer.port()) {
-                exists = true;
-                break;
-            }
-        }
-        
-        if (!exists) {
-            known_peers_.push_back(gossip_peer);
-        }
+        known_peers_.push_back(gossip_peer);
     }
 }
 
@@ -540,12 +524,12 @@ std::vector<lt::tcp::endpoint> Gossip::selectRandomPeers(size_t count, const lt:
 
 void Gossip::spreadMessage(const GossipMessage& message, const lt::tcp::endpoint& exclude) {
     // std::cout << "spreading message" << std::endl;
-    auto peers = selectRandomPeers(3, exclude);
+    auto peers = selectRandomPeers(2, exclude);
     // std::cout << "selected random peers" << std::endl;
 
     std::lock_guard<std::mutex> lock(outgoing_queue_mutex_);
     for (const auto & peer: peers) {
-        std::cout << "peer: " << peer << std::endl;
+        // std::cout << "peer: " << peer << std::endl;
         outgoing_messages_.push({peer, message});
     }
     // std::cout << "messages pushed to queue" << std::endl;

@@ -3,19 +3,9 @@
 #include <thread>
 #include <chrono>
 #include <sstream>
-#include <csignal>
 #include <string>
 
 using namespace torrent_p2p;
-
-// // Global flag for graceful shutdown
-// volatile sig_atomic_t running = 1;
-
-// // Signal handler
-// void signal_handler(int signal) {
-//     std::cout << "Received signal " << signal << ", shutting down..." << std::endl;
-//     running = 0;
-// }
 
 void displayHelp(const char* programName) {
     std::cout << "Usage: " << programName << " [options]\n";
@@ -27,9 +17,6 @@ void displayHelp(const char* programName) {
 }
 
 int main(int argc, char* argv[]) {
-    // Register signal handler for graceful shutdown
-    // std::signal(SIGINT, signal_handler);
-    // std::signal(SIGTERM, signal_handler);
     
     // Default values
     int port = 6881;

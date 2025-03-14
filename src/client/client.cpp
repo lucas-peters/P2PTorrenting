@@ -112,15 +112,15 @@ bool Client::hasTorrent(const lt::sha1_hash& hash) const {
 // Make sure that torrentFilePath is only the local path to the torrent, it is automatically appended to "/app/torrents/" for our docker images
 void Client::addTorrent(const std::string& torrentFilePath) {
     try {
-        // Load the torrent file into a byte vector
+        // load the torrent file into a byte vector
         std::ifstream torrentFileStream(torrent_path_ + torrentFilePath, std::ios_base::binary);
         std::vector<char> torrentFileBytes((std::istreambuf_iterator<char>(torrentFileStream)),
                                             std::istreambuf_iterator<char>());
 
-        // Create torrent_info from the byte vector
+        // create torrent_info from the byte vector
         lt::torrent_info torrentInfo(torrentFileBytes.data(), torrentFileBytes.size());
 
-        // Create add_torrent_params from torrent_info
+        // create add_torrent_params from torrent_info
         lt::add_torrent_params params;
         params.ti = std::make_shared<lt::torrent_info>(torrentInfo);
         std::cout << "params.ti->name(): " << params.ti->name() << std::endl;
@@ -138,7 +138,7 @@ void Client::addTorrent(const std::string& torrentFilePath) {
             if (last_slash != std::string::npos) {
                 filename = file_path.substr(last_slash + 1);
                 std::cout << "filename: " << filename << std::endl;
-                // Rename the file to just its basename
+                // rename the file without the extension
                 params.ti->rename_file(i, filename);
             }
         }
@@ -182,7 +182,7 @@ void Client::addTorrent(const std::string& torrentFilePath) {
         
         std::cout << "Added torrent: " << params.ti->name() << std::endl;
         
-        // Print detailed initial torrent status
+        // initial torrent status
         lt::torrent_status status = handle.status();
         std::cout << "\nInitial torrent status:" << std::endl;
         std::cout << "State: " << 
@@ -194,13 +194,11 @@ void Client::addTorrent(const std::string& torrentFilePath) {
         std::cout << "Total wanted: " << status.total_wanted << " bytes" << std::endl;
         std::cout << "State: " << status.state << std::endl;
         
-        // Check piece verification state
+        // piece verification
         std::cout << "\nPiece verification:" << std::endl;
         std::cout << "Checking files: " << (status.state == lt::torrent_status::checking_files) << std::endl;
         std::cout << "Checking resume data: " << (status.state == lt::torrent_status::checking_resume_data) << std::endl;
 
-
-        //std::cout << "Adding to index title: " << title << std::endl;
         std::string magnetLink = lt::make_magnet_uri(*(params.ti));
         addIndex(params.ti->name(), magnetLink);
         
@@ -217,27 +215,11 @@ void Client::addMagnet(const std::string& magnet) {
 
     try {
         lt::sha1_hash hash = stringToHash(magnet);
-        
-        // Check if we already have this torrent
-        if (hasTorrent(hash)) {
-            std::cout << "Torrent already exists in session" << std::endl;
-            return;
-        }
-        
-        // Create magnet URI from info hash
-        std::string magnetUri = "magnet:?xt=urn:btih:" + hash.to_string();
-        
-        lt::add_torrent_params params = lt::parse_magnet_uri(magnetUri);
+        lt::add_torrent_params params = lt::parse_magnet_uri(magnet);
+
         params.save_path = download_path_;
-        
         lt::torrent_handle handle = session_->add_torrent(params);
-        {
-            std::lock_guard<std::mutex> lock(torrents_mutex_);
-            torrents_[hash] = handle;
-        }
-        
-        std::cout << "Added magnet link with info hash: " << hash.to_string() << std::endl;
-        
+        std::cout << "Added magnet link with info hash: " << hash.to_string() << std::endl;   
     } catch (const std::exception& e) {
         std::cout << "Error: " << e.what() << std::endl;
     }
@@ -316,7 +298,7 @@ void Client::handleAlerts() {
             }
             std::cout << "\n[Client:" << port_ << "] DHT nodes in routing table: " << total_nodes << std::endl;
             
-            // Print detailed routing table info
+            //routing table info
             if (total_nodes > 0) {
                 std::cout << "[Client:" << port_ << "] Routing table details:" << std::endl;
                 for (size_t i = 0; i < dht_stats->routing_table.size(); ++i) {
@@ -361,6 +343,7 @@ void Client::handleAlerts() {
             std::cout << "Hash check failed! getting bad peers" << std::endl;
             lt::sha1_hash info_hash = hfa->handle.info_hash();
 
+            std::lock_guard<std::mutex> lock(torrent_tracker_mutex_);
             if(torrent_trackers_.find(info_hash) != torrent_trackers_.end()) {
                 torrent_trackers_[info_hash]->record_bad_piece(hfa->piece_index);
 
@@ -375,6 +358,8 @@ void Client::handleAlerts() {
         else if (auto* pfa = lt::alert_cast<lt::piece_finished_alert>(a)) {
             std::cout << "piece finished downloading" << std::endl;
             lt::sha1_hash info_hash = pfa->handle.info_hash();
+            
+            std::lock_guard<std::mutex> lock(torrent_tracker_mutex_);
             if(torrent_trackers_.find(info_hash) != torrent_trackers_.end()) {
                 torrent_trackers_[info_hash]->record_good_piece(pfa->piece_index);
             }
@@ -390,6 +375,7 @@ void Client::handleAlerts() {
             // Get the info hash directly - works with both older and newer libtorrent versions
             lt::sha1_hash info_hash = tfa->handle.info_hash();
             
+            std::lock_guard<std::mutex> lock(torrent_tracker_mutex_);
             if (torrent_trackers_.find(info_hash) != torrent_trackers_.end()) {
                 auto updates = torrent_trackers_[info_hash]->get_reputation_updates();
                 
@@ -530,7 +516,7 @@ void Client::generateTorrentFile(const std::string& fileName) {
 
 void Client::sendGossip(std::vector<std::pair<lt::tcp::endpoint, int>> peer_reputation) const{
     if (!gossip_) {
-        std::cerr << "ERROR: Cannot send gossip - gossip_ is null" << std::endl;
+        std::cout << "ERROR: Cannot send gossip - gossip_ is null" << std::endl;
         return;
     }
     
@@ -702,24 +688,23 @@ void Client::corruptAllTorrents(double corruption_percent) {
 void Client::corruptTorrentData(const lt::sha1_hash& info_hash, double corruption_percent) {
     std::cout << "Attempting to corrupt torrent data for testing..." << std::endl;
     
-    std::lock_guard<std::mutex> lock(torrents_mutex_);
     auto it = torrents_.find(info_hash);
     if (it == torrents_.end()) {
-        std::cerr << "Torrent not found with hash: " << info_hash.to_string() << std::endl;
+        std::cout << "Torrent not found with hash: " << info_hash.to_string() << std::endl;
         return;
     }
 
     lt::torrent_handle handle = torrents_[info_hash];
     
     if (!handle.is_valid()) {
-        std::cerr << "Invalid torrent handle" << std::endl;
+        std::cout << "Invalid torrent handle" << std::endl;
         return;
     }
     
     // get torrent info hash from the torrent file
     std::shared_ptr<const lt::torrent_info> ti = handle.torrent_file();
     if (!ti) {
-        std::cerr << "Missing torrent info" << std::endl;
+        std::cout << "Missing torrent info" << std::endl;
         return;
     }
     
@@ -730,7 +715,7 @@ void Client::corruptTorrentData(const lt::sha1_hash& info_hash, double corruptio
     std::cout << "Torrent paused" << std::endl;
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
     
-    // corrupt each file in the torrent, for our case we should only have single files
+    // corrupt each file in the torrent, for our cases we should only have single files
     for (lt::file_index_t i(0); i < ti->files().end_file(); ++i) {
         std::string file_path = download_path_ + ti->files().file_path(i);
         std::cout << "Processing file: " << file_path << std::endl;
@@ -740,28 +725,20 @@ void Client::corruptTorrentData(const lt::sha1_hash& info_hash, double corruptio
             continue;
         }
         std::streamsize file_size = std::filesystem::file_size(file_path);
-        if (file_size < 1024) {
-            std::cout << "File too small to corrupt: " << file_path << std::endl;
-            continue;
-        }
+
         std::fstream file(file_path, std::ios::in | std::ios::out | std::ios::binary);
         if (!file) {
-            std::cerr << "Cannot open file: " << file_path << std::endl;
+            std::cerr << "Cant open file: " << file_path << std::endl;
             continue;
         }
         
-        // Calculate bytes to corrupt (at least 100 bytes)
+        
         size_t bytes_to_corrupt = std::max<size_t>(static_cast<size_t>(file_size * corruption_percent / 100.0), 100);
         
-        std::random_device rd;
-        std::mt19937 rng(rd());
-        std::uniform_int_distribution<std::streamsize> dist(0, file_size - 1);
-        
         std::cout << "Corrupting " << bytes_to_corrupt << " bytes in file: " << file_path << std::endl;
-
+        // loop through file and flip bits to corrupt
         for (size_t j = 0; j < bytes_to_corrupt; ++j) {
-            // jump to a random position and read a byte
-            std::streampos pos = dist(rng);
+            std::streampos pos = j;
             file.seekg(pos);
             char byte;
             file.read(&byte, 1);
@@ -884,60 +861,4 @@ lt::torrent_handle Client::getTorrentHandleByName(const std::string& name) const
     
     throw std::runtime_error("Torrent with name '" + name + "' not found");
 }
-
-// void Client::pauseTorrent(const std::string& name) {
-//     try {
-//         lt::torrent_handle handle = getTorrentHandleByName(name);
-//         if (!handle.is_valid()) {
-//             std::cerr << "Invalid torrent handle for '" << name << "'" << std::endl;
-//             return;
-//         }
-//         handle.pause();
-//         std::cout << "Torrent '" << name << "' paused" << std::endl;
-//     } catch (const std::exception& e) {
-//         std::cerr << "Error pausing torrent: " << e.what() << std::endl;
-//     }
-// }
-
-// void Client::resumeTorrent(const std::string& name) {
-//     try {
-//         lt::torrent_handle handle = getTorrentHandleByName(name);
-//         if (!handle.is_valid()) {
-//             std::cerr << "Invalid torrent handle for '" << name << "'" << std::endl;
-//             return;
-//         }
-//         handle.resume();
-//         handle.set_flags(lt::torrent_flags::auto_managed);
-//         std::cout << "Torrent '" << name << "' resumed" << std::endl;
-//     } catch (const std::exception& e) {
-//         std::cerr << "Error resuming torrent: " << e.what() << std::endl;
-//     }
-// }
-
-// void Client::removeTorrent(const std::string& name) {
-//     try {
-//         lt::torrent_handle handle;
-//         lt::sha1_hash hash;
-//         std::lock_guard<std::mutex> lock(torrents_mutex_);
-//         handle = getTorrentHandleByName(name);
-        
-//         if (!handle.is_valid()) {
-//             std::cerr << "Invalid torrent handle for '" << name << "'" << std::endl;
-//             return;
-//         }
-        
-//         hash = handle.info_hash();
-//         lt::remove_flags_t removeFlags = lt::remove_flags_t{};
-//         session_->remove_torrent(handle, removeFlags);            
-//         torrents_.erase(hash);
-
-//         std::lock_guard<std::mutex> tracker_lock(torrent_tracker_mutex_);
-//         torrent_trackers_.erase(hash);
-
-//         std::cout << "Torrent '" << name << "' removed" << std::endl;
-//     } catch (const std::exception& e) {
-//         std::cerr << "Error removing torrent: " << e.what() << std::endl;
-//     }
-// }
-
 } // namespace bracket

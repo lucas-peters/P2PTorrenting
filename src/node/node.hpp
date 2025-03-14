@@ -30,18 +30,14 @@ public:
     // Constructor to load from save state file
     Node(const int port, const std::string& env, const std::string& ip, const std::string& state_file);
     ~Node();
-    // Get the node's DHT state
     std::string getDHTStats() const;
-    // Get the node's endpoint information
+    
     std::pair<std::string, int> getEndpoint() const;
 
-    // Save/load the DHT state to/from a file
     bool saveDHTState() const;
     bool loadDHTState(const std::string& state_file);
     
 private:
-    
-    // Handle DHT alerts, each node will implement this differently
     virtual void handleAlerts() = 0;
     void loadEnvConfig(const std::string& env);
 

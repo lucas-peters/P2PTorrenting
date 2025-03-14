@@ -125,7 +125,6 @@ void Messenger::startAccept() {
         
         std::cout << "Waiting for incoming connections on port " << port_ << "..." << std::endl;
         
-        // registering acceptor callback with io_context_, spawns a thread to handle this in background
         acceptor_->async_accept(*socket, [this, socket](const boost::system::error_code& error) {
             if (!error) {
                 std::cout << "Accepted new connection from " << socket->remote_endpoint().address() 
@@ -146,7 +145,7 @@ void Messenger::startAccept() {
 
 // asynchronously reads messages from the socket and passes them to handleReceivedMessage()
 void Messenger::handleAccept(std::shared_ptr<boost::asio::ip::tcp::socket> socket) {
-    // ee the endpoint of the sender
+    // get the endpoint of the sender
     lt::tcp::endpoint sender(
         socket->remote_endpoint().address(),
         socket->remote_endpoint().port()
